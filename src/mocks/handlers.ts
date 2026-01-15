@@ -191,4 +191,30 @@ export const handlers = [
             }
         })
     }),
+
+    // Game Center - List
+    http.get('/api/v2/game/list', async () => {
+        await delay(600)
+
+        const list = faker.helpers.multiple(() => {
+            const provider = faker.helpers.arrayElement(['PGSoft', 'JILI', 'PragmaticPlay', 'Habanero'])
+            return {
+                game_id: faker.string.alpha({ length: 6, casing: 'lower' }) + '_' + faker.number.int({ min: 100, max: 999 }),
+                name_en: faker.lorem.words({ min: 2, max: 3 }).replace(/^\w/, (c) => c.toUpperCase()),
+                provider: provider,
+                type: faker.helpers.arrayElement(['Slot', 'Live', 'Fishing']),
+                rtp_default: faker.number.float({ min: 95.0, max: 98.0, fractionDigits: 1 }),
+                status: faker.helpers.arrayElement(['active', 'maintenance'])
+            }
+        }, { count: 30 })
+
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: {
+                list,
+                total: 100
+            }
+        })
+    }),
 ]

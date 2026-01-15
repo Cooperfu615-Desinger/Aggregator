@@ -37,7 +37,7 @@ const router = createRouter({
                 {
                     path: 'game-center/list',
                     name: 'game-center',
-                    component: () => import('../views/Merchant/List.vue') // Reuse list for now as placeholder
+                    component: () => import('../views/GameCenter/List.vue')
                 }
             ]
         },

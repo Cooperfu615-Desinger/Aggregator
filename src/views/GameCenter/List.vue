@@ -1,0 +1,172 @@
+<script setup lang="ts">
+import { ref, onMounted, h } from 'vue'
+import { 
+  NCard, NForm, NFormItem, NInput, NSelect, NButton, 
+  NDataTable, NTag, NSwitch, useMessage
+} from 'naive-ui'
+import type { DataTableColumns } from 'naive-ui'
+import type { Game } from '../../types/game'
+
+// State
+const message = useMessage()
+const loading = ref(false)
+const games = ref<Game[]>([])
+
+// Filter
+const filter = ref({
+    provider: null as string | null,
+    keyword: '',
+    status: null as string | null
+})
+
+// Options
+const providerOptions = [
+    { label: 'PGSoft', value: 'PGSoft' },
+    { label: 'JILI', value: 'JILI' },
+    { label: 'PragmaticPlay', value: 'PragmaticPlay' }
+]
+
+const statusOptions = [
+    { label: 'Active', value: 'active' },
+    { label: 'Maintenance', value: 'maintenance' }
+]
+
+// Data Fetching
+// (Logic inline directly for this task to show self-contained code, though composable is better practice for complex modules)
+const fetchGames = async () => {
+    loading.value = true
+    try {
+        const res = await fetch('/api/v2/game/list')
+        const data = await res.json()
+        if (data.code === 0) {
+            games.value = data.data.list
+            // Client-side filtering simulation
+            if (filter.value.provider) {
+                games.value = games.value.filter(g => g.provider === filter.value.provider)
+            }
+            if (filter.value.status) {
+                games.value = games.value.filter(g => g.status === filter.value.status)
+            }
+             if (filter.value.keyword) {
+                const k = filter.value.keyword.toLowerCase()
+                games.value = games.value.filter(g => g.name_en.toLowerCase().includes(k) || g.game_id.includes(k))
+            }
+        }
+    } catch (e) {
+        message.error('Failed to load games')
+    } finally {
+        loading.value = false
+    }
+}
+
+// Actions
+const handleStatusChange = (row: Game, value: boolean) => {
+    // In real app, call API
+    row.status = value ? 'active' : 'maintenance'
+    message.success(`${row.name_en} status updated to ${row.status}`)
+}
+
+const handleConfig = (row: Game) => {
+    message.info(`Open Config for ${row.name_en}`)
+}
+
+// Columns
+const columns: DataTableColumns<Game> = [
+    { 
+        title: 'Icon', 
+        key: 'icon', 
+        width: 60,
+        render: () => '🎰' 
+    },
+    { title: 'Game Name', key: 'name_en', width: 200, ellipsis: true },
+    { 
+        title: 'ID', 
+        key: 'game_id', 
+        width: 150,
+        render: (row) => h(
+            'span', 
+            { class: 'font-mono text-gray-400 text-xs' }, 
+            row.game_id 
+        )
+    },
+    { 
+        title: 'Provider', 
+        key: 'provider', 
+        width: 120,
+        render: (row) => h(
+            NTag,
+            { type: row.provider === 'PGSoft' ? 'success' : 'info', bordered: false, size: 'small' },
+            { default: () => row.provider }
+        )
+    },
+    { title: 'Type', key: 'type', width: 100 },
+    { 
+        title: 'RTP', 
+        key: 'rtp_default', 
+        width: 100,
+        render: (row) => row.rtp_default.toFixed(1) + '%'
+    },
+    {
+        title: 'Status',
+        key: 'status',
+        width: 100,
+        render: (row) => h(
+            NSwitch,
+            {
+                value: row.status === 'active',
+                onUpdateValue: (v) => handleStatusChange(row, v)
+            }
+        )
+    },
+    {
+        title: 'Action',
+        key: 'action',
+        width: 100,
+        render: (row) => h(
+            NButton,
+            { size: 'small', secondary: true, onClick: () => handleConfig(row) },
+            { default: () => 'Config' }
+        )
+    }
+]
+
+onMounted(() => {
+    fetchGames()
+})
+</script>
+
+<template>
+  <div class="p-6 space-y-4">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Game Center</h1>
+        <n-button type="primary" dashed>Sync Games</n-button>
+    </div>
+
+    <!-- Filter -->
+    <n-card size="small">
+        <n-form inline :model="filter" label-placement="left">
+             <n-form-item label="Provider" class="w-40">
+                <n-select v-model:value="filter.provider" :options="providerOptions" clearable placeholder="All" />
+             </n-form-item>
+             <n-form-item label="Status" class="w-40">
+                <n-select v-model:value="filter.status" :options="statusOptions" clearable placeholder="All" />
+             </n-form-item>
+             <n-form-item label="Search">
+                <n-input v-model:value="filter.keyword" placeholder="Game Name / ID" />
+             </n-form-item>
+             <n-form-item>
+                <n-button type="primary" @click="fetchGames" :loading="loading">Search</n-button>
+             </n-form-item>
+        </n-form>
+    </n-card>
+
+    <!-- List -->
+    <n-data-table
+        :columns="columns"
+        :data="games"
+        :loading="loading"
+        :pagination="{ pageSize: 10 }"
+        class="bg-[#18181c] rounded-lg"
+    />
+  </div>
+</template>
