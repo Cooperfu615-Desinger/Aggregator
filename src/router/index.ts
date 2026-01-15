@@ -35,8 +35,9 @@ const router = createRouter({
                 },
                 {
                     path: 'data-center/round-search',
-                    name: 'round-search',
-                    component: () => import('../views/DataCenter/RoundSearch.vue')
+                    name: 'RoundSearch',
+                    component: () => import('../views/DataCenter/BetLog.vue'),
+                    meta: { title: 'Bet Log Query' }
                 },
                 // Placeholder for Game Center
                 {

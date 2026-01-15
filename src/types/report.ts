@@ -16,6 +16,8 @@ export interface BetLog {
     win_amount: number;
     profit: number; // win - bet
     currency: string;
+    payout: number; // multiplier
+    status: 'win' | 'loss' | 'refund';
     game_detail: GameDetail;
 }
 

@@ -61,6 +61,85 @@ export function setupManualMock() {
             }), { status: 200 })
         }
 
+        // --- Bet Logs ---
+        if (url.includes('/api/v2/report/bet-logs') && method === 'POST') {
+            await delay(600)
+            const list = Array.from({ length: 50 }).map(() => {
+                const bet = parseFloat(faker.finance.amount({ min: 1, max: 500, dec: 2 }))
+
+                // Scenarios:
+                // 0: Loss (40%)
+                // 1: Small Win (40%)
+                // 2: Big Win (10%)
+                // 3: Refund (5%)
+                // 4: Free Game (5%)
+                const scenario = faker.helpers.weightedArrayElement([
+                    { weight: 40, value: 'loss' },
+                    { weight: 40, value: 'small_win' },
+                    { weight: 10, value: 'big_win' },
+                    { weight: 5, value: 'refund' },
+                    { weight: 5, value: 'free_game' }
+                ])
+
+                let win = 0
+                let status = 'loss'
+                let isFreeGame = false
+
+                if (scenario === 'loss') {
+                    win = 0
+                    status = 'loss'
+                } else if (scenario === 'small_win') {
+                    win = bet * faker.number.float({ min: 1.1, max: 10 })
+                    status = 'win'
+                } else if (scenario === 'big_win') {
+                    win = bet * faker.number.float({ min: 100, max: 5000 })
+                    status = 'win'
+                } else if (scenario === 'refund') {
+                    win = bet
+                    status = 'refund'
+                } else if (scenario === 'free_game') {
+                    win = bet * faker.number.float({ min: 20, max: 50 })
+                    status = 'win'
+                    isFreeGame = true
+                }
+
+                const payout = bet > 0 ? (win / bet) : 0
+
+                return {
+                    id: faker.string.numeric(12),
+                    created_at: faker.date.recent({ days: 1 }).toISOString(),
+                    player_account: faker.internet.username(),
+                    game_name: faker.helpers.arrayElement(['Fortune Tiger', 'Super Ace', 'Gates of Olympus', 'Sugar Rush']),
+                    bet_amount: bet,
+                    win_amount: win,
+                    profit: win - bet,
+                    currency: 'CNY',
+                    payout: parseFloat(payout.toFixed(2)),
+                    status: status,
+                    game_detail: {
+                        round_id: faker.string.uuid(),
+                        matrix: [
+                            ['A', 'K', 'Q', 'J'],
+                            ['10', '9', '8', '7'],
+                            ['SCC', 'WILD', 'A', 'K']
+                        ],
+                        lines_won: status === 'win' ? [{ line_id: 1, win: win, symbols: ['A', 'A', 'A'] }] : [],
+                        free_games_triggered: isFreeGame,
+                        multiplier: payout,
+                        currency: 'CNY'
+                    }
+                }
+            })
+            // Sort by time desc
+            list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+            return new Response(JSON.stringify({
+                code: 0,
+                msg: 'success',
+                data: { list, total: 50 }
+            }), { status: 200 })
+        }
+
         // --- Agent: Create ---
         if (url.includes('/api/v1/agent/create') && method === 'POST') {
             await delay(800)
