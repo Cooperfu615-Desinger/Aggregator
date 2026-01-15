@@ -85,7 +85,10 @@ const handleSubmit = async () => {
         await formRef.value?.validate()
         loading.value = true
         
-        const url = props.type === 'create' ? '/api/v2/agent/create' : '/api/v2/agent/update'
+        const isCreate = props.type === 'create'
+        const url = isCreate ? '/api/v1/agent/create' : '/api/v1/agent/update'
+        const method = isCreate ? 'POST' : 'PUT'
+        
         const payload = {
             ...formModel.value,
             parent_id: props.parentAgent?.id,
@@ -94,7 +97,7 @@ const handleSubmit = async () => {
         }
 
         const res = await fetch(url, {
-            method: 'POST',
+            method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })

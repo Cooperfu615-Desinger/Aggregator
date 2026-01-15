@@ -62,7 +62,7 @@ export function setupManualMock() {
         }
 
         // --- Agent: Create ---
-        if (url.includes('/api/v2/agent/create') && method === 'POST') {
+        if (url.includes('/api/v1/agent/create') && method === 'POST') {
             await delay(800)
             return new Response(JSON.stringify({
                 code: 0,
@@ -72,7 +72,7 @@ export function setupManualMock() {
         }
 
         // --- Agent: Update ---
-        if (url.includes('/api/v2/agent/update') && method === 'POST') {
+        if (url.includes('/api/v1/agent/update') && method === 'PUT') {
             await delay(800)
             return new Response(JSON.stringify({
                 code: 0,
