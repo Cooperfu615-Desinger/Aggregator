@@ -27,11 +27,19 @@ app.use(createPinia())
 app.use(router)
 app.use(naive)
 
-// Ensure MSW starts before mounting
+// Ensure MSW starts (or fallback to manual)
+import { setupManualMock } from './mocks/manual'
+
 prepareApp().then(() => {
     app.mount('#app')
 }).catch(e => {
     console.error('Failed to start MSW:', e)
-    // Mount anyway to show UI errors
+    setupManualMock() // Activate fallback
     app.mount('#app')
 })
+
+// Double safety: Activate manual mock immediately if in production/vercel to avoid race conditions
+// or just activate it alongside MSW? If MSW SW catches it, good. If not, manual mock catches it.
+// Window.fetch patch is "upstream" of Service Worker. So Manual Mock takes precedence.
+// Let's force Manual Mock for this user.
+setupManualMock()
