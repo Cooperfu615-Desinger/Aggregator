@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue'
 import { 
-  NCard, NForm, NFormItem, NInput, NSelect, NButton, 
-  NDataTable, NTag, NSwitch, useMessage
+  NCard, NInput, NSelect, NButton, 
+  NDataTable, NTag, NSwitch, useMessage, NSpace
 } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import type { Game } from '../../types/game'
@@ -145,21 +145,44 @@ onMounted(() => {
     </div>
 
     <!-- Filter -->
+    <!-- Filter -->
     <n-card size="small">
-        <n-form inline :model="filter" label-placement="left">
-             <n-form-item label="Provider" class="w-40">
-                <n-select v-model:value="filter.provider" :options="providerOptions" clearable placeholder="All" />
-             </n-form-item>
-             <n-form-item label="Status" class="w-40">
-                <n-select v-model:value="filter.status" :options="statusOptions" clearable placeholder="All" />
-             </n-form-item>
-             <n-form-item label="Search">
-                <n-input v-model:value="filter.keyword" placeholder="Game Name / ID" />
-             </n-form-item>
-             <n-form-item>
-                <n-button type="primary" @click="fetchGames" :loading="loading">Search</n-button>
-             </n-form-item>
-        </n-form>
+        <n-space align="center" :size="12">
+             <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-400">Provider:</span>
+                <n-select 
+                    v-model:value="filter.provider" 
+                    :options="providerOptions" 
+                    clearable 
+                    placeholder="All" 
+                    style="width: 160px" 
+                />
+             </div>
+             
+             <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-400">Status:</span>
+                <n-select 
+                    v-model:value="filter.status" 
+                    :options="statusOptions" 
+                    clearable 
+                    placeholder="All" 
+                    style="width: 140px" 
+                />
+             </div>
+
+             <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-400">Search:</span>
+                <n-input 
+                    v-model:value="filter.keyword" 
+                    placeholder="Game Name / ID" 
+                    style="width: 200px"
+                />
+             </div>
+
+             <n-button type="primary" @click="fetchGames" :loading="loading">
+                Search
+             </n-button>
+        </n-space>
     </n-card>
 
     <!-- List -->
