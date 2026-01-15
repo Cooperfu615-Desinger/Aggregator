@@ -29,3 +29,12 @@ export interface BetLogSearchResponse {
         total: number;
     };
 }
+
+export interface FinancialReportItem {
+    key: string; // Date (YYYY-MM-DD) or Agent Name
+    total_bet: number;
+    total_win: number;
+    ggr: number; // bet - win
+    rtp: number; // (win / bet) * 100
+    round_count: number;
+}

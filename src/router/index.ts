@@ -39,6 +39,12 @@ const router = createRouter({
                     component: () => import('../views/DataCenter/BetLog.vue'),
                     meta: { title: 'Bet Log Query' }
                 },
+                {
+                    path: 'data-center/report',
+                    name: 'FinancialReport',
+                    component: () => import('../views/DataCenter/Report.vue'),
+                    meta: { title: 'Financial Report' }
+                },
                 // Placeholder for Game Center
                 {
                     path: 'game-center/list',
