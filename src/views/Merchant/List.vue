@@ -24,7 +24,7 @@ const createColumns = (): DataTableColumns<Merchant> => {
     {
       title: 'Site Code',
       key: 'site_code',
-      width: 100,
+      width: 130,
       sorter: (row1, row2) => row1.site_code.localeCompare(row2.site_code)
     },
     {
@@ -42,7 +42,7 @@ const createColumns = (): DataTableColumns<Merchant> => {
     {
       title: 'Currency',
       key: 'currency_type',
-      width: 100,
+      width: 130,
       sorter: (row1, row2) => row1.currency_type.localeCompare(row2.currency_type)
     },
     {
@@ -76,6 +76,7 @@ const createColumns = (): DataTableColumns<Merchant> => {
       title: 'Created At',
       key: 'created_at',
       width: 200,
+      sorter: (row1, row2) => new Date(row1.created_at).getTime() - new Date(row2.created_at).getTime(),
       render(row) {
         return new Date(row.created_at).toLocaleString()
       }
