@@ -15,9 +15,11 @@ import {
   MenuOutlined
 } from '@vicons/material'
 import { NIcon } from 'naive-ui'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const currentRoute = useRoute()
+const authStore = useAuthStore()
 
 // State
 const collapsed = ref(false)
@@ -68,10 +70,9 @@ const userOptions = [
     { label: 'Profile', key: 'profile' },
     { label: 'Logout', key: 'logout' }
 ]
-
 const handleUserSelect = (key: string) => {
     if (key === 'logout') {
-        // Mock logout
+        authStore.logout()
         router.push('/login')
     }
 }

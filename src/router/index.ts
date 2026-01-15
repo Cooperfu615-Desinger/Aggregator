@@ -46,7 +46,11 @@ const router = createRouter({
                 }
             ]
         },
-        // Login route would go here outside MainLayout
+        {
+            path: '/login',
+            name: 'login',
+            component: () => import('../views/Login/index.vue')
+        }
     ]
 })
 
