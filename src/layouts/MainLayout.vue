@@ -35,7 +35,12 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(DashboardOutlined)
   },
   {
-    label: () => h(RouterLink, { to: '/merchant/list' }, { default: () => 'Merchant Management' }),
+    label: () => h(RouterLink, { to: '/agent/list' }, { default: () => 'Agent Management' }),
+    key: 'agent-list',
+    icon: renderIcon(PeopleAltOutlined)
+  },
+  {
+    label: () => h(RouterLink, { to: '/merchant/list' }, { default: () => 'Merchant (Legacy)' }),
     key: 'merchant-list',
     icon: renderIcon(PeopleAltOutlined)
   },

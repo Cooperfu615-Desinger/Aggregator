@@ -19,6 +19,11 @@ const router = createRouter({
                     component: () => import('../views/Merchant/List.vue')
                 },
                 {
+                    path: 'agent/list',
+                    name: 'agent-list',
+                    component: () => import('../views/Agent/List.vue')
+                },
+                {
                     path: 'merchant/create',
                     name: 'merchant-create',
                     component: () => import('../views/Merchant/Create.vue')

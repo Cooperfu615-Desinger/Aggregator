@@ -1,6 +1,22 @@
 import { http, HttpResponse, delay } from 'msw'
 import { faker } from '@faker-js/faker'
 import type { Merchant, MerchantDetail } from '../types/merchant'
+import type { Agent } from '../types/agent'
+
+function createRandomAgent(id: number, parentId: number | null = null, level: number = 1): Agent {
+    return {
+        id,
+        account: faker.internet.username(),
+        site_code: faker.string.alpha({ length: 4, casing: 'upper' }),
+        level,
+        parent_id: parentId,
+        balance: faker.number.float({ min: 1000, max: 100000, fractionDigits: 2 }),
+        percent: faker.number.int({ min: 10, max: 90 }),
+        state: faker.helpers.arrayElement(['active', 'disabled']),
+        created_at: faker.date.past().toISOString(),
+        children_count: level < 3 ? faker.number.int({ min: 0, max: 5 }) : 0
+    }
+}
 
 function createRandomMerchant(id: number): Merchant {
     return {
@@ -224,6 +240,38 @@ export const handlers = [
             data: {
                 list,
                 total: 100
+            }
+        })
+    }),
+
+    // Hierarchical Agent List
+    http.get('/api/v2/agents', async ({ request }) => {
+        await delay(500)
+        const url = new URL(request.url)
+        const parentIdParam = url.searchParams.get('parent_id')
+        const parentId = parentIdParam ? Number(parentIdParam) : null
+
+        let level = 1
+        if (parentId) {
+            const levelParam = url.searchParams.get('level')
+            level = levelParam ? Number(levelParam) + 1 : 2
+        }
+
+        const count = faker.number.int({ min: 5, max: 15 })
+        const list = Array.from({ length: count }).map(() =>
+            createRandomAgent(
+                faker.number.int({ min: 1000, max: 99999 }),
+                parentId,
+                level
+            )
+        )
+
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: {
+                list,
+                total: count
             }
         })
     }),
