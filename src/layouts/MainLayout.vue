@@ -12,7 +12,9 @@ import {
   CasinoOutlined, 
   BarChartOutlined,
   MenuOpenOutlined,
-  MenuOutlined
+  MenuOutlined,
+  DescriptionOutlined,
+  AttachMoneyOutlined
 } from '@vicons/material'
 import { NIcon } from 'naive-ui'
 import { useAuthStore } from '../stores/auth'
@@ -52,9 +54,21 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(CasinoOutlined)
   },
   {
-    label: () => h(RouterLink, { to: '/data-center/round-search' }, { default: () => 'Data Center' }),
-    key: 'round-search',
-    icon: renderIcon(BarChartOutlined)
+    label: 'Data Center',
+    key: 'data-center',
+    icon: renderIcon(BarChartOutlined),
+    children: [
+      {
+        label: () => h(RouterLink, { to: '/data-center/bet-log' }, { default: () => 'Bet Logs' }),
+        key: 'BetLog',
+        icon: renderIcon(DescriptionOutlined)
+      },
+      {
+        label: () => h(RouterLink, { to: '/data-center/report' }, { default: () => 'Financial Report' }),
+        key: 'FinancialReport',
+        icon: renderIcon(AttachMoneyOutlined)
+      }
+    ]
   }
 ]
 

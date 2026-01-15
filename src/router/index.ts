@@ -34,8 +34,8 @@ const router = createRouter({
                     component: () => import('../views/Merchant/Configuration.vue')
                 },
                 {
-                    path: 'data-center/round-search',
-                    name: 'RoundSearch',
+                    path: 'data-center/bet-log',
+                    name: 'BetLog',
                     component: () => import('../views/DataCenter/BetLog.vue'),
                     meta: { title: 'Bet Log Query' }
                 },

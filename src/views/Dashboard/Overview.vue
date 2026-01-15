@@ -143,7 +143,7 @@ onMounted(() => {
              </n-button>
         </n-grid-item>
         <n-grid-item>
-             <n-button block size="large" secondary @click="router.push('/data-center/round-search')">
+             <n-button block size="large" secondary @click="router.push('/data-center/bet-log')">
                 Search Round Logs
              </n-button>
         </n-grid-item>
