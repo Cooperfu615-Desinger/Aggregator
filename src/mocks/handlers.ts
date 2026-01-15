@@ -156,4 +156,39 @@ export const handlers = [
             }
         })
     }),
+
+    // Dashboard Statistics (War Room)
+    http.get('/api/v2/report/dashboard', async () => {
+        await delay(500)
+
+        // Generate trend data for 7 days
+        const trend = Array.from({ length: 7 }, (_, i) => {
+            const date = new Date()
+            date.setDate(date.getDate() - (6 - i))
+            const bet = faker.number.float({ min: 10000, max: 50000, fractionDigits: 2 })
+            const win = bet * faker.number.float({ min: 0.90, max: 1.05, fractionDigits: 2 }) // RTP 90-105%
+            return {
+                date: date.toISOString().split('T')[0],
+                ggr: Number((bet - win).toFixed(2)),
+                bet: Number(bet.toFixed(2))
+            }
+        })
+
+        // Current snapshot stats
+        const totalBet = 1500000 + faker.number.float({ min: 100, max: 1000 }) // ~1.5M
+        const totalWin = totalBet * 0.965 // ~96.5% RTP
+        const ggr = totalBet - totalWin
+
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: {
+                total_bet: Number(totalBet.toFixed(2)),
+                total_ggr: Number(ggr.toFixed(2)),
+                rtp: 96.50,
+                active_players: 342,
+                trend // [ {date, ggr, bet}, ... ]
+            }
+        })
+    }),
 ]

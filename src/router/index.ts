@@ -5,7 +5,12 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            redirect: '/merchant/list'
+            redirect: '/dashboard'
+        },
+        {
+            path: '/dashboard',
+            name: 'dashboard',
+            component: () => import('../views/Dashboard/Overview.vue')
         },
         {
             path: '/merchant/list',
