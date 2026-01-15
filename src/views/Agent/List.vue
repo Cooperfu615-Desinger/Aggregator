@@ -37,13 +37,29 @@ const handleEdit = (agent: Agent) => {
 
 // Columns
 const columns: DataTableColumns<Agent> = [
-    { title: 'ID', key: 'id', width: 80 },
-    { title: 'Site Code', key: 'site_code', width: 100 },
-    { title: 'Account', key: 'account', width: 150 },
+    { 
+        title: 'ID', 
+        key: 'id', 
+        width: 80,
+        sorter: (row1, row2) => row1.id - row2.id
+    },
+    { 
+        title: 'Site Code', 
+        key: 'site_code', 
+        width: 100,
+        sorter: (row1, row2) => row1.site_code.localeCompare(row2.site_code)
+    },
+    { 
+        title: 'Account', 
+        key: 'account', 
+        width: 150,
+        sorter: (row1, row2) => row1.account.localeCompare(row2.account)
+    },
     { 
         title: 'Level', 
         key: 'level', 
         width: 80,
+        sorter: (row1, row2) => row1.level - row2.level,
         render: (row) => h(
             NTag,
             { type: 'info', size: 'small', bordered: false },
@@ -54,18 +70,21 @@ const columns: DataTableColumns<Agent> = [
         title: 'Balance', 
         key: 'balance', 
         width: 120,
+        sorter: (row1, row2) => row1.balance - row2.balance,
         render: (row) => row.balance.toLocaleString() 
     },
     { 
         title: 'Percent', 
         key: 'percent', 
         width: 80,
+        sorter: (row1, row2) => row1.percent - row2.percent,
         render: (row) => `${row.percent}%` 
     },
     { 
         title: 'State', 
         key: 'state', 
         width: 100,
+        sorter: (row1, row2) => (row1.state === 'active' ? 1 : 0) - (row2.state === 'active' ? 1 : 0),
         render: (row) => h(
             NTag,
             { type: row.state === 'active' ? 'success' : 'error', size: 'small', bordered: false },

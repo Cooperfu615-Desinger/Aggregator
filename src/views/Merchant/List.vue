@@ -18,32 +18,38 @@ const createColumns = (): DataTableColumns<Merchant> => {
     {
       title: 'ID',
       key: 'id',
-      width: 80
+      width: 80,
+      sorter: (row1, row2) => row1.id - row2.id
     },
     {
       title: 'Site Code',
       key: 'site_code',
-      width: 100
+      width: 100,
+      sorter: (row1, row2) => row1.site_code.localeCompare(row2.site_code)
     },
     {
       title: 'Account',
       key: 'account',
-      width: 150
+      width: 150,
+      sorter: (row1, row2) => row1.account.localeCompare(row2.account)
     },
     {
       title: 'Name',
       key: 'name',
-      width: 180
+      width: 180,
+      sorter: (row1, row2) => row1.name.localeCompare(row2.name)
     },
     {
       title: 'Currency',
       key: 'currency_type',
-      width: 100
+      width: 100,
+      sorter: (row1, row2) => row1.currency_type.localeCompare(row2.currency_type)
     },
     {
       title: 'Percent',
       key: 'percent',
       width: 100,
+      sorter: (row1, row2) => row1.percent - row2.percent,
       render(row) {
         return `${row.percent}%`
       }
@@ -52,6 +58,7 @@ const createColumns = (): DataTableColumns<Merchant> => {
       title: 'Status',
       key: 'state',
       width: 100,
+      sorter: (row1, row2) => row1.state - row2.state,
       render(row) {
         return h(
           NTag,

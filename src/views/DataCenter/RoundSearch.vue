@@ -22,15 +22,18 @@ const openDetail = (row: BetLog) => {
 // Columns Configuration
 const columns: DataTableColumns<BetLog> = [
   { title: 'Time', key: 'created_at', width: 180, 
+    sorter: (row1, row2) => new Date(row1.created_at).getTime() - new Date(row2.created_at).getTime(),
     render: (row) => new Date(row.created_at).toLocaleString() 
   },
-  { title: 'Round ID', key: 'id', width: 140, ellipsis: true },
-  { title: 'Player', key: 'player_account', width: 120 },
-  { title: 'Game', key: 'game_name', width: 140 },
+  { title: 'Round ID', key: 'id', width: 140, ellipsis: true, sorter: (row1, row2) => row1.id.localeCompare(row2.id) },
+  { title: 'Player', key: 'player_account', width: 120, sorter: (row1, row2) => row1.player_account.localeCompare(row2.player_account) },
+  { title: 'Game', key: 'game_name', width: 140, sorter: (row1, row2) => row1.game_name.localeCompare(row2.game_name) },
   { title: 'Bet', key: 'bet_amount', width: 100, 
+    sorter: (row1, row2) => row1.bet_amount - row2.bet_amount, 
     render: (row) => row.currency + ' ' + row.bet_amount.toFixed(2) 
   },
   { title: 'Win', key: 'win_amount', width: 100, 
+    sorter: (row1, row2) => row1.win_amount - row2.win_amount, 
     render: (row) => {
         const isWin = row.win_amount > 0
         return h(
@@ -41,6 +44,7 @@ const columns: DataTableColumns<BetLog> = [
     }
   },
   { title: 'Profit', key: 'profit', width: 100,
+    sorter: (row1, row2) => row1.profit - row2.profit,
     render: (row) => {
         const val = row.profit
         return h(

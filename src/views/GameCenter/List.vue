@@ -88,11 +88,18 @@ const columns: DataTableColumns<Game> = [
         width: 60,
         render: () => '🎰' 
     },
-    { title: 'Game Name', key: 'name_en', width: 200, ellipsis: true },
+    { 
+        title: 'Game Name', 
+        key: 'name_en', 
+        width: 200, 
+        ellipsis: true,
+        sorter: (row1, row2) => row1.name_en.localeCompare(row2.name_en) 
+    },
     { 
         title: 'ID', 
         key: 'game_id', 
         width: 150,
+        sorter: (row1, row2) => row1.game_id.localeCompare(row2.game_id),
         render: (row) => h(
             'span', 
             { class: 'font-mono text-gray-400 text-xs' }, 
@@ -103,23 +110,31 @@ const columns: DataTableColumns<Game> = [
         title: 'Provider', 
         key: 'provider', 
         width: 120,
+        sorter: (row1, row2) => row1.provider.localeCompare(row2.provider),
         render: (row) => h(
             NTag,
             { type: row.provider === 'PGSoft' ? 'success' : 'info', bordered: false, size: 'small' },
             { default: () => row.provider }
         )
     },
-    { title: 'Type', key: 'type', width: 100 },
+    { 
+        title: 'Type', 
+        key: 'type', 
+        width: 100,
+        sorter: (row1, row2) => (row1.type || '').localeCompare(row2.type || '')
+    },
     { 
         title: 'RTP', 
         key: 'rtp_default', 
         width: 100,
+        sorter: (row1, row2) => row1.rtp_default - row2.rtp_default,
         render: (row) => row.rtp_default.toFixed(1) + '%'
     },
     {
         title: 'Status',
         key: 'status',
         width: 100,
+        sorter: (row1, row2) => (row1.status === 'active' ? 1 : 0) - (row2.status === 'active' ? 1 : 0),
         render: (row) => h(
             NSwitch,
             {
