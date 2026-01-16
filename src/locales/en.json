@@ -13,12 +13,13 @@
         "refresh": "Refresh",
         "viewDetail": "View Detail",
         "exportCSV": "Export CSV",
-        "analyze": "Analyze"
+        "analyze": "Analyze",
+        "back": "Back / Cancel"
     },
     "menu": {
         "dashboard": "Dashboard",
         "agentManagement": "Agent Management",
-        "merchant": "Merchant (Legacy)",
+        "merchant": "Merchant",
         "gameCenter": "Game Center",
         "dataCenter": "Data Center",
         "betLogs": "Bet Logs",
@@ -58,10 +59,23 @@
     "merchant": {
         "title": "Merchant List",
         "create": "Create Merchant",
+        "createTitle": "Create New Merchant",
         "name": "Name",
         "currency": "Currency",
         "config": "Config",
-        "listTitle": "Merchant List"
+        "listTitle": "Merchant List",
+        "basicInfo": "Basic Information",
+        "financeConfig": "Finance Configuration",
+        "siteCodePlaceholder": "e.g. ABC",
+        "siteCodeLabel": "Site Code (3 Uppercase Letters)",
+        "displayName": "Display Name",
+        "adminAccount": "Admin Account",
+        "loginAccount": "Login Account",
+        "initialPassword": "Initial Password",
+        "profitShare": "Profit Share (Percent)",
+        "noteInherit": "Note: The created merchant will inherit games from the parent agent by default.",
+        "initialState": "Initial State",
+        "currencyType": "Currency"
     },
     "game": {
         "title": "Game Center",
@@ -71,7 +85,17 @@
         "type": "Type",
         "rtp": "RTP",
         "icon": "Icon",
-        "config": "Config"
+        "config": "Config",
+        "configTitle": "Game Configuration",
+        "gameId": "Game ID",
+        "readOnly": "Read Only",
+        "rtpSetting": "RTP Setting",
+        "selectRtp": "Select RTP Level",
+        "maxBet": "Max Bet",
+        "enterLimit": "Enter limit",
+        "rtpPromo": "Promotion",
+        "rtpStd": "Standard",
+        "rtpHigh": "High Margin"
     },
     "dashboard": {
         "title": "Dashboard",

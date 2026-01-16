@@ -13,12 +13,13 @@
         "refresh": "重新整理",
         "viewDetail": "查看詳情",
         "exportCSV": "匯出 CSV",
-        "analyze": "分析"
+        "analyze": "分析",
+        "back": "返回 / 取消"
     },
     "menu": {
         "dashboard": "儀表板",
         "agentManagement": "代理管理",
-        "merchant": "商戶管理 (舊版)",
+        "merchant": "商戶管理",
         "gameCenter": "遊戲中心",
         "dataCenter": "數據中心",
         "betLogs": "投注記錄",
@@ -58,10 +59,23 @@
     "merchant": {
         "title": "商戶列表",
         "create": "新增商戶",
+        "createTitle": "新增商戶",
         "name": "名稱",
         "currency": "幣種",
         "config": "配置",
-        "listTitle": "商戶列表"
+        "listTitle": "商戶列表",
+        "basicInfo": "基本資訊",
+        "financeConfig": "財務配置",
+        "siteCodePlaceholder": "例如 ABC",
+        "siteCodeLabel": "站點代碼 (3位大寫字母)",
+        "displayName": "顯示名稱",
+        "adminAccount": "管理員帳號",
+        "loginAccount": "登入帳號",
+        "initialPassword": "初始密碼",
+        "profitShare": "占成 (百分比)",
+        "noteInherit": "注意：建立的商戶將預設繼承上級代理的遊戲。",
+        "initialState": "初始狀態",
+        "currencyType": "幣種"
     },
     "game": {
         "title": "遊戲中心",
@@ -71,7 +85,17 @@
         "type": "類型",
         "rtp": "殺率 (RTP)",
         "icon": "圖示",
-        "config": "配置"
+        "config": "配置",
+        "configTitle": "遊戲配置",
+        "gameId": "遊戲 ID",
+        "readOnly": "唯讀",
+        "rtpSetting": "RTP 設定",
+        "selectRtp": "選擇 RTP 等級",
+        "maxBet": "單注上限",
+        "enterLimit": "輸入限額",
+        "rtpPromo": "推廣",
+        "rtpStd": "標準",
+        "rtpHigh": "高殺率"
     },
     "dashboard": {
         "title": "儀表板",

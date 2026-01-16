@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { 
     NModal, NForm, NFormItem, NInput, NSelect, 
     NSwitch, NInputNumber, NButton, useMessage 
@@ -17,6 +18,7 @@ const emit = defineEmits<{
 }>()
 
 const message = useMessage()
+const { t } = useI18n()
 const loading = ref(false)
 
 // Form State
@@ -26,13 +28,13 @@ const formModel = ref({
     max_bet: 0
 })
 
-const rtpOptions = [
-    { label: '99.0% (Promotion)', value: '99.0%' },
-    { label: '96.5% (Standard)', value: '96.5%' },
+const rtpOptions = computed(() => [
+    { label: `99.0% (${t('game.rtpPromo')})`, value: '99.0%' },
+    { label: `96.5% (${t('game.rtpStd')})`, value: '96.5%' },
     { label: '95.0%', value: '95.0%' },
     { label: '92.0%', value: '92.0%' },
-    { label: '90.0% (High Margin)', value: '90.0%' }
-]
+    { label: `90.0% (${t('game.rtpHigh')})`, value: '90.0%' }
+])
 
 // Initialize form when game changes
 watch(() => props.game, (newGame) => {
@@ -91,7 +93,7 @@ const handleSave = async () => {
         @update:show="$emit('update:show', $event)"
         class="w-[600px]"
         preset="card"
-        :title="`Game Configuration: ${game?.name_en || ''}`"
+        :title="`${t('game.configTitle')}: ${game?.name_en || ''}`"
         :bordered="false"
         size="huge"
         :mask-closable="false"
@@ -104,35 +106,35 @@ const handleSave = async () => {
             require-mark-placement="right-hanging"
         >
             <!-- Read-only Info -->
-            <n-form-item label="Game ID">
-                <n-input :value="game?.game_id" disabled placeholder="Read Only" />
+            <n-form-item :label="t('game.gameId')">
+                <n-input :value="game?.game_id" disabled :placeholder="t('game.readOnly')" />
             </n-form-item>
-            <n-form-item label="Provider">
-                <n-input :value="game?.provider" disabled placeholder="Read Only" />
+            <n-form-item :label="t('game.provider')">
+                <n-input :value="game?.provider" disabled :placeholder="t('game.readOnly')" />
             </n-form-item>
 
             <!-- Editable Settings -->
-            <n-form-item label="Status" path="status">
+            <n-form-item :label="t('common.status')" path="status">
                 <n-switch v-model:value="formModel.status">
-                    <template #checked>Active</template>
-                    <template #unchecked>Maintenance</template>
+                    <template #checked>{{ t('status.active') }}</template>
+                    <template #unchecked>{{ t('status.maintenance') }}</template>
                 </n-switch>
             </n-form-item>
 
-            <n-form-item label="RTP Setting" path="rtp">
+            <n-form-item :label="t('game.rtpSetting')" path="rtp">
                 <n-select 
                     v-model:value="formModel.rtp" 
                     :options="rtpOptions" 
-                    placeholder="Select RTP Level"
+                    :placeholder="t('game.selectRtp')"
                 />
             </n-form-item>
 
-            <n-form-item label="Max Bet" path="max_bet">
+            <n-form-item :label="t('game.maxBet')" path="max_bet">
                 <n-input-number 
                     v-model:value="formModel.max_bet" 
                     :min="0" 
                     :step="10"
-                    placeholder="Enter limit"
+                    :placeholder="t('game.enterLimit')"
                     class="w-full"
                 >
                     <template #suffix>USD</template>
@@ -142,10 +144,10 @@ const handleSave = async () => {
             <!-- Footer Actions -->
             <div class="flex justify-end gap-3 mt-6">
                 <n-button @click="handleClose" :disabled="loading">
-                    Cancel
+                    {{ t('common.cancel') }}
                 </n-button>
                 <n-button type="primary" @click="handleSave" :loading="loading">
-                    Save Changes
+                    {{ t('form.saveChanges') }}
                 </n-button>
             </div>
         </n-form>
