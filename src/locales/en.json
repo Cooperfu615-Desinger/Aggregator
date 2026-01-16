@@ -1,0 +1,37 @@
+{
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "search": "Search",
+        "reset": "Reset",
+        "action": "Action",
+        "status": "Status"
+    },
+    "menu": {
+        "dashboard": "Dashboard",
+        "agentManagement": "Agent Management",
+        "merchant": "Merchant (Legacy)",
+        "gameCenter": "Game Center",
+        "dataCenter": "Data Center",
+        "betLogs": "Bet Logs",
+        "financialReport": "Financial Report",
+        "profile": "Profile",
+        "logout": "Logout"
+    },
+    "login": {
+        "title": "Sign In",
+        "account": "Account",
+        "password": "Password",
+        "submit": "Login",
+        "subtitle": "Admin Management System"
+    },
+    "columns": {
+        "id": "ID",
+        "account": "Account",
+        "balance": "Balance",
+        "state": "State",
+        "createdAt": "Created At"
+    }
+}

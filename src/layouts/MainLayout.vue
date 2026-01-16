@@ -18,10 +18,13 @@ import {
 } from '@vicons/material'
 import { NIcon } from 'naive-ui'
 import { useAuthStore } from '../stores/auth'
+import LanguageSwitcher from '../components/LanguageSwitcher.vue'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 const currentRoute = useRoute()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 // State
 const collapsed = ref(false)
@@ -32,45 +35,46 @@ const renderIcon = (icon: any) => {
 }
 
 // Menu Options
-const menuOptions: MenuOption[] = [
+// Menu Options
+const menuOptions = computed<MenuOption[]>(() => [
   {
-    label: () => h(RouterLink, { to: '/dashboard' }, { default: () => 'Dashboard' }),
+    label: () => h(RouterLink, { to: '/dashboard' }, { default: () => t('menu.dashboard') }),
     key: 'dashboard',
     icon: renderIcon(DashboardOutlined)
   },
   {
-    label: () => h(RouterLink, { to: '/agent/list' }, { default: () => 'Agent Management' }),
+    label: () => h(RouterLink, { to: '/agent/list' }, { default: () => t('menu.agentManagement') }),
     key: 'agent-list',
     icon: renderIcon(PeopleAltOutlined)
   },
   {
-    label: () => h(RouterLink, { to: '/merchant/list' }, { default: () => 'Merchant (Legacy)' }),
+    label: () => h(RouterLink, { to: '/merchant/list' }, { default: () => t('menu.merchant') }),
     key: 'merchant-list',
     icon: renderIcon(PeopleAltOutlined)
   },
   {
-    label: () => h(RouterLink, { to: '/game-center/list' }, { default: () => 'Game Center' }),
+    label: () => h(RouterLink, { to: '/game-center/list' }, { default: () => t('menu.gameCenter') }),
     key: 'game-center',
     icon: renderIcon(CasinoOutlined)
   },
   {
-    label: 'Data Center',
+    label: t('menu.dataCenter'),
     key: 'data-center',
     icon: renderIcon(BarChartOutlined),
     children: [
       {
-        label: () => h(RouterLink, { to: '/data-center/bet-log' }, { default: () => 'Bet Logs' }),
+        label: () => h(RouterLink, { to: '/data-center/bet-log' }, { default: () => t('menu.betLogs') }),
         key: 'BetLog',
         icon: renderIcon(DescriptionOutlined)
       },
       {
-        label: () => h(RouterLink, { to: '/data-center/report' }, { default: () => 'Financial Report' }),
+        label: () => h(RouterLink, { to: '/data-center/report' }, { default: () => t('menu.financialReport') }),
         key: 'FinancialReport',
         icon: renderIcon(AttachMoneyOutlined)
       }
     ]
   }
-]
+])
 
 // Active Key Logic
 const activeKey = computed(() => {
@@ -80,10 +84,10 @@ const activeKey = computed(() => {
 })
 
 // Header Dropdown
-const userOptions = [
-    { label: 'Profile', key: 'profile' },
-    { label: 'Logout', key: 'logout' }
-]
+const userOptions = computed(() => [
+    { label: t('menu.profile'), key: 'profile' },
+    { label: t('menu.logout'), key: 'logout' }
+])
 const handleUserSelect = (key: string) => {
     if (key === 'logout') {
         authStore.logout()
@@ -124,7 +128,7 @@ const handleVersionClick = () => {
     </n-layout-sider>
 
     <n-layout>
-      <n-layout-header bordered class="h-16 flex items-center justify-between px-6 bg-white dark:bg-[#18181c]">
+      <n-layout-header bordered class="h-16 flex items-center justify-between px-6 bg-[#18181c]">
          <div class="flex items-center">
             <n-button quaternary circle @click="collapsed = !collapsed">
                 <template #icon>
@@ -141,6 +145,7 @@ const handleVersionClick = () => {
                  <div class="text-sm font-bold">Admin User</div>
                  <div class="text-xs text-gray-400">Super Administrator</div>
              </div>
+             <LanguageSwitcher />
              <n-dropdown :options="userOptions" @select="handleUserSelect">
                 <n-avatar round size="medium" src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" class="cursor-pointer" />
              </n-dropdown>

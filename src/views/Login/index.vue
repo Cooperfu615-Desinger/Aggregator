@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage, NCard, NForm, NFormItem, NInput, NButton } from 'naive-ui'
 import { useAuthStore } from '../../stores/auth'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 const message = useMessage()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const loading = ref(false)
 const formRef = ref()
@@ -15,10 +17,10 @@ const model = ref({
     password: 'admin'
 })
 
-const rules = {
-    account: { required: true, message: 'Please enter account', trigger: 'blur' },
-    password: { required: true, message: 'Please enter password', trigger: 'blur' }
-}
+const rules = computed(() => ({
+    account: { required: true, message: t('login.account') + ' is required', trigger: 'blur' },
+    password: { required: true, message: t('login.password') + ' is required', trigger: 'blur' }
+}))
 
 const handleLogin = async () => {
     try {
@@ -66,8 +68,10 @@ const handleLogin = async () => {
         <n-card class="w-[400px] shadow-lg">
             <template #header>
                 <div class="text-center">
-                    <h2 class="text-2xl font-bold mb-2">Game Platform Login</h2>
-                    <p class="text-gray-400 text-sm">B2B Management System</p>
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold mb-2">{{ t('login.title') }}</h2>
+                    <p class="text-gray-400 text-sm">{{ t('login.subtitle') }}</p>
+                </div>
                 </div>
             </template>
             
@@ -77,11 +81,11 @@ const handleLogin = async () => {
                 :rules="rules"
                 size="large"
             >
-                <n-form-item path="account" label="Account">
+                <n-form-item path="account" :label="t('login.account')">
                     <n-input v-model:value="model.account" placeholder="admin" @keydown.enter="handleLogin" />
                 </n-form-item>
                 
-                <n-form-item path="password" label="Password">
+                <n-form-item path="password" :label="t('login.password')">
                     <n-input 
                         v-model:value="model.password" 
                         type="password" 
@@ -98,7 +102,7 @@ const handleLogin = async () => {
                     @click="handleLogin"
                     class="mt-4"
                 >
-                    Login
+                    {{ t('login.submit') }}
                 </n-button>
             </n-form>
         </n-card>

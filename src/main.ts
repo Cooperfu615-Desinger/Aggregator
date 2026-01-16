@@ -5,6 +5,7 @@ import router from './router'
 import './router/permission' // Import permission guard
 import './style.css'
 import App from './App.vue'
+import i18n from './i18n'
 
 // Tech Standards: Force Mock in Prod or if API is unreachable
 // In a real scenario, you might check for API availability, but for now we follow the standard:
@@ -26,6 +27,7 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(naive)
+app.use(i18n)
 
 // Ensure MSW starts (or fallback to manual)
 import { setupManualMock } from './mocks/manual'
