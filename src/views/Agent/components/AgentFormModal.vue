@@ -4,6 +4,7 @@ import {
     NModal, NForm, NFormItem, NInput, NInputNumber,
     NSwitch, NButton, useMessage
 } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
 import type { Agent } from '../../../types/agent'
 
@@ -20,6 +21,7 @@ const emit = defineEmits<{
 }>()
 
 const message = useMessage()
+const { t } = useI18n()
 const loading = ref(false)
 const formRef = ref()
 
@@ -37,13 +39,13 @@ const rules = computed<FormRules>(() => {
     const maxPercent = props.parentAgent ? props.parentAgent.percent : 100
     
     return {
-        account: { required: true, message: 'Account is required', trigger: 'blur' },
-        password: { required: props.type === 'create', message: 'Password is required', trigger: 'blur' },
+        account: { required: true, message: t('form.required', { field: t('form.account') }), trigger: 'blur' },
+        password: { required: props.type === 'create', message: t('form.required', { field: t('form.password') }), trigger: 'blur' },
         percent: [
-            { required: true, type: 'number', message: 'Percent is required', trigger: 'blur' },
+            { required: true, type: 'number', message: t('form.required', { field: t('form.percent') }), trigger: 'blur' },
             { 
                 validator: (_: any, value: number) => value <= maxPercent,
-                message: `Max allowed percent is ${maxPercent}% (Parent's limit)`,
+                message: t('form.maxPercent', { max: maxPercent }),
                 trigger: ['blur', 'change']
             }
         ]
@@ -104,11 +106,11 @@ const handleSubmit = async () => {
         const data = await res.json()
 
         if (data.code === 0) {
-            message.success(data.msg)
+            message.success(data.msg || t('form.saveChanges') + ' Success')
             emit('refresh')
             handleClose()
         } else {
-            message.error(data.msg || 'Operation failed')
+            message.error(data.msg || t('common.action') + ' Failed')
         }
     } catch (e) {
         // Validation error or Network error
@@ -128,7 +130,7 @@ const handleSubmit = async () => {
         @update:show="$emit('update:show', $event)"
         class="w-[600px]"
         preset="card"
-        :title="type === 'create' ? 'Add Sub-Agent' : 'Edit Agent'"
+        :title="type === 'create' ? t('agent.modalTitleCreate') : t('agent.modalTitleEdit')"
         size="huge"
         :bordered="false"
     >
@@ -141,14 +143,14 @@ const handleSubmit = async () => {
             require-mark-placement="right-hanging"
         >
             <!-- Parent Info Context -->
-            <n-form-item label="Parent Agent" v-if="parentAgent">
+            <n-form-item :label="t('agent.parentAgent')" v-if="parentAgent">
                 <div class="text-gray-400">
                     {{ parentAgent.account }} (Max Percent: {{ parentAgent.percent }}%)
                 </div>
             </n-form-item>
 
-            <n-form-item label="Account" path="account">
-                <n-input v-model:value="formModel.account" :disabled="type === 'edit'" placeholder="Username" />
+            <n-form-item :label="t('form.account')" path="account">
+                <n-input v-model:value="formModel.account" :disabled="type === 'edit'" :placeholder="t('form.account')" />
             </n-form-item>
 
             <n-form-item label="Password" path="password" v-if="type === 'create'">
@@ -156,7 +158,7 @@ const handleSubmit = async () => {
                     v-model:value="formModel.password" 
                     type="password" 
                     show-password-on="click" 
-                    placeholder="Password" 
+                    :placeholder="t('form.password')" 
                 />
             </n-form-item>
 
@@ -164,33 +166,33 @@ const handleSubmit = async () => {
                 <n-input v-model:value="formModel.site_code" :disabled="!!parentAgent || type === 'edit'" placeholder="Inherited if sub-agent" />
             </n-form-item>
 
-            <n-form-item label="Percent (%)" path="percent">
+            <n-form-item :label="t('form.percent') + ' (%)'" path="percent">
                 <n-input-number 
                     v-model:value="formModel.percent" 
                     :min="0" 
                     :max="100" 
-                    placeholder="Profit Share %" 
+                    :placeholder="t('form.percent')" 
                     class="w-full"
                 >
                     <template #suffix>%</template>
                 </n-input-number>
             </n-form-item>
 
-            <n-form-item label="State" path="state">
+            <n-form-item :label="t('form.state')" path="state">
                 <n-switch v-model:value="formModel.state">
-                    <template #checked>Active</template>
-                    <template #unchecked>Disabled</template>
+                    <template #checked>{{ t('status.active') }}</template>
+                    <template #unchecked>{{ t('status.disabled') }}</template>
                 </n-switch>
             </n-form-item>
 
-             <n-form-item label="Memo" path="memo">
-                <n-input v-model:value="formModel.memo" type="textarea" placeholder="Optional notes" />
+             <n-form-item :label="t('form.memo')" path="memo">
+                <n-input v-model:value="formModel.memo" type="textarea" :placeholder="t('form.memo')" />
             </n-form-item>
 
             <div class="flex justify-end gap-3 mt-6">
-                <n-button @click="handleClose">Cancel</n-button>
+                <n-button @click="handleClose">{{ t('form.cancel') }}</n-button>
                 <n-button type="primary" @click="handleSubmit" :loading="loading">
-                    {{ type === 'create' ? 'Create' : 'Save Changes' }}
+                    {{ type === 'create' ? t('form.create') : t('form.saveChanges') }}
                 </n-button>
             </div>
         </n-form>

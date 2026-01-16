@@ -7,7 +7,9 @@
         "search": "搜尋",
         "reset": "重置",
         "action": "操作",
-        "status": "狀態"
+        "status": "狀態",
+        "all": "全部",
+        "sync": "同步"
     },
     "menu": {
         "dashboard": "儀表板",
@@ -33,5 +35,70 @@
         "balance": "餘額",
         "state": "狀態",
         "createdAt": "建立時間"
+    },
+    "agent": {
+        "title": "代理管理",
+        "modalTitleCreate": "新增下級代理",
+        "modalTitleEdit": "編輯代理",
+        "siteCode": "站點代碼",
+        "level": "層級",
+        "balance": "餘額",
+        "percent": "占成",
+        "state": "狀態",
+        "actions": "操作",
+        "viewSubs": "查看下級",
+        "addSub": "新增下級",
+        "edit": "編輯",
+        "parentAgent": "上級代理"
+    },
+    "merchant": {
+        "title": "商戶列表",
+        "create": "新增商戶",
+        "name": "名稱",
+        "currency": "幣種",
+        "config": "配置",
+        "listTitle": "商戶列表"
+    },
+    "game": {
+        "title": "遊戲中心",
+        "sync": "同步遊戲",
+        "name": "遊戲名稱",
+        "provider": "供應商",
+        "type": "類型",
+        "rtp": "殺率 (RTP)",
+        "icon": "圖示",
+        "config": "配置"
+    },
+    "dashboard": {
+        "title": "儀表板",
+        "warRoom": "戰情室",
+        "realTime": "即時更新",
+        "totalBet": "總投注",
+        "totalGGR": "總營收 (GGR)",
+        "net": "淨利",
+        "rtp": "殺率 (RTP)",
+        "activePlayers": "活躍玩家",
+        "online": "在線",
+        "revenueTrend": "營收走勢 (7天)"
+    },
+    "form": {
+        "account": "帳號",
+        "password": "密碼",
+        "memo": "備註",
+        "siteCode": "站點代碼",
+        "percent": "占成",
+        "state": "狀態",
+        "required": "請輸入{field}",
+        "maxPercent": "最高允許 {max}% (上級限制)",
+        "saveChanges": "儲存變更",
+        "create": "建立",
+        "cancel": "取消",
+        "submit": "送出"
+    },
+    "status": {
+        "active": "啟用",
+        "disabled": "停用",
+        "inactive": "停用",
+        "maintenance": "維護中"
     }
 }

@@ -5,6 +5,7 @@ import {
   useMessage, NTag, NSkeleton
 } from 'naive-ui'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
@@ -16,6 +17,7 @@ use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent
 
 const router = useRouter()
 const message = useMessage()
+const { t } = useI18n()
 const loading = ref(true)
 
 // Data State
@@ -30,7 +32,7 @@ const stats = ref({
 // Chart Option Computed
 const chartOption = computed(() => ({
     tooltip: { trigger: 'axis' },
-    legend: { data: ['GGR', 'Bet'], textStyle: { color: '#ccc' } },
+    legend: { data: [t('dashboard.totalGGR'), t('dashboard.totalBet')], textStyle: { color: '#ccc' } },
     grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
     xAxis: { 
         type: 'category', 
@@ -44,7 +46,7 @@ const chartOption = computed(() => ({
     },
     series: [
         {
-            name: 'GGR',
+            name: t('dashboard.totalGGR'),
             type: 'line',
             data: stats.value.trend.map(t => t.ggr),
             smooth: true,
@@ -52,7 +54,7 @@ const chartOption = computed(() => ({
             areaStyle: { opacity: 0.1, color: '#63e2b7' }
         },
         {
-            name: 'Bet',
+            name: t('dashboard.totalBet'),
             type: 'line',
             data: stats.value.trend.map(t => t.bet),
             smooth: true,
@@ -83,32 +85,32 @@ onMounted(() => {
 <template>
   <div class="p-6 space-y-6">
     <div class="flex items-center justify-between">
-       <h1 class="text-2xl font-bold">Dashboard (War Room)</h1>
-       <n-tag type="info" size="small" bordered>Real-time Updated</n-tag>
+       <h1 class="text-2xl font-bold">{{ t('dashboard.title') }} ({{ t('dashboard.warRoom') }})</h1>
+       <n-tag type="info" size="small" bordered>{{ t('dashboard.realTime') }}</n-tag>
     </div>
 
     <!-- Top Row: Metrics -->
     <n-grid x-gap="12" y-gap="12" cols="1 s:2 m:4" responsive="screen">
         <n-grid-item>
             <n-card size="small">
-                <n-statistic label="Total Bet" :value="stats.total_bet">
+                <n-statistic :label="t('dashboard.totalBet')" :value="stats.total_bet">
                     <template #prefix>$</template>
                 </n-statistic>
             </n-card>
         </n-grid-item>
         <n-grid-item>
              <n-card size="small" class="border-green-500/30">
-                <n-statistic label="Total GGR" :value="stats.total_ggr">
+                <n-statistic :label="t('dashboard.totalGGR')" :value="stats.total_ggr">
                     <template #prefix>$</template>
                     <template #suffix>
-                         <span class="text-xs text-green-400 ml-2">(Net)</span>
+                         <span class="text-xs text-green-400 ml-2">({{ t('dashboard.net') }})</span>
                     </template>
                 </n-statistic>
             </n-card>
         </n-grid-item>
         <n-grid-item>
              <n-card size="small">
-                <n-statistic label="RTP (Return to Player)" :value="stats.rtp">
+                <n-statistic :label="t('dashboard.rtp')" :value="stats.rtp">
                     <template #suffix>%</template>
                     <template #prefix>
                          <div :class="{'text-red-500': stats.rtp > 100, 'text-green-500': stats.rtp < 95, 'text-gray-200': stats.rtp >= 95 && stats.rtp <= 100}">
@@ -120,15 +122,15 @@ onMounted(() => {
         </n-grid-item>
         <n-grid-item>
              <n-card size="small">
-                <n-statistic label="Active Players" :value="stats.active_players">
-                    <template #suffix>Online</template>
+                <n-statistic :label="t('dashboard.activePlayers')" :value="stats.active_players">
+                    <template #suffix>{{ t('dashboard.online') }}</template>
                 </n-statistic>
             </n-card>
         </n-grid-item>
     </n-grid>
 
     <!-- Middle Row: Charts -->
-    <n-card title="Revenue Trend (7 Days)">
+    <n-card :title="t('dashboard.revenueTrend')">
         <div class="h-[350px] w-full">
             <n-skeleton v-if="loading" text :repeat="5" />
             <v-chart v-else class="chart" :option="chartOption" autoresize />

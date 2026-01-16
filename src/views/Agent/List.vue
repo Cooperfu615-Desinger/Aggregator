@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, h, ref, type VNode } from 'vue'
+import { onMounted, h, ref, type VNode, computed } from 'vue'
 import { 
     NCard, NBreadcrumb, NBreadcrumbItem, NDataTable, 
     NButton, NTag, NSpace 
 } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 import type { DataTableColumns } from 'naive-ui'
 import { useAgentList } from '../../composables/useAgentList'
 import type { Agent } from '../../types/agent'
@@ -13,6 +14,7 @@ const {
     loading, agents, breadcrumbs, 
     fetchAgents, handleDrillDown, handleBreadcrumbClick 
 } = useAgentList()
+const { t } = useI18n()
 
 // Modal State
 const showModal = ref(false)
@@ -36,27 +38,27 @@ const handleEdit = (agent: Agent) => {
 }
 
 // Columns
-const columns: DataTableColumns<Agent> = [
+const columns = computed<DataTableColumns<Agent>>(() => [
     { 
-        title: 'ID', 
+        title: t('columns.id'), 
         key: 'id', 
         width: 80,
         sorter: (row1, row2) => row1.id - row2.id
     },
     { 
-        title: 'Site Code', 
+        title: t('agent.siteCode'), 
         key: 'site_code', 
         width: 130,
         sorter: (row1, row2) => row1.site_code.localeCompare(row2.site_code)
     },
     { 
-        title: 'Account', 
+        title: t('columns.account'), 
         key: 'account', 
         width: 150,
         sorter: (row1, row2) => row1.account.localeCompare(row2.account)
     },
     { 
-        title: 'Level', 
+        title: t('agent.level'), 
         key: 'level', 
         width: 80,
         sorter: (row1, row2) => row1.level - row2.level,
@@ -67,32 +69,32 @@ const columns: DataTableColumns<Agent> = [
         )
     },
     { 
-        title: 'Balance', 
+        title: t('agent.balance'), 
         key: 'balance', 
         width: 120,
         sorter: (row1, row2) => row1.balance - row2.balance,
         render: (row) => row.balance.toLocaleString() 
     },
     { 
-        title: 'Percent', 
+        title: t('agent.percent'), 
         key: 'percent', 
         width: 120,
         sorter: (row1, row2) => row1.percent - row2.percent,
         render: (row) => `${row.percent}%` 
     },
     { 
-        title: 'State', 
+        title: t('agent.state'), 
         key: 'state', 
         width: 100,
         sorter: (row1, row2) => (row1.state === 'active' ? 1 : 0) - (row2.state === 'active' ? 1 : 0),
         render: (row) => h(
             NTag,
             { type: row.state === 'active' ? 'success' : 'error', size: 'small', bordered: false },
-            { default: () => row.state.toUpperCase() }
+            { default: () => row.state === 'active' ? t('status.active') : t('status.disabled') }
         )
     },
     {
-        title: 'Actions',
+        title: t('agent.actions'),
         key: 'actions',
         render: (row) => {
             const actions: VNode[] = []
@@ -107,7 +109,7 @@ const columns: DataTableColumns<Agent> = [
                         quaternary: true,
                         onClick: () => handleDrillDown(row)
                     },
-                    { default: () => 'View Subs' }
+                    { default: () => t('agent.viewSubs') }
                 ))
                  
                 // Add Sub-Agent Button
@@ -119,7 +121,7 @@ const columns: DataTableColumns<Agent> = [
                         quaternary: true,
                         onClick: () => handleAddSub(row)
                     },
-                    { default: () => 'Add Sub' }
+                    { default: () => t('agent.addSub') }
                 ))
             }
 
@@ -130,13 +132,13 @@ const columns: DataTableColumns<Agent> = [
                     quaternary: true,
                     onClick: () => handleEdit(row)
                 },
-                { default: () => 'Edit' }
+                { default: () => t('agent.edit') }
             ))
 
             return h(NSpace, null, { default: () => actions })
         }
     }
-]
+])
 
 onMounted(() => {
     fetchAgents()
@@ -155,7 +157,7 @@ const handleRefresh = () => {
     <div class="p-6 space-y-4">
         <!-- Header & Breadcrumb -->
         <div class="flex flex-col gap-2">
-            <h1 class="text-2xl font-bold">Agent Management</h1>
+            <h1 class="text-2xl font-bold">{{ t('agent.title') }}</h1>
             <n-breadcrumb>
                 <n-breadcrumb-item 
                     v-for="(crumb, index) in breadcrumbs" 

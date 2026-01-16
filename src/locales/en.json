@@ -7,7 +7,9 @@
         "search": "Search",
         "reset": "Reset",
         "action": "Action",
-        "status": "Status"
+        "status": "Status",
+        "all": "All",
+        "sync": "Sync"
     },
     "menu": {
         "dashboard": "Dashboard",
@@ -33,5 +35,70 @@
         "balance": "Balance",
         "state": "State",
         "createdAt": "Created At"
+    },
+    "agent": {
+        "title": "Agent Management",
+        "modalTitleCreate": "Add Sub-Agent",
+        "modalTitleEdit": "Edit Agent",
+        "siteCode": "Site Code",
+        "level": "Level",
+        "balance": "Balance",
+        "percent": "Percent",
+        "state": "State",
+        "actions": "Actions",
+        "viewSubs": "View Subs",
+        "addSub": "Add Sub",
+        "edit": "Edit",
+        "parentAgent": "Parent Agent"
+    },
+    "merchant": {
+        "title": "Merchant List",
+        "create": "Create Merchant",
+        "name": "Name",
+        "currency": "Currency",
+        "config": "Config",
+        "listTitle": "Merchant List"
+    },
+    "game": {
+        "title": "Game Center",
+        "sync": "Sync Games",
+        "name": "Game Name",
+        "provider": "Provider",
+        "type": "Type",
+        "rtp": "RTP",
+        "icon": "Icon",
+        "config": "Config"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "warRoom": "War Room",
+        "realTime": "Real-time Updated",
+        "totalBet": "Total Bet",
+        "totalGGR": "Total GGR",
+        "net": "Net",
+        "rtp": "RTP (Return to Player)",
+        "activePlayers": "Active Players",
+        "online": "Online",
+        "revenueTrend": "Revenue Trend (7 Days)"
+    },
+    "form": {
+        "account": "Account",
+        "password": "Password",
+        "memo": "Memo",
+        "siteCode": "Site Code",
+        "percent": "Percent",
+        "state": "State",
+        "required": "{field} is required",
+        "maxPercent": "Max allowed percent is {max}% (Parent's limit)",
+        "saveChanges": "Save Changes",
+        "create": "Create",
+        "cancel": "Cancel",
+        "submit": "Submit"
+    },
+    "status": {
+        "active": "Active",
+        "disabled": "Disabled",
+        "inactive": "Inactive",
+        "maintenance": "Maintenance"
     }
 }

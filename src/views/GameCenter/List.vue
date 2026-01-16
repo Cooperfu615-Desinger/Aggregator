@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, h } from 'vue'
+import { ref, onMounted, h, computed } from 'vue'
 import { 
   NCard, NInput, NSelect, NButton, 
   NDataTable, NTag, NSwitch, useMessage, NSpace
 } from 'naive-ui'
+import { useI18n } from 'vue-i18n'
 import type { DataTableColumns } from 'naive-ui'
 import type { Game } from '../../types/game'
 import GameConfigModal from './components/GameConfigModal.vue'
 
 // State
 const message = useMessage()
+const { t } = useI18n()
 const loading = ref(false)
 const games = ref<Game[]>([])
 const showConfigModal = ref(false)
@@ -23,19 +25,19 @@ const filter = ref({
 })
 
 // Options
-const providerOptions = [
-    { label: 'All', value: 'all' },
+const providerOptions = computed(() => [
+    { label: t('common.all'), value: 'all' },
     { label: 'PGSoft', value: 'PGSoft' },
     { label: 'JILI', value: 'JILI' },
     { label: 'PragmaticPlay', value: 'PragmaticPlay' },
     { label: 'Habanero', value: 'Habanero' }
-]
+])
 
-const statusOptions = [
-    { label: 'All', value: 'all' },
-    { label: 'Active', value: 'active' },
-    { label: 'Maintenance', value: 'maintenance' }
-]
+const statusOptions = computed(() => [
+    { label: t('common.all'), value: 'all' },
+    { label: t('status.active'), value: 'active' },
+    { label: t('status.maintenance'), value: 'maintenance' }
+])
 
 // Data Fetching
 const fetchGames = async () => {
@@ -81,22 +83,22 @@ const handleRefresh = () => {
 }
 
 // Columns
-const columns: DataTableColumns<Game> = [
+const columns = computed<DataTableColumns<Game>>(() => [
     { 
-        title: 'Icon', 
+        title: t('game.icon'), 
         key: 'icon', 
         width: 60,
         render: () => '🎰' 
     },
     { 
-        title: 'Game Name', 
+        title: t('game.name'), 
         key: 'name_en', 
         width: 200, 
         ellipsis: true,
         sorter: (row1, row2) => row1.name_en.localeCompare(row2.name_en) 
     },
     { 
-        title: 'ID', 
+        title: t('columns.id'), 
         key: 'game_id', 
         width: 150,
         sorter: (row1, row2) => row1.game_id.localeCompare(row2.game_id),
@@ -107,7 +109,7 @@ const columns: DataTableColumns<Game> = [
         )
     },
     { 
-        title: 'Provider', 
+        title: t('game.provider'), 
         key: 'provider', 
         width: 120,
         sorter: (row1, row2) => row1.provider.localeCompare(row2.provider),
@@ -118,23 +120,22 @@ const columns: DataTableColumns<Game> = [
         )
     },
     { 
-        title: 'Type', 
+        title: t('game.type'), 
         key: 'type', 
         width: 100,
         sorter: (row1, row2) => (row1.type || '').localeCompare(row2.type || '')
     },
     { 
-        title: 'RTP', 
+        title: t('game.rtp'), 
         key: 'rtp_default', 
         width: 100,
         sorter: (row1, row2) => row1.rtp_default - row2.rtp_default,
         render: (row) => row.rtp_default.toFixed(1) + '%'
     },
     {
-        title: 'Status',
+        title: t('common.status'),
         key: 'status',
         width: 100,
-        // sorter removed as per request
         render: (row) => h(
             NSwitch,
             {
@@ -144,16 +145,16 @@ const columns: DataTableColumns<Game> = [
         )
     },
     {
-        title: 'Action',
+        title: t('game.config'),
         key: 'action',
         width: 100,
         render: (row) => h(
             NButton,
             { size: 'small', secondary: true, onClick: () => handleConfig(row) },
-            { default: () => 'Config' }
+            { default: () => t('game.config') }
         )
     }
-]
+])
 
 onMounted(() => {
     fetchGames()
@@ -163,52 +164,49 @@ onMounted(() => {
 <template>
   <div class="p-6 space-y-4">
     <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold">Game Center</h1>
-        <n-button type="primary" dashed>Sync Games</n-button>
+        <h1 class="text-2xl font-bold">{{ t('game.title') }}</h1>
+        <n-button type="primary" dashed>{{ t('game.sync') }}</n-button>
     </div>
 
-    <!-- Filter -->
-    <!-- Filter -->
     <n-card size="small">
         <n-space align="center" :size="12">
              <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-400">Provider:</span>
+                <span class="text-sm text-gray-400">{{ t('game.provider') }}:</span>
                 <n-select 
                     v-model:value="filter.provider" 
                     :options="providerOptions" 
                     clearable 
-                    placeholder="All" 
-                    style="width: 160px" 
+                    :placeholder="t('common.all')" 
+                    class="w-[160px]" 
                 />
              </div>
              
              <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-400">Status:</span>
+                <span class="text-sm text-gray-400">{{ t('common.status') }}:</span>
                 <n-select 
                     v-model:value="filter.status" 
                     :options="statusOptions" 
                     clearable 
-                    placeholder="All" 
-                    style="width: 140px" 
+                    :placeholder="t('common.all')" 
+                    class="w-[140px]" 
                 />
              </div>
 
              <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-400">Search:</span>
+                <span class="text-sm text-gray-400">{{ t('common.search') }}:</span>
                 <n-input 
                     v-model:value="filter.keyword" 
                     placeholder="Game Name / ID" 
-                    style="width: 200px"
+                    class="w-[200px]"
                 />
              </div>
 
              <n-button type="primary" @click="fetchGames" :loading="loading">
-                Search
+                {{ t('common.search') }}
              </n-button>
         </n-space>
     </n-card>
 
-    <!-- List -->
     <n-data-table
         :columns="columns"
         :data="games"
