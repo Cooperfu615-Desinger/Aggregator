@@ -12,6 +12,7 @@
         "reset": "Reset",
         "action": "Action",
         "status": "Status",
+        "syncCplt": "Synced {count} new items",
         "all": "All",
         "sync": "Sync",
         "refresh": "Refresh",
@@ -143,7 +144,13 @@
         "enterLimit": "Enter limit",
         "rtpPromo": "Promotion",
         "rtpStd": "Standard",
-        "rtpHigh": "High Margin"
+        "rtpHigh": "High Margin",
+        "gameList": "Game Repository",
+        "slot": "Slot Machine",
+        "live": "Live Casino",
+        "fishing": "Fishing",
+        "sports": "Sports",
+        "table": "Table Game"
     },
     "dashboard": {
         "title": "Dashboard",

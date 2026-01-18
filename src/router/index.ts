@@ -37,7 +37,7 @@ const router = createRouter({
                 {
                     path: 'admin/game-center/list',
                     name: 'game-center',
-                    component: () => import('../views/Admin/GameCenter/List.vue'),
+                    component: () => import('../views/Admin/GameCenter/GameList.vue'),
                     meta: { title: 'Game Center', roles: ['admin'] }
                 },
                 {

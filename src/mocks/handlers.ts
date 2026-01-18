@@ -2,7 +2,11 @@ import { http, HttpResponse, delay } from 'msw'
 import { faker } from '@faker-js/faker'
 import type { Merchant, MerchantDetail } from '../types/merchant'
 import type { Agent } from '../types/agent'
+import { mockGames } from './data/games'
 
+// ... existing code ...
+
+// Helper Functions
 function createRandomAgent(id: number, parentId: number | null = null, level: number = 1): Agent {
     return {
         id,
@@ -69,6 +73,67 @@ export const mockProviders: any[] = [
 ]
 
 export const handlers = [
+    // Game List
+    http.get('/api/v2/games', async ({ request }) => {
+        await delay(500)
+        const url = new URL(request.url)
+        const providerId = url.searchParams.get('provider_id')
+        const type = url.searchParams.get('type')
+        const status = url.searchParams.get('status')
+        const search = url.searchParams.get('search')?.toLowerCase()
+
+        let filtered = [...mockGames]
+
+        if (providerId) {
+            filtered = filtered.filter(g => g.providerId === Number(providerId))
+        }
+        if (type) {
+            filtered = filtered.filter(g => g.type === type)
+        }
+        if (status) {
+            filtered = filtered.filter(g => g.status === status)
+        }
+        if (search) {
+            filtered = filtered.filter(g =>
+                g.name_en.toLowerCase().includes(search) ||
+                (g.name_zh && g.name_zh.includes(search)) ||
+                g.game_id.toLowerCase().includes(search)
+            )
+        }
+
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: {
+                list: filtered,
+                total: filtered.length
+            }
+        })
+    }),
+
+    // Game Sync
+    http.post('/api/v2/games/sync', async () => {
+        await delay(3000)
+        return HttpResponse.json({
+            code: 0,
+            msg: `Synced ${faker.number.int({ min: 5, max: 20 })} new games successfully`,
+            data: { count: 15 }
+        })
+    }),
+
+    // Update Game Status
+    http.post('/api/v2/games/update', async ({ request }) => {
+        await delay(600)
+        const body = await request.json() as any
+        const game = mockGames.find(g => g.game_id === body.game_id)
+        if (game) {
+            Object.assign(game, body)
+        }
+        return HttpResponse.json({
+            code: 0,
+            msg: 'Game Updated'
+        })
+    }),
     // Provider List
     http.get('/api/v2/providers', async () => {
         await delay(600)
