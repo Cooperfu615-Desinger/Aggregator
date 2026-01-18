@@ -19,6 +19,10 @@ export interface BetLog {
     payout: number; // multiplier
     status: 'win' | 'loss' | 'refund';
     game_detail: GameDetail;
+    // New fields
+    providerId?: number;
+    txId?: string;
+    currencyBaseAmount?: number;
 }
 
 export interface BetLogSearchResponse {

@@ -7,6 +7,11 @@ export interface Merchant {
     percent: number;
     state: number; // 1=Active, 0=Inactive
     created_at: string;
+    // New fields
+    walletMode?: 'seamless' | 'transfer';
+    secretKey?: string;
+    ipWhitelist?: string[];
+    baseCurrency?: string;
 }
 
 export interface MerchantDetail extends Merchant {

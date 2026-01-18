@@ -1,4 +1,8 @@
 {
+    "wallet_mode": {
+        "seamless": "單一錢包",
+        "transfer": "轉帳錢包"
+    },
     "common": {
         "save": "儲存",
         "cancel": "取消",

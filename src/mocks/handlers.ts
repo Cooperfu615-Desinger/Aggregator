@@ -25,11 +25,22 @@ function createRandomMerchant(id: number): Merchant {
         account: faker.internet.username(),
         name: faker.company.name(),
         currency_type: faker.helpers.arrayElement(['TWD', 'CNY', 'USD']),
-        percent: faker.number.int({ min: 90, max: 99 }), // Used for RTP or share? "percent" in Merchant usually means share, but leveraging for initial value if needed.
+        percent: faker.number.int({ min: 90, max: 99 }),
         state: faker.helpers.arrayElement([0, 1]),
         created_at: faker.date.past().toISOString(),
+        // New fields defaults
+        walletMode: 'transfer',
+        secretKey: faker.string.uuid(),
+        ipWhitelist: [faker.internet.ip()],
+        baseCurrency: 'TWD'
     }
 }
+
+// Mock Providers
+export const mockProviders: any[] = [
+    { id: 1, code: 'pg', name: 'PG Soft', status: 'active', apiConfig: {} },
+    { id: 2, code: 'evo', name: 'Evolution', status: 'active', apiConfig: {} }
+]
 
 export const handlers = [
     http.get('/api/v2/agent/list', async () => {
@@ -169,7 +180,11 @@ export const handlers = [
                 win_amount: win,
                 profit: Number((win - bet).toFixed(2)),
                 currency: 'USD',
-                game_detail: generateGameDetail()
+                game_detail: generateGameDetail(),
+                // New fields
+                providerId: faker.helpers.arrayElement([1, 2]),
+                txId: faker.string.uuid(),
+                currencyBaseAmount: bet // simplified for mock
             }
         }, { count: 20 })
 

@@ -1,4 +1,8 @@
 {
+    "wallet_mode": {
+        "seamless": "Seamless",
+        "transfer": "Transfer"
+    },
     "common": {
         "save": "Save",
         "cancel": "Cancel",
