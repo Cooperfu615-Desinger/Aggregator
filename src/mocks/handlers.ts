@@ -309,4 +309,26 @@ export const handlers = [
             msg: 'Agent Updated Successfully'
         })
     }),
+
+    // Generate New Key
+    http.post('/api/v2/agent/regenerate-key', async () => {
+        await delay(500)
+        return HttpResponse.json({
+            code: 0,
+            msg: 'New Secret Key Generated',
+            data: {
+                secret_key: 'sk_live_' + faker.string.uuid()
+            }
+        })
+    }),
+
+    // Save Merchant Config
+    http.post('/api/v2/agent/config/update', async () => {
+        await delay(800)
+        return HttpResponse.json({
+            code: 0,
+            msg: 'Configuration Saved Successfully'
+        })
+    }),
+
 ]

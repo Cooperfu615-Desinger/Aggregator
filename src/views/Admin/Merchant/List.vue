@@ -60,6 +60,22 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       sorter: (row1, row2) => row1.name.localeCompare(row2.name)
     },
     {
+      title: t('merchantConfig.walletMode'),
+      key: 'walletMode',
+      width: 120,
+      render(row) {
+        return h(
+          NTag,
+          {
+            type: row.walletMode === 'seamless' ? 'success' : 'info',
+            bordered: false,
+            size: 'small'
+          },
+          { default: () => row.walletMode === 'seamless' ? t('merchantConfig.seamless') : t('merchantConfig.transfer') }
+        )
+      }
+    },
+    {
       title: t('merchant.currency'),
       key: 'currency_type',
       width: 130,

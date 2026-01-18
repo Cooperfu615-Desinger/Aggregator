@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { 
     NModal, NTabs, NTabPane, NForm, NFormItem, 
     NRadioGroup, NRadioButton, NInput, NInputGroup, 
-    NButton, NSelect, NDynamicTags, NSwitch, useMessage
+    NButton, NSelect, NDynamicTags, useMessage
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
@@ -21,10 +21,12 @@ const { t } = useI18n()
 const message = useMessage()
 const loading = ref(false)
 
+const originalWalletMode = ref('transfer')
+
 // Form State
 const formModel = ref({
     wallet_mode: 'transfer',
-    api_key: '',
+    site_code: '',
     secret_key: '',
     callback_url: '',
     currency: 'CNY',
@@ -44,15 +46,17 @@ const currencyOptions = [
 watch(() => props.show, (newVal) => {
     if (newVal && props.merchantId) {
         // Mock fetch API call
-        formModel.value = {
+        const mockData = {
             wallet_mode: 'transfer',
-            api_key: 'mk_' + Math.random().toString(36).substring(7),
-            secret_key: 'sk_' + Math.random().toString(36).substring(7) + '...',
+            site_code: 'MOCK' + props.merchantId,
+            secret_key: 'sk_live_' + Math.random().toString(36).substring(2),
             callback_url: 'https://api.merchant.com/callback',
-            currency: 'CNY',
-            allowed_ips: ['192.168.1.1'],
+            currency: 'TWD',
+            allowed_ips: ['10.0.0.1'],
             state: true
         }
+        formModel.value = mockData
+        originalWalletMode.value = mockData.wallet_mode
     }
 })
 
@@ -109,31 +113,22 @@ const handleSave = async () => {
                     require-mark-placement="right-hanging"
                     class="mt-4"
                 >
+                    <n-form-item :label="t('merchant.siteCodeLabel')">
+                        <n-input :value="formModel.site_code" readonly placeholder="Read Only" />
+                    </n-form-item>
+
+                    <n-form-item :label="t('merchantConfig.base_currency')">
+                        <n-select v-model:value="formModel.currency" :options="currencyOptions" />
+                    </n-form-item>
+
                     <n-form-item :label="t('merchantConfig.walletMode')">
                         <n-radio-group v-model:value="formModel.wallet_mode">
                             <n-radio-button value="transfer">{{ t('merchantConfig.transfer') }}</n-radio-button>
                             <n-radio-button value="seamless">{{ t('merchantConfig.seamless') }}</n-radio-button>
                         </n-radio-group>
-                    </n-form-item>
-
-                    <n-form-item :label="t('merchantConfig.apiKey')">
-                        <n-input-group>
-                            <n-input :value="formModel.api_key" readonly placeholder="Read Only" />
-                            <n-button @click="handleCopy(formModel.api_key)">{{ t('common.copy') }}</n-button>
-                        </n-input-group>
-                    </n-form-item>
-
-                    <n-form-item :label="t('merchantConfig.secretKey')">
-                        <n-input-group>
-                            <n-input :value="formModel.secret_key" readonly type="password" show-password-on="click" />
-                            <n-button type="warning" ghost @click="handleRegenerate">
-                                {{ t('merchantConfig.regenerate') }}
-                            </n-button>
-                        </n-input-group>
-                    </n-form-item>
-
-                    <n-form-item :label="t('merchantConfig.callbackUrl')">
-                        <n-input v-model:value="formModel.callback_url" placeholder="https://..." />
+                        <div v-if="formModel.wallet_mode !== originalWalletMode" class="text-amber-500 text-xs mt-1">
+                            ⚠️ {{ t('merchantConfig.wallet_mode_warning') }}
+                        </div>
                     </n-form-item>
                 </n-form>
             </n-tab-pane>
@@ -146,8 +141,14 @@ const handleSave = async () => {
                     require-mark-placement="right-hanging"
                     class="mt-4"
                 >
-                    <n-form-item :label="t('merchant.currency')">
-                        <n-select v-model:value="formModel.currency" :options="currencyOptions" />
+                    <n-form-item :label="t('merchantConfig.secretKey')">
+                        <n-input-group>
+                            <n-input :value="formModel.secret_key" readonly type="password" show-password-on="click" />
+                            <n-button @click="handleCopy(formModel.secret_key)">{{ t('common.copy') }}</n-button>
+                            <n-button type="warning" ghost @click="handleRegenerate">
+                                {{ t('merchantConfig.regenerate') }}
+                            </n-button>
+                        </n-input-group>
                     </n-form-item>
 
                     <n-form-item :label="t('merchantConfig.allowedIps')">
@@ -156,12 +157,19 @@ const handleSave = async () => {
                             <span class="text-xs text-gray-500">{{ t('merchantConfig.enterIp') }}</span>
                         </template>
                     </n-form-item>
+                </n-form>
+            </n-tab-pane>
 
-                    <n-form-item :label="t('common.status')">
-                        <n-switch v-model:value="formModel.state">
-                            <template #checked>{{ t('status.active') }}</template>
-                            <template #unchecked>{{ t('status.disabled') }}</template>
-                        </n-switch>
+            <!-- Tab 3: Webhooks -->
+            <n-tab-pane name="webhooks" :tab="t('merchantConfig.webhooks')" :disabled="formModel.wallet_mode === 'transfer'">
+                <n-form
+                    label-placement="left"
+                    label-width="140"
+                    require-mark-placement="right-hanging"
+                    class="mt-4"
+                >
+                    <n-form-item :label="t('merchantConfig.callbackUrl')">
+                        <n-input v-model:value="formModel.callback_url" placeholder="https://..." />
                     </n-form-item>
                 </n-form>
             </n-tab-pane>
