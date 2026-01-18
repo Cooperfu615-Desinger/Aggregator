@@ -260,6 +260,23 @@
         "preview": "預覽帳單",
         "confirmGenerate": "確認並生成"
     },
+    "system": {
+        "title": "系統安全",
+        "staffList": "員工管理",
+        "auditLogs": "操作日誌",
+        "settings": "全域設定",
+        "role": "角色權限",
+        "lastLogin": "最後登入",
+        "account": "帳號",
+        "addStaff": "新增員工",
+        "operator": "操作人員",
+        "action": "動作",
+        "target": "目標對象",
+        "changes": "變更內容",
+        "maintenanceMode": "系統維護模式",
+        "whitelist": "後台 IP 白名單",
+        "whitelistPlaceholder": "輸入 IP 後按下 Enter 新增"
+    },
     "report": {
         "title": "財務報表",
         "byDate": "依日期",

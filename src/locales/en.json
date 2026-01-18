@@ -262,6 +262,23 @@
         "preview": "Preview Invoices",
         "confirmGenerate": "Confirm & Generate"
     },
+    "system": {
+        "title": "System Security",
+        "staffList": "Staff List",
+        "auditLogs": "Audit Logs",
+        "settings": "Global Settings",
+        "role": "Role",
+        "lastLogin": "Last Login",
+        "account": "Account",
+        "addStaff": "Add Staff",
+        "operator": "Operator",
+        "action": "Action",
+        "target": "Target",
+        "changes": "Changes",
+        "maintenanceMode": "Maintenance Mode",
+        "whitelist": "Admin IP Whitelist",
+        "whitelistPlaceholder": "Press Enter to add IP"
+    },
     "report": {
         "title": "Financial Report",
         "byDate": "By Date",

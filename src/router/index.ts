@@ -59,6 +59,26 @@ const router = createRouter({
                     meta: { title: 'Invoice Manager', roles: ['admin'] }
                 },
 
+                // ================== SYSTEM ROUTES ==================
+                {
+                    path: 'admin/system/staff',
+                    name: 'StaffList',
+                    component: () => import('../views/Admin/System/StaffList.vue'),
+                    meta: { title: 'Staff List', roles: ['admin'] }
+                },
+                {
+                    path: 'admin/system/audit-logs',
+                    name: 'AuditLogs',
+                    component: () => import('../views/Admin/System/AuditLogs.vue'),
+                    meta: { title: 'Audit Logs', roles: ['admin'] }
+                },
+                {
+                    path: 'admin/system/settings',
+                    name: 'SystemSettings',
+                    component: () => import('../views/Admin/System/Settings.vue'),
+                    meta: { title: 'System Settings', roles: ['admin'] }
+                },
+
                 // ================== AGENT ROUTES ==================
                 {
                     path: 'agent/dashboard',
