@@ -29,6 +29,12 @@ const router = createRouter({
                 },
                 // Removed redundant config route as it's now a modal
                 {
+                    path: 'admin/game-center/providers',
+                    name: 'provider-list',
+                    component: () => import('../views/Admin/GameCenter/ProviderList.vue'),
+                    meta: { title: 'Provider Management', roles: ['admin'] }
+                },
+                {
                     path: 'admin/game-center/list',
                     name: 'game-center',
                     component: () => import('../views/Admin/GameCenter/List.vue'),

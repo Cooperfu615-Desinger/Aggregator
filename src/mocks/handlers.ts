@@ -38,11 +38,73 @@ function createRandomMerchant(id: number): Merchant {
 
 // Mock Providers
 export const mockProviders: any[] = [
-    { id: 1, code: 'pg', name: 'PG Soft', status: 'active', apiConfig: {} },
-    { id: 2, code: 'evo', name: 'Evolution', status: 'active', apiConfig: {} }
+    {
+        id: 1,
+        code: 'pg',
+        name: 'PG Soft',
+        status: 'active',
+        type: 'Slot',
+        apiConfig: {
+            apiUrl: 'https://api.pgsoft.com',
+            merchantCode: 'AGG_TEST',
+            secretKey: 'sk_pg_123',
+            revenueShare: 12,
+            currency: 'USD'
+        }
+    },
+    {
+        id: 2,
+        code: 'evo',
+        name: 'Evolution',
+        status: 'active',
+        type: 'Live',
+        apiConfig: {
+            apiUrl: 'https://api.evolution.com',
+            merchantCode: 'AGG_EVO',
+            secretKey: 'sk_evo_456',
+            revenueShare: 10,
+            currency: 'EUR'
+        }
+    }
 ]
 
 export const handlers = [
+    // Provider List
+    http.get('/api/v2/providers', async () => {
+        await delay(600)
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: {
+                list: mockProviders,
+                total: mockProviders.length
+            }
+        })
+    }),
+
+    // Update Provider
+    http.post('/api/v2/providers/update', async ({ request }) => {
+        await delay(800)
+        const body = await request.json() as any
+        const providerIndex = mockProviders.findIndex(p => p.id === body.id)
+
+        if (providerIndex !== -1) {
+            // Merge updates
+            mockProviders[providerIndex] = {
+                ...mockProviders[providerIndex],
+                ...body,
+                apiConfig: {
+                    ...mockProviders[providerIndex].apiConfig,
+                    ...(body.apiConfig || {})
+                }
+            }
+        }
+
+        return HttpResponse.json({
+            code: 0,
+            msg: 'Provider Updated Successfully'
+        })
+    }),
     http.get('/api/v2/agent/list', async () => {
         await delay(500) // Simulate network latency
 

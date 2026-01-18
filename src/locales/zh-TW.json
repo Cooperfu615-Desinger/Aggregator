@@ -109,6 +109,22 @@
         "saveSuccess": "配置儲存成功",
         "enterIp": "輸入允許的 IP 並按下 Enter"
     },
+    "provider": {
+        "title": "供應商管理",
+        "list": "供應商列表",
+        "config": "配置",
+        "code": "代碼",
+        "name": "供應商名稱",
+        "type": "遊戲類型",
+        "status": "狀態",
+        "integration": "API連線設定",
+        "finance": "財務設定",
+        "apiUrl": "API 網址 (Endpoint)",
+        "merchantCode": "商戶號 (Merchant Code)",
+        "secretKey": "通訊密鑰 (Secret Key)",
+        "revenueShare": "成本占成 (%)",
+        "currency": "結算幣種"
+    },
     "game": {
         "title": "遊戲中心",
         "sync": "同步遊戲",

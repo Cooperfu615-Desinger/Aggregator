@@ -3,7 +3,15 @@ export interface Provider {
     code: string;
     name: string;
     status: 'active' | 'maintenance';
-    apiConfig: Record<string, any>;
+    apiConfig: {
+        apiUrl?: string;
+        merchantCode?: string;
+        secretKey?: string;
+        revenueShare?: number;
+        currency?: string;
+        [key: string]: any;
+    };
+    type?: string;
 }
 
 export interface ProviderListResponse {

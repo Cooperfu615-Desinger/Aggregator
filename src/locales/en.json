@@ -109,6 +109,22 @@
         "saveSuccess": "Configuration saved successfully",
         "enterIp": "Enter allowed IP and press Enter"
     },
+    "provider": {
+        "title": "Provider Management",
+        "list": "Provider List",
+        "config": "Configuration",
+        "code": "Code",
+        "name": "Provider Name",
+        "type": "Type",
+        "status": "Status",
+        "integration": "API Connection",
+        "finance": "Cost & Revenue",
+        "apiUrl": "API Endpoint",
+        "merchantCode": "Merchant Code (Our ID)",
+        "secretKey": "Secret Key",
+        "revenueShare": "Revenue Share (%)",
+        "currency": "Settlement Currency"
+    },
     "game": {
         "title": "Game Center",
         "sync": "Sync Games",
