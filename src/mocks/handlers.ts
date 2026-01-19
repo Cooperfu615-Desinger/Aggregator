@@ -56,6 +56,7 @@ export const mockProviders: any[] = [
         name: 'PG Soft',
         status: 'active',
         type: 'Slot',
+        gameCount: 128,
         apiConfig: {
             apiUrl: 'https://api.pgsoft.com',
             merchantCode: 'AGG_TEST',
@@ -70,12 +71,58 @@ export const mockProviders: any[] = [
         name: 'Evolution',
         status: 'active',
         type: 'Live',
+        gameCount: 85,
         apiConfig: {
             apiUrl: 'https://api.evolution.com',
             merchantCode: 'AGG_EVO',
             secretKey: 'sk_evo_456',
             revenueShare: 10,
             currency: 'EUR'
+        }
+    },
+    {
+        id: 3,
+        code: 'pp',
+        name: 'Pragmatic Play',
+        status: 'active',
+        type: 'Slot',
+        gameCount: 256,
+        apiConfig: {
+            apiUrl: 'https://api.pragmaticplay.com',
+            merchantCode: 'AGG_PP',
+            secretKey: 'sk_pp_789',
+            revenueShare: 15,
+            currency: 'USD'
+        }
+    },
+    {
+        id: 4,
+        code: 'jili',
+        name: 'JILI',
+        status: 'maintenance',
+        type: 'Slot',
+        gameCount: 67,
+        apiConfig: {
+            apiUrl: 'https://api.jili.com',
+            merchantCode: 'AGG_JILI',
+            secretKey: 'sk_jili_abc',
+            revenueShare: 8,
+            currency: 'USD'
+        }
+    },
+    {
+        id: 5,
+        code: 'habanero',
+        name: 'Habanero',
+        status: 'active',
+        type: 'Slot',
+        gameCount: 142,
+        apiConfig: {
+            apiUrl: 'https://api.habanero.com',
+            merchantCode: 'AGG_HAB',
+            secretKey: 'sk_hab_xyz',
+            revenueShare: 11,
+            currency: 'USD'
         }
     }
 ]

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, h, watch } from 'vue'
 import { 
-    NDataTable, NTag, NButton, NSwitch, useMessage, NInput, NSelect
+    NDataTable, NTag, NButton, useMessage, NSelect
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import type { DataTableColumns } from 'naive-ui'
 import type { Game } from '../../../types/game'
+import PageFilterBar from '../../../components/Common/PageFilterBar.vue'
+import StatusSwitch from '../../../components/Common/StatusSwitch.vue'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -20,6 +22,9 @@ const filters = ref({
     status: 'all' as string,
     search: ''
 })
+
+// Track switch states
+const switchStates = ref<Record<string, boolean>>({})
 
 const providerOptions = [
     { label: t('common.all'), value: 'all' },
@@ -55,6 +60,10 @@ const fetchList = async () => {
         const res = await fetch(`/api/v2/games?${params.toString()}`).then(r => r.json())
         if (res.code === 0) {
             list.value = res.data.list
+            // Initialize switch states
+            list.value.forEach(game => {
+                switchStates.value[game.game_id] = game.status === 'active'
+            })
         }
     } catch (e) {
         message.error('Failed to load games')
@@ -68,7 +77,7 @@ const handleSync = async () => {
     try {
         const res = await fetch('/api/v2/games/sync', { method: 'POST' }).then(r => r.json())
         if (res.code === 0) {
-            message.success(t('common.syncCplt', { count: res.data.count }))
+            message.success(`✅ Synced ${res.data?.count || 15} new games from upstream`)
             fetchList()
         }
     } catch (e) {
@@ -78,9 +87,10 @@ const handleSync = async () => {
     }
 }
 
-const handleStatusChange = async (row: Game, newVal: boolean) => {
+const handleStatusConfirm = async (row: Game, newVal: boolean) => {
     const oldStatus = row.status
     row.status = newVal ? 'active' : 'maintenance'
+    switchStates.value[row.game_id] = newVal
     
     try {
         const res = await fetch('/api/v2/games/update', {
@@ -90,22 +100,28 @@ const handleStatusChange = async (row: Game, newVal: boolean) => {
         }).then(r => r.json())
 
         if (res.code !== 0) throw new Error(res.msg)
+        message.success(newVal ? 'Game enabled' : 'Game set to maintenance')
     } catch (e) {
         row.status = oldStatus
+        switchStates.value[row.game_id] = oldStatus === 'active'
         message.error('Update failed')
     }
+}
+
+const handleReset = () => {
+    filters.value = { provider_id: 'all', type: 'all', status: 'all', search: '' }
 }
 
 const columns: DataTableColumns<Game> = [
     {
         title: t('game.name'),
         key: 'name_en',
-        width: 250,
+        width: 280,
         render: (row) => h('div', { class: 'flex items-center gap-3' }, [
             h('img', { 
-                src: row.thumbnail || 'https://placehold.co/100x100?text=Game', 
-                class: 'w-10 h-10 rounded object-cover bg-gray-100',
-                onError: (e: Event) => (e.target as HTMLImageElement).src = 'https://placehold.co/100x100?text=Err'
+                src: row.thumbnail || 'https://placehold.co/80x80?text=Game', 
+                class: 'w-12 h-12 rounded-lg object-cover bg-gray-700',
+                onError: (e: Event) => (e.target as HTMLImageElement).src = 'https://placehold.co/80x80?text=Err'
             }),
             h('div', {}, [
                 h('div', { class: 'font-medium' }, row.name_en),
@@ -116,36 +132,48 @@ const columns: DataTableColumns<Game> = [
     {
         title: t('game.provider'),
         key: 'provider',
-        width: 120,
-        render: (row) => h(NTag, { size: 'small' }, { default: () => row.provider })
+        width: 130,
+        render: (row) => h(NTag, { size: 'small', type: 'info' }, { default: () => row.provider })
     },
     {
         title: t('game.type'),
         key: 'type',
-        width: 120,
+        width: 100,
         render: (row) => {
-            const map: Record<string, string> = {
-                'Slot': t('game.slot'),
-                'Live': t('game.live'),
-                'Fishing': t('game.fishing'),
-                'Sports': t('game.sports')
+            const typeColors: Record<string, string> = {
+                'Slot': 'success',
+                'Live': 'warning',
+                'Fishing': 'info',
+                'Sports': 'default'
             }
-            return map[row.type] || row.type
+            return h(NTag, { 
+                size: 'small', 
+                type: typeColors[row.type] as any || 'default',
+                bordered: false
+            }, { default: () => row.type })
         }
     },
     {
         title: t('game.rtp'),
         key: 'rtp_default',
-        width: 100,
-        render: (row) => `${row.rtp_default}%`
+        width: 90,
+        render: (row) => h('span', { class: 'font-mono text-green-400' }, `${row.rtp_default}%`)
     },
     {
         title: t('common.status'),
         key: 'status',
-        width: 100,
-        render: (row) => h(NSwitch, {
-            value: row.status === 'active',
-            'onUpdate:value': (val: boolean) => handleStatusChange(row, val)
+        width: 150,
+        render: (row) => h(StatusSwitch, {
+            value: switchStates.value[row.game_id] ?? (row.status === 'active'),
+            warningMessage: `Disabling "${row.name_en}" will hide it from all merchants.`,
+            warningTitle: '⚠️ Disable Game',
+            'onUpdate:value': (val: boolean) => {
+                switchStates.value[row.game_id] = val
+            },
+            onConfirm: (val: boolean) => handleStatusConfirm(row, val)
+        }, {
+            checked: () => 'Active',
+            unchecked: () => 'Off'
         })
     }
 ]
@@ -162,27 +190,49 @@ onMounted(() => {
 <template>
     <div class="p-6">
         <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold">{{ t('game.gameList') }}</h1>
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <span>🎮</span> {{ t('game.gameList') }}
+            </h1>
             <n-button type="primary" :loading="syncing" @click="handleSync">
-                🔄 {{ t('game.sync') }}
+                🔄 {{ syncing ? 'Syncing...' : t('game.sync') }}
             </n-button>
         </div>
 
-        <div class="bg-gray-800/50 p-4 rounded-lg mb-6 flex flex-wrap gap-4 items-center">
-            <n-input v-model:value="filters.search" placeholder="Search..." class="w-64" clearable />
-            <n-select v-model:value="filters.provider_id" :options="providerOptions" class="w-40" />
-            <n-select v-model:value="filters.type" :options="typeOptions" class="w-40" />
-            <n-select v-model:value="filters.status" :options="statusOptions" class="w-40" />
-            <n-button @click="filters = { provider_id: 'all', type: 'all', status: 'all', search: '' }">
-                {{ t('common.reset') }}
-            </n-button>
-        </div>
+        <!-- Filter Bar -->
+        <PageFilterBar
+            v-model:searchValue="filters.search"
+            searchPlaceholder="Search game name..."
+            @reset="handleReset"
+        >
+            <template #filters>
+                <n-select 
+                    v-model:value="filters.provider_id" 
+                    :options="providerOptions" 
+                    placeholder="Provider"
+                    class="w-36"
+                />
+                <n-select 
+                    v-model:value="filters.type" 
+                    :options="typeOptions" 
+                    placeholder="Type"
+                    class="w-32"
+                />
+                <n-select 
+                    v-model:value="filters.status" 
+                    :options="statusOptions" 
+                    placeholder="Status"
+                    class="w-32"
+                />
+            </template>
+        </PageFilterBar>
 
         <n-data-table
             :columns="columns"
             :data="list"
             :loading="loading"
             :pagination="{ pageSize: 15 }"
+            :bordered="false"
+            striped
         />
     </div>
 </template>

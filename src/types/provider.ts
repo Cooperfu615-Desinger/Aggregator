@@ -12,6 +12,7 @@ export interface Provider {
         [key: string]: any;
     };
     type?: string;
+    gameCount?: number;
 }
 
 export interface ProviderListResponse {
