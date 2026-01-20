@@ -40,8 +40,7 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       title: '#',
       key: 'id',
       width: 60,
-      render: (_, index) => index + 1,
-      sorter: (a, b) => a.id - b.id
+      render: (_, index) => index + 1
     },
     {
       title: t('merchant.merchantId'),
@@ -64,12 +63,14 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       title: t('merchant.siteCodeLabel'),
       key: 'site_code',
       width: 150,
+      sorter: (a, b) => (a.site_code || '').localeCompare(b.site_code || ''),
       render: (row) => h('span', { class: 'font-bold' }, row.site_code)
     },
     {
       title: t('merchant.walletType'),
       key: 'walletMode',
       width: 120,
+      sorter: (a, b) => (a.walletMode || '').localeCompare(b.walletMode || ''),
       render(row) {
         return h(
           NTag,
@@ -87,6 +88,7 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       title: t('merchant.currency'),
       key: 'currency_type',
       width: 100,
+      sorter: (a, b) => (a.currency_type || '').localeCompare(b.currency_type || ''),
       render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => row.currency_type })
     },
     {
@@ -94,6 +96,7 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       key: 'revenue_share',
       width: 120,
       align: 'right',
+      sorter: (a, b) => (a.revenue_share || a.percent || 0) - (b.revenue_share || b.percent || 0),
       render: (row) => `${(row.revenue_share || row.percent || 0).toFixed(2)}%`
     },
     {
@@ -117,6 +120,7 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       key: 'state',
       width: 100,
       align: 'center',
+      sorter: (a, b) => (a.state || 0) - (b.state || 0),
       render(row) {
         return h(StatusBadge, {
           status: row.state === 1 ? 'Active' : 'Suspended'
