@@ -381,13 +381,15 @@
         "online": "在線",
         "revenueTrend": "營收走勢 (24h)",
         "requests": "API 請求總量",
+        "reqs": "次",
         "avgMargin": "平均毛利率",
         "providerShare": "供應商佔比",
         "topMerchants": "熱門商戶 (GGR)",
         "topGames": "熱門遊戲 (注單量)",
         "systemHealth": "系統健康度 (延遲)",
         "ms": "毫秒",
-        "loadFailed": "無法載入儀表板資料"
+        "loadFailed": "無法載入儀表板資料",
+        "loadError": "無法載入儀表板資料"
     },
     "form": {
         "account": "帳號",
@@ -471,19 +473,6 @@
         "yesterday": "昨天",
         "last7Days": "近 7 天",
         "thisMonth": "本月"
-    },
-    "dashboard": {
-        "title": "儀表板",
-        "myBalance": "我的餘額",
-        "todayGgr": "今日 GGR",
-        "activePlayers": "活躍玩家",
-        "enabledGames": "已啟用遊戲",
-        "yesterday": "昨日",
-        "last24h": "近 24 小時",
-        "acrossAllProviders": "所有供應商",
-        "ggrTrend": "📈 GGR 走勢（近 7 天）",
-        "transferWallet": "💼 轉帳錢包",
-        "seamless": "🔗 單一錢包"
     },
     "myGames": {
         "title": "我的遊戲",

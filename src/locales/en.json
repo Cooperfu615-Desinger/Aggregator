@@ -333,7 +333,9 @@
         "topGames": "Top Games (Bets)",
         "systemHealth": "System Health (Latency)",
         "ms": "ms",
-        "loadFailed": "Failed to load dashboard data"
+        "loadFailed": "Failed to load dashboard data",
+        "loadError": "Failed to load dashboard data",
+        "reqs": "reqs"
     },
     "form": {
         "account": "Account",
