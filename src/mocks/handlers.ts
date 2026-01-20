@@ -428,7 +428,7 @@ export const handlers = [
         })
     }),
 
-    // Get Bet Logs (Round Search)
+    // Get Bet Logs (Round Search) - Phase 8.8 Spec
     http.post('/api/v2/report/bet-logs', async ({ request }) => {
         await delay(800)
         const body = await request.json() as any
@@ -441,7 +441,11 @@ export const handlers = [
         }
 
         const list = faker.helpers.multiple(() => {
-            // Determine Provider based on filter or random
+            // Merchant data
+            const merchantCode = match_merchant || `OP-${faker.number.int({ min: 1001, max: 1020 })}`
+            const merchantName = faker.helpers.arrayElement(['Golden Dragon', 'Silver Tiger', 'Diamond Star', 'Royal Crown', 'Lucky 88', 'Grand Casino'])
+
+            // Provider data
             const providerScenario = match_provider
                 ? (match_provider === 'pg' ? 'PG' : match_provider === 'evo' ? 'EVO' : 'PP')
                 : faker.helpers.weightedArrayElement([
@@ -450,38 +454,51 @@ export const handlers = [
                     { weight: 10, value: 'PP' }
                 ])
 
-            let providerCode, providerName, currency, rate, betRange
+            const providerName = providerScenario === 'PG' ? 'PG Soft' : providerScenario === 'EVO' ? 'Evolution' : 'Pragmatic Play'
+            const gameName = faker.helpers.arrayElement(['Fortune Tiger', 'Super Ace', 'Crazy Time', 'Sweet Bonanza', 'Gates of Olympus'])
 
-            switch (providerScenario) {
-                case 'PG':
-                    providerCode = 'pg'
-                    providerName = 'PG Soft'
-                    currency = 'THB'
-                    rate = 0.03
-                    betRange = { min: 10, max: 500 }
+            // Player IDs (dual-layer)
+            const aggPlayerId = match_playerId || `PL-${faker.number.int({ min: 1000, max: 9999 })}`
+            const merchantMemberId = match_playerId || `mem_${faker.internet.username().toLowerCase()}`
+
+            // Financial scenarios
+            const scenario = faker.helpers.weightedArrayElement([
+                { weight: 40, value: 'WIN' },    // 40% wins
+                { weight: 50, value: 'LOSS' },   // 50% losses
+                { weight: 10, value: 'REFUND' }  // 10% refunds/cancelled
+            ])
+
+            let betAmount: number, payoutAmount: number, netWin: number, status: 'settled' | 'unsettled' | 'cancelled'
+
+            const baseBet = faker.number.float({ min: 10, max: 500, fractionDigits: 2 })
+
+            switch (scenario) {
+                case 'WIN':
+                    betAmount = baseBet
+                    payoutAmount = baseBet * faker.number.float({ min: 1.5, max: 10, fractionDigits: 2 })
+                    netWin = Number((payoutAmount - betAmount).toFixed(2))
+                    status = 'settled'
                     break
-                case 'EVO':
-                    providerCode = 'evo'
-                    providerName = 'Evolution'
-                    currency = 'USD'
-                    rate = 1.0
-                    betRange = { min: 1, max: 100 }
+                case 'LOSS':
+                    betAmount = baseBet
+                    payoutAmount = faker.datatype.boolean(0.9) ? 0 : baseBet * faker.number.float({ min: 0.1, max: 0.9, fractionDigits: 2 })
+                    netWin = Number((payoutAmount - betAmount).toFixed(2))
+                    status = 'settled'
                     break
-                case 'PP':
-                    providerCode = 'pp'
-                    providerName = 'Pragmatic Play'
-                    currency = 'VND'
-                    rate = 0.00004
-                    betRange = { min: 10000, max: 500000 }
+                case 'REFUND':
+                    betAmount = baseBet
+                    payoutAmount = baseBet
+                    netWin = 0
+                    status = 'cancelled'
                     break
                 default:
-                    providerCode = 'pg'; providerName = 'PG'; currency = 'THB'; rate = 0.03; betRange = { min: 10, max: 100 }
+                    betAmount = baseBet
+                    payoutAmount = 0
+                    netWin = -baseBet
+                    status = 'settled'
             }
 
-            const bet = faker.number.float({ min: betRange!.min, max: betRange!.max, fractionDigits: 2 })
-            const win = faker.number.float({ min: 0, max: bet * 5, fractionDigits: 2 })
-
-            // Generate timestamps within range if provided, else recent
+            // Timestamp
             let created_at = faker.date.recent({ days: 1 }).toISOString()
             if (timeRange && timeRange.length === 2) {
                 const start = new Date(timeRange[0])
@@ -489,36 +506,56 @@ export const handlers = [
                 created_at = faker.date.between({ from: start, to: end }).toISOString()
             }
 
-            const mCode = match_merchant || `OP-${faker.number.int({ min: 1001, max: 1020 })}`
-            const mName = faker.helpers.arrayElement(['Golden Dragon', 'Silver Tiger', 'Diamond Star', 'Royal Crown', 'Lucky 88', 'Grand Casino'])
-
             return {
-                id: match_roundId || ('PF' + faker.string.numeric(12)),
-                txId: faker.string.uuid(),
+                // Core IDs
+                round_id: match_roundId || `R-${faker.string.numeric(12)}`,
+                id: `PF-${faker.string.numeric(10)}`,
                 created_at,
-                player_account: match_playerId || faker.internet.username(),
-                merchant_code: mCode,
-                merchant_name: mName, // Added Merchant Name
-                game_name: faker.helpers.arrayElement(['Fortune Tiger', 'Super Ace', 'Crazy Time', 'Sweet Bonanza']),
 
-                providerCode,
+                // Merchant info
+                merchant_display_id: merchantCode,
+                merchant_name: merchantName,
+
+                // Game info
+                provider_name: providerName,
+                game_name: gameName,
+
+                // Player IDs
+                agg_player_id: aggPlayerId,
+                merchant_member_id: merchantMemberId,
+
+                // Financial
+                bet_amount: betAmount,
+                payout_amount: payoutAmount,
+                net_win: netWin,
+                currency: 'USD',
+
+                // Status
+                status,
+
+                // Detail
+                game_detail: {
+                    round_id: `R-${faker.string.numeric(12)}`,
+                    matrix: [],
+                    lines_won: [],
+                    free_games_triggered: false,
+                    multiplier: 1,
+                    currency: 'USD'
+                },
+
+                // Legacy compatibility (for existing code)
+                merchant_code: merchantCode,
+                providerCode: providerScenario.toLowerCase(),
                 providerName,
-                currency,
-                exchangeRate: rate,
-
-                originalBet: bet,
-                originalWin: win,
-
-                bet_amount: Number((bet * rate!).toFixed(4)),
-                win_amount: Number((win * rate!).toFixed(4)),
-                profit: Number(((win - bet) * rate!).toFixed(4)),
-
-                status: win > 0 ? 'win' : 'loss',
-                payout: win / (bet || 1),
-
-                game_detail: { round_id: faker.string.uuid() },
-                providerId: 1,
-                currencyBaseAmount: Number((bet * rate!).toFixed(4))
+                player_account: merchantMemberId,
+                player_id: aggPlayerId,
+                win_amount: payoutAmount,
+                profit: netWin,
+                payout: betAmount > 0 ? payoutAmount / betAmount : 0,
+                originalBet: betAmount,
+                originalWin: payoutAmount,
+                exchangeRate: 1.0,
+                txId: faker.string.uuid()
             }
         }, { count: 50 })
 
@@ -527,7 +564,7 @@ export const handlers = [
             msg: 'success',
             data: {
                 list,
-                total: 100
+                total: 200
             }
         })
     }),

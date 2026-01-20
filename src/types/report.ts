@@ -8,28 +8,47 @@ export interface GameDetail {
 }
 
 export interface BetLog {
-    id: string; // Round ID
-    created_at: string; // Time
-    player_account: string;
-    player_id?: string; // Player ID for filtering
+    // Core identifiers
+    round_id: string; // e.g., "R-882190..."
+    id: string; // Platform internal ID
+    created_at: string; // ISO timestamp
+
+    // Merchant information
+    merchant_display_id: string; // e.g., "OP-1001"
+    merchant_name: string; // e.g., "Golden Dragon"
+
+    // Game information
+    provider_name: string; // e.g., "PG Soft"
     game_name: string;
+
+    // Player identifiers (dual-layer)
+    agg_player_id: string; // Platform player ID, e.g., "PL-9988"
+    merchant_member_id: string; // Merchant's member ID, e.g., "mem_user_01"
+
+    // Financial data
     bet_amount: number;
-    win_amount: number;
-    profit: number; // win - bet
+    payout_amount: number;
+    net_win: number; // Computed: payout_amount - bet_amount
     currency: string;
-    payout: number; // multiplier
-    status: 'win' | 'loss' | 'refund';
-    game_detail: GameDetail;
-    // Aggregator fields
+
+    // Status
+    status: 'settled' | 'unsettled' | 'cancelled';
+
+    // Detail payload
+    game_detail?: GameDetail;
+
+    // Legacy fields (for backward compatibility)
+    player_account?: string;
+    player_id?: string;
+    win_amount?: number;
+    profit?: number;
+    payout?: number;
     merchant_code?: string;
-    merchant_name?: string; // Added for UI display
     providerCode?: string;
     providerName?: string;
     originalBet?: number;
     originalWin?: number;
     exchangeRate?: number;
-
-    // Legacy/Compatibility
     providerId?: number;
     txId?: string;
     currencyBaseAmount?: number;
