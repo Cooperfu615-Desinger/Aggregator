@@ -3,8 +3,9 @@ import { ref, onMounted, computed, h } from 'vue'
 import { 
     NCard, NButton, NDataTable, NModal, NDatePicker, 
     NSpace, NStatistic, NDrawer, NDrawerContent, NList, NListItem,
-    useMessage, type DataTableColumns 
+    useMessage, type DataTableColumns, NTooltip, NIcon 
 } from 'naive-ui'
+import { DescriptionOutlined } from '@vicons/material'
 import { useI18n } from 'vue-i18n'
 import StatusBadge from '../../../components/Common/StatusBadge.vue'
 import MoneyText from '../../../components/Common/MoneyText.vue'
@@ -40,13 +41,13 @@ const markingPaid = ref(false)
 // Columns with StatusBadge and MoneyText
 const columns = computed<DataTableColumns<Invoice>>(() => [
     { 
-        title: 'ID', 
+        title: t('merchant.merchantId'), 
         key: 'id',
         width: 120,
         render: (row) => h('span', { class: 'font-mono text-xs' }, row.id)
     },
     { 
-        title: t('finance.merchant'), 
+        title: t('merchant.siteCodeLabel'), 
         key: 'merchant_name',
         width: 180
     },
@@ -59,8 +60,10 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
         title: t('finance.totalGGR'), 
         key: 'total_ggr', 
         width: 140,
-        align: 'right',
-        render: (row) => h(MoneyText, { value: row.total_ggr, currency: 'USD' })
+        align: 'left',
+        render: (row) => h('div', { class: 'text-right' }, [
+            h(MoneyText, { value: row.total_ggr, currency: 'USD' })
+        ])
     },
     { 
         title: () => renderHeaderWithTooltip(t('finance.amountDue'), 'tips.invoice_amount'), 
@@ -83,11 +86,16 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
     {
         title: t('columns.action'),
         key: 'action',
-        width: 100,
-        render: (row) => h(NButton, { 
-            size: 'small', 
-            onClick: () => openDetail(row) 
-        }, { default: () => t('finance.detail') })
+        width: 80,
+        align: 'center',
+        render: (row) => h(NTooltip, { trigger: 'hover' }, {
+            trigger: () => h(NButton, { 
+                size: 'small', 
+                secondary: true,
+                onClick: () => openDetail(row) 
+            }, { icon: () => h(NIcon, null, { default: () => h(DescriptionOutlined) }) }),
+            default: () => t('finance.detail')
+        })
     }
 ])
 
@@ -260,7 +268,7 @@ onMounted(() => {
                         </div>
                         <div class="mt-3 text-sm text-gray-400">
                             {{ t('finance.period') }}: <span class="text-white">{{ selectedInvoice.period }}</span> • 
-                            {{ t('finance.merchant') }}: <span class="text-white">{{ selectedInvoice.merchant_name }}</span>
+                            {{ t('merchant.siteCodeLabel') }}: <span class="text-white">{{ selectedInvoice.merchant_name }}</span>
                         </div>
                     </n-card>
 

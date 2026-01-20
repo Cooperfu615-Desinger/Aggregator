@@ -550,6 +550,6 @@
         "turnover_def": "定義: 玩家實際產生的有效流水金額",
         "payout_def": "定義: 派發給玩家的總獎金 (含 Jackpot)",
         "margin_formula": "公式: (GGR / Total Bet) * 100%",
-        "invoice_amount": "說明: 本期應結算的最終金額 (含稅)"
+        "invoice_amount": "公式: 總 GGR * 商戶占成 %"
     }
 }
