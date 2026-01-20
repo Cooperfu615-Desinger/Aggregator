@@ -79,6 +79,16 @@ const handleReset = () => {
 
 // Columns with MoneyText
 const columns = computed<DataTableColumns<BetLog>>(() => [
+    {
+        title: t('betLog.roundId'),
+        key: 'id',
+        width: 140,
+        fixed: 'left',
+        render: (row) => h('span', { 
+            class: 'font-mono text-xs text-primary cursor-pointer hover:underline',
+            onClick: () => openDetail(row)
+        }, row.id)
+    },
     { 
         title: t('betLog.time'), 
         key: 'created_at', 
@@ -110,7 +120,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         ellipsis: true
     },
     { 
-        title: 'Player', 
+        title: t('betLog.playerAccount'), 
         key: 'player_id', 
         width: 120,
         render: (row) => h('span', { class: 'font-mono text-xs' }, row.player_id || row.player_account)
@@ -122,11 +132,11 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         align: 'right',
         render: (row) => h('div', { class: 'text-right space-y-1' }, [
             h('div', { class: 'text-xs text-gray-500' }, [
-                'Bet: ',
+                t('betLog.bet') + ': ',
                 h(MoneyText, { value: row.originalBet || 0, currency: row.currency })
             ]),
             h('div', { class: 'text-sm' }, [
-                'Win: ',
+                t('betLog.win') + ': ',
                 h(MoneyText, { value: row.originalWin || 0, currency: row.currency })
             ])
         ])
@@ -153,7 +163,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         }
     },
     {
-        title: t('common.status'),
+        title: t('betLog.status'),
         key: 'status',
         width: 90,
         render: (row) => {
@@ -161,7 +171,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
                 win: 'success', loss: 'error', refund: 'warning'
             }
             return h(NTag, { type: statusMap[row.status] || 'default', bordered: false, size: 'small' }, 
-                { default: () => row.status.toUpperCase() }
+                { default: () => t(`status.${row.status}`) }
             )
         }
     },
@@ -189,29 +199,29 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
     <!-- Filter Bar with DateRangePicker -->
     <PageFilterBar
         v-model:searchValue="searchModel.roundId"
-        searchPlaceholder="Round ID / TX ID..."
+        :searchPlaceholder="t('betLog.roundId') + ' / TX ID...'"
         @reset="handleReset"
     >
         <template #filters>
-            <DateRangePicker v-model:value="searchModel.timeRange" />
+            <DateRangePicker v-model:value="searchModel.timeRange" class="w-64" />
             <n-select 
                 v-model:value="searchModel.merchantCode" 
                 :options="merchantOptions" 
-                placeholder="Merchant"
-                class="w-44"
+                :placeholder="t('betLog.merchant')"
+                class="w-40"
                 clearable
             />
             <n-select 
                 v-model:value="searchModel.provider" 
                 :options="providerOptions" 
-                placeholder="Provider"
+                :placeholder="t('betLog.provider')"
                 class="w-36"
                 clearable
             />
             <n-input 
                 v-model:value="searchModel.playerId" 
                 :placeholder="t('betLog.playerAccount')" 
-                class="w-32"
+                class="w-48"
             />
         </template>
         <template #actions>

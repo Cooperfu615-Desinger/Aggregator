@@ -425,9 +425,9 @@
         "refund": "退款"
     },
     "betLog": {
-        "title": "投注記錄查詢",
+        "title": "投注明細",
         "timeRange": "時間範圍 (預設 24h)",
-        "playerAccount": "玩家帳號 (模糊搜尋)",
+        "playerAccount": "玩家帳號",
         "roundId": "局號",
         "selectGame": "選擇遊戲",
         "searchLogs": "搜尋日誌",
@@ -438,7 +438,11 @@
         "payout": "賠率",
         "merchant": "商戶",
         "bigWin": "大獎",
-        "freeGame": "免費遊戲"
+        "freeGame": "免費遊戲",
+        "provider": "供應商",
+        "originalAmount": "原始金額",
+        "baseAmount": "清算金額",
+        "status": "狀態"
     },
     "finance": {
         "invoiceManager": "帳單管理",

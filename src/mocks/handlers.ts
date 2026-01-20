@@ -523,7 +523,7 @@ export const handlers = [
                 providerId: 1,
                 currencyBaseAmount: Number((bet * rate!).toFixed(4))
             }
-        }, { count: 20 })
+        }, { count: 50 })
 
         return HttpResponse.json({
             code: 0,

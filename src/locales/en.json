@@ -376,9 +376,9 @@
         "refund": "Refund"
     },
     "betLog": {
-        "title": "Bet Log Query System",
+        "title": "Bet Details",
         "timeRange": "Time Range (Default 24h)",
-        "playerAccount": "Player Account (Fuzzy)",
+        "playerAccount": "Player Account",
         "roundId": "Round ID",
         "selectGame": "Select Game",
         "searchLogs": "Search Logs",
@@ -391,7 +391,11 @@
         "roundDetail": "Round Detail",
         "summary": "Summary",
         "bigWin": "Big Win",
-        "freeGame": "Free Game"
+        "freeGame": "Free Game",
+        "provider": "Provider",
+        "originalAmount": "Original Amount",
+        "baseAmount": "Settlement Amount",
+        "status": "Status"
     },
     "finance": {
         "invoiceManager": "Invoice Manager",
