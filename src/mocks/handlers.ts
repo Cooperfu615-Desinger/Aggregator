@@ -27,13 +27,18 @@ function createRandomAgent(id: number, parentId: number | null = null, level: nu
 
 function createRandomMerchant(id: number): Merchant {
     const walletMode = faker.helpers.arrayElement(['transfer', 'seamless']) as 'transfer' | 'seamless'
+    const displayId = `OP-${(1000 + id).toString()}`
+
     return {
         id,
+        display_id: displayId,
         site_code: faker.string.alpha({ length: 3, casing: 'upper' }),
         account: faker.internet.username(),
-        name: faker.company.name(),
+        name: faker.company.name(), // Keeping as is, but UI might use this or remarks
+        remarks: faker.lorem.sentence({ min: 3, max: 8 }), // New remarks field
         currency_type: faker.helpers.arrayElement(['TWD', 'CNY', 'USD']),
-        percent: faker.number.int({ min: 90, max: 99 }),
+        percent: faker.number.float({ min: 10, max: 90, fractionDigits: 2 }), // Refers to revenue_share
+        revenue_share: faker.number.float({ min: 10, max: 90, fractionDigits: 2 }),
         state: faker.helpers.arrayElement([0, 1]),
         created_at: faker.date.past().toISOString(),
         // Extended fields

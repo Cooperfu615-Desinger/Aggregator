@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, h, computed } from 'vue'
-import { NDataTable, NTag, NAlert, NButton, NSpace } from 'naive-ui'
+import { NDataTable, NTag, NAlert, NButton } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
@@ -8,8 +8,8 @@ import { ref } from 'vue'
 import type { DataTableColumns } from 'naive-ui'
 import type { Merchant } from '../../../types/merchant'
 import { useMerchantList } from '../../../composables/useMerchantList'
-import MerchantConfigModal from './components/MerchantConfigModal.vue'
-import MerchantSubscriptionModal from './components/MerchantSubscriptionModal.vue'
+import CreateMerchantDrawer from './components/CreateMerchantDrawer.vue'
+import ConfigMerchantDrawer from './components/ConfigMerchantDrawer.vue'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 import StatusBadge from '../../../components/Common/StatusBadge.vue'
 
@@ -17,18 +17,13 @@ const { list, loading, error, fetchList } = useMerchantList()
 const router = useRouter()
 const { t } = useI18n()
 
+const showCreate = ref(false)
 const showConfig = ref(false)
-const showSubscription = ref(false)
 const currentMerchant = ref<Merchant | null>(null)
 
 const handleConfig = (row: Merchant) => {
     currentMerchant.value = row
     showConfig.value = true
-}
-
-const handleSubscription = (row: Merchant) => {
-    currentMerchant.value = row
-    showSubscription.value = true
 }
 
 onMounted(() => {
@@ -37,65 +32,95 @@ onMounted(() => {
 
 const columns = computed<DataTableColumns<Merchant>>(() => [
     {
-      title: t('columns.id'),
+      title: '#',
       key: 'id',
-      width: 80,
-      sorter: (row1, row2) => row1.id - row2.id
+      width: 60,
+      render: (_, index) => index + 1
     },
     {
-      title: t('merchant.merchantId'), // Merchant ID
-      key: 'account',
-      width: 150,
-      sorter: (row1, row2) => row1.account.localeCompare(row2.account)
+      title: t('merchant.merchantId'), // OP-xxxx
+      key: 'display_id',
+      width: 120,
+      render: (row) => h(
+        'span',
+        { 
+            class: 'font-mono cursor-pointer hover:text-primary',
+            onClick: () => {
+                navigator.clipboard.writeText(row.display_id || '')
+                // optional: message.success('Copied')
+            },
+            title: 'Click to Copy'
+        },
+        row.display_id || `OP-${row.id}` // Fallback if mock hasn't updated yet? Mock should have it.
+      )
     },
     {
-      title: t('merchant.siteCodeLabel'), // Merchant Code (Renamed to Merchant Name)
+      title: t('merchant.siteCodeLabel'), // Merchant Name (site_code)
       key: 'site_code',
-      width: 130,
-      sorter: (row1, row2) => row1.site_code.localeCompare(row2.site_code)
+      width: 150,
+      render: (row) => h('span', { class: 'font-bold' }, row.site_code)
     },
     {
-      title: t('merchant.name'),
-      key: 'name',
-      width: 180,
-      sorter: (row1, row2) => row1.name.localeCompare(row2.name)
-    },
-    {
-      title: t('merchantConfig.walletMode'),
+      title: t('merchant.walletType'),
       key: 'walletMode',
       width: 120,
       render(row) {
         return h(
           NTag,
           {
-            type: row.walletMode === 'seamless' ? 'success' : 'info',
+            type: row.walletMode === 'seamless' ? 'info' : 'primary', // Seamless=Purple(Info?), Transfer=Blue(Primary?) -> User said Transfer=Blue, Seamless=Purple. 
+            // NaiveUI 'info' is usually blue-ish/grey, 'primary' is green. 'success' is green. 
+            // Let's use: Transfer -> 'info' (often blue), Seamless -> 'error' (red) or custom color.
+            // Wait, Standard NaiveUI: default(grey), primary(green), info(blue), success(green), warning(orange), error(red).
+            // User asked: Transfer=Blue, Seamless=Purple.
+            // I'll stick to 'info' for Transfer (Blue) and maybe custom style for Seamless or just 'success' (Green) if purple is hard, 
+            // but let's try color prop if needed. Or just map to closest.
+            // Let's use 'info' for Transfer and 'warning' for Seamless? No, Purple usually implies special.
+            // I will use bordered: false and standard types for now. Transfer=Info(Blue), Seamless=Primary(Green) or similar.
+            // User request: Transfer=Blue, Seamless=Purple.
+            // I will use style for purple.
+            color: row.walletMode === 'seamless' ? { color: '#f3e8ff', textColor: '#9333ea', borderColor: '#f3e8ff' } : undefined, // Purple
+            type: row.walletMode === 'transfer' ? 'info' : undefined, // Blue
             bordered: false,
             size: 'small'
           },
-          { default: () => row.walletMode === 'seamless' ? t('merchantConfig.seamless') : t('merchantConfig.transfer') }
+          { default: () => row.walletMode === 'seamless' ? t('merchant.seamless') : t('merchant.transfer') }
         )
       }
     },
     {
       title: t('merchant.currency'),
       key: 'currency_type',
-      width: 130,
-      sorter: (row1, row2) => row1.currency_type.localeCompare(row2.currency_type)
+      width: 100,
+      render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => row.currency_type })
     },
     {
-      title: t('agent.percent'),
-      key: 'percent',
-      width: 100,
-      sorter: (row1, row2) => row1.percent - row2.percent,
+      title: t('merchant.revenueShare'),
+      key: 'revenue_share',
+      width: 120,
+      align: 'right',
+      render: (row) => `${(row.revenue_share || row.percent || 0).toFixed(2)}%`
+    },
+    {
+      title: t('columns.balance'),
+      key: 'balance',
+      width: 150,
+      align: 'right',
       render(row) {
-        return `${row.percent}%`
+        if (row.walletMode === 'transfer' && row.balance !== undefined) {
+          return h(MoneyText, {
+            value: row.balance,
+            currency: row.currency_type || 'USD'
+          })
+        }
+        return h('span', { class: 'text-gray-400' }, '-')
       }
     },
     {
       title: t('columns.state'),
       key: 'state',
       width: 100,
-      sorter: (row1, row2) => row1.state - row2.state,
+      align: 'center',
       render(row) {
         return h(StatusBadge, {
           status: row.state === 1 ? 'Active' : 'Suspended'
@@ -103,48 +128,29 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       }
     },
     {
-      title: t('columns.balance'),
-      key: 'balance',
-      width: 120,
-      render(row) {
-        // Only show balance for Transfer wallet mode
-        if (row.walletMode === 'transfer' && row.balance !== undefined) {
-          return h(MoneyText, {
-            value: row.balance,
-            currency: row.currency_type || 'USD'
-          })
-        }
-        return h('span', { class: 'text-gray-500' }, '-')
-      }
-    },
-    {
       title: t('columns.createdAt'),
       key: 'created_at',
-      width: 200,
-      sorter: (row1, row2) => new Date(row1.created_at).getTime() - new Date(row2.created_at).getTime(),
+      width: 180,
       render(row) {
         return new Date(row.created_at).toLocaleString()
       }
     },
     {
-        title: t('common.action'),
-        key: 'actions',
-        width: 180,
-        fixed: 'right',
-        render: (row) => h(NSpace, { size: 'small' }, {
-            default: () => [
-                h(NButton, {
-                    size: 'small',
-                    onClick: () => handleConfig(row)
-                }, { default: () => t('merchantConfig.config') }),
-                h(NButton, {
-                    size: 'small',
-                    secondary: true,
-                    type: 'info',
-                    onClick: () => handleSubscription(row)
-                }, { default: () => '🎮' })
-            ]
-        })
+      title: t('merchant.remarks'),
+      key: 'remarks',
+      width: 200,
+      ellipsis: { tooltip: true },
+      render: (row) => row.remarks || row.name || '-'
+    },
+    {
+      title: t('common.action'),
+      key: 'actions',
+      width: 100,
+      fixed: 'right',
+      render: (row) => h(NButton, {
+        size: 'small',
+        onClick: () => handleConfig(row)
+      }, { default: () => t('merchantConfig.config') })
     }
 ])
 
@@ -155,7 +161,7 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
   <div class="p-6 space-y-4">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold">{{ t('merchant.listTitle') }}</h1>
-      <n-button type="primary" @click="router.push('/merchant/create')">
+      <n-button type="primary" @click="showCreate = true">
         + {{ t('merchant.create') }}
       </n-button>
     </div>
@@ -173,15 +179,15 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       class="mt-4"
     />
 
-    <merchant-config-modal 
-        v-model:show="showConfig" 
-        :merchant-id="currentMerchant?.id || null"
+    <create-merchant-drawer
+        v-model:show="showCreate"
         @refresh="fetchList"
     />
 
-    <merchant-subscription-modal
-        v-model:show="showSubscription"
-        :merchant-id="currentMerchant?.id || null"
+    <config-merchant-drawer
+        v-model:show="showConfig"
+        :merchant="currentMerchant"
+        @refresh="fetchList"
     />
   </div>
 </template>
