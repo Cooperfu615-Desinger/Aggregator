@@ -3,10 +3,12 @@ import { ref, watch } from 'vue'
 import { 
     NModal, NTabs, NTabPane, NForm, NFormItem, 
     NInput, NButton, NSelect, NInputNumber,
-    useMessage
+    useMessage, NDatePicker, NIcon
 } from 'naive-ui'
+import { SettingsOutlined } from '@vicons/material'
 import { useI18n } from 'vue-i18n'
 import type { Provider } from '../../../../types/provider'
+import MaintenanceSettingsModal from './MaintenanceSettingsModal.vue'
 
 const props = defineProps<{
     show: boolean
@@ -21,9 +23,14 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const message = useMessage()
 const loading = ref(false)
+const showMaintenance = ref(false)
 
 const formModel = ref<Partial<Provider>>({
-    apiConfig: {}
+    apiConfig: {},
+    contract: {
+        costPercent: 0,
+        expiryDate: Date.now()
+    }
 })
 
 // Deep copy provider data when modal opens
@@ -32,6 +39,12 @@ watch(() => props.show, (newVal) => {
         formModel.value = JSON.parse(JSON.stringify(props.provider))
         if (!formModel.value.apiConfig) {
             formModel.value.apiConfig = {}
+        }
+        if (!formModel.value.contract) {
+            formModel.value.contract = {
+                costPercent: 0,
+                expiryDate: Date.now()
+            }
         }
     }
 })
@@ -79,6 +92,15 @@ const handleSave = async () => {
         :bordered="false"
         size="huge"
     >
+        <template #header-extra>
+            <n-button size="small" secondary type="warning" @click="showMaintenance = true">
+                <template #icon>
+                    <n-icon :component="SettingsOutlined" />
+                </template>
+                {{ t('provider.maintenanceSchedule') }}
+            </n-button>
+        </template>
+
         <n-tabs type="line" animated>
             <!-- Tab 1: API Connection -->
             <n-tab-pane name="integration" :tab="t('provider.integration')">
@@ -132,11 +154,46 @@ const handleSave = async () => {
                     </n-form-item>
                 </n-form>
             </n-tab-pane>
+
+            <!-- Tab 3: Contract -->
+            <n-tab-pane name="contract" :tab="t('provider.contract')">
+                <n-form
+                    label-placement="left"
+                    label-width="160"
+                    require-mark-placement="right-hanging"
+                    class="mt-4"
+                >
+                    <n-form-item :label="t('provider.contractCost')">
+                        <n-input-number 
+                            v-model:value="formModel.contract!.costPercent" 
+                            :min="0" 
+                            :max="100"
+                            :placeholder="t('provider.costPlaceholder')"
+                        >
+                            <template #suffix>%</template>
+                        </n-input-number>
+                    </n-form-item>
+
+                    <n-form-item :label="t('provider.expiryDate')">
+                        <n-date-picker 
+                            v-model:value="formModel.contract!.expiryDate as number" 
+                            type="date"
+                            class="w-full"
+                        />
+                    </n-form-item>
+                </n-form>
+            </n-tab-pane>
         </n-tabs>
 
         <div class="flex justify-end gap-3 mt-6 border-t border-gray-700 pt-4">
             <n-button @click="handleClose" :disabled="loading">{{ t('common.cancel') }}</n-button>
             <n-button type="primary" @click="handleSave" :loading="loading">{{ t('common.save') }}</n-button>
         </div>
+
+        <maintenance-settings-modal
+            v-model:show="showMaintenance"
+            :provider="provider"
+            @refresh="$emit('refresh')"
+        />
     </n-modal>
 </template>

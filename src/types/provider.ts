@@ -13,6 +13,15 @@ export interface Provider {
     };
     type?: string;
     gameCount?: number;
+    contract?: {
+        costPercent: number;
+        expiryDate: number | string;
+    };
+    maintenanceConfig?: {
+        isEmergency: boolean;
+        startTime?: number;
+        endTime?: number;
+    };
 }
 
 export interface ProviderListResponse {

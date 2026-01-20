@@ -287,7 +287,21 @@
         "merchantCode": "Merchant Code (Our ID)",
         "secretKey": "Secret Key",
         "revenueShare": "Revenue Share (%)",
-        "currency": "Settlement Currency"
+        "currency": "Settlement Currency",
+        "gameList": "Game List",
+        "contract": "Contract",
+        "contractCost": "Contract Cost (%)",
+        "expiryDate": "Expiry Date",
+        "maintenanceSchedule": "Maintenance Schedule",
+        "emergencyMaintenance": "Emergency Maintenance",
+        "periodicMaintenance": "Periodic Maintenance",
+        "maintenanceTime": "Maintenance Time",
+        "maintenanceDesc": "Set provider maintenance status and schedule.",
+        "gameType": "Game Type",
+        "rtp": "RTP",
+        "games": "Games",
+        "costPlaceholder": "Enter percentage",
+        "searchGame": "Search games..."
     },
     "game": {
         "title": "Game Center",

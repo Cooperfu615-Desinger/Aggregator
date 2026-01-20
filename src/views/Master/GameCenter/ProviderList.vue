@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n'
 import type { DataTableColumns } from 'naive-ui'
 import type { Provider } from '../../../types/provider'
 import ProviderConfigModal from './components/ProviderConfigModal.vue'
+import ProviderGameListDrawer from './components/ProviderGameListDrawer.vue'
 import StatusSwitch from '../../../components/Common/StatusSwitch.vue'
 
 const { t } = useI18n()
@@ -14,6 +15,7 @@ const message = useMessage()
 const loading = ref(false)
 const list = ref<Provider[]>([])
 const showConfig = ref(false)
+const showGameList = ref(false)
 const currentProvider = ref<Provider | null>(null)
 
 const switchStates = ref<Record<number, boolean>>({})
@@ -62,6 +64,11 @@ const handleStatusConfirm = async (row: Provider, newVal: boolean) => {
 const handleConfig = (row: Provider) => {
     currentProvider.value = row
     showConfig.value = true
+}
+
+const handleGameList = (row: Provider) => {
+    currentProvider.value = row
+    showGameList.value = true
 }
 
 const columns: DataTableColumns<Provider> = [
@@ -114,9 +121,14 @@ const columns: DataTableColumns<Provider> = [
     {
         title: t('common.action'),
         key: 'actions',
-        width: 120,
+        width: 180,
         render: (row) => h(NSpace, { size: 'small' }, {
             default: () => [
+                h(NButton, {
+                    size: 'small',
+                    secondary: true,
+                    onClick: () => handleGameList(row)
+                }, { default: () => t('provider.gameList') }),
                 h(NButton, {
                     size: 'small',
                     onClick: () => handleConfig(row)
@@ -148,13 +160,18 @@ onMounted(() => {
             :loading="loading"
             :pagination="false"
             :bordered="false"
-            striped
+            stripe
         />
 
         <provider-config-modal
             v-model:show="showConfig"
             :provider="currentProvider"
             @refresh="fetchList"
+        />
+
+        <provider-game-list-drawer
+            v-model:show="showGameList"
+            :provider="currentProvider"
         />
     </div>
 </template>

@@ -310,7 +310,21 @@
         "merchantCode": "商戶號 (Merchant Code)",
         "secretKey": "通訊密鑰 (Secret Key)",
         "revenueShare": "成本占成 (%)",
-        "currency": "結算幣種"
+        "currency": "結算幣種",
+        "gameList": "遊戲清單",
+        "contract": "合約",
+        "contractCost": "合約成本 (%)",
+        "expiryDate": "合約到期日",
+        "maintenanceSchedule": "維護排程",
+        "emergencyMaintenance": "緊急維護",
+        "periodicMaintenance": "週期性維護",
+        "maintenanceTime": "維護時間",
+        "maintenanceDesc": "設定供應商的維護狀態與時間。緊急維護將立即生效。",
+        "gameType": "遊戲類別",
+        "rtp": "殺率 (RTP)",
+        "games": "遊戲",
+        "costPlaceholder": "輸入百分比",
+        "searchGame": "搜尋遊戲..."
     },
     "invoices": {
         "myInvoices": "我的帳單",
