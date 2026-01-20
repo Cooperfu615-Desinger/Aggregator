@@ -10,9 +10,9 @@ const generateInitialInvoices = () => {
 
     const months = ['2025-10', '2025-11', '2025-12']
     const merchants = [
-        { id: 1, name: 'Bet365', code: 'B365' },
-        { id: 2, name: '1xbet', code: '1X' },
-        { id: 3, name: 'K9Win', code: 'K9' }
+        { id: 'OP-1001', name: 'Bet365', code: 'B365' },
+        { id: 'OP-1002', name: '1xbet', code: '1X' },
+        { id: 'OP-1003', name: 'K9Win', code: 'K9' }
     ]
 
     months.forEach(month => {
@@ -64,10 +64,10 @@ export const financeHandlers = [
 
         // Simulate fetching GGR for all merchants for this month
         const merchants = [
-            { id: 1, name: 'Bet365', code: 'B365' },
-            { id: 2, name: '1xbet', code: '1X' },
-            { id: 3, name: 'K9Win', code: 'K9' },
-            { id: 4, name: 'M88', code: 'M88' }
+            { id: 'OP-1001', name: 'Bet365', code: 'B365' },
+            { id: 'OP-1002', name: '1xbet', code: '1X' },
+            { id: 'OP-1003', name: 'K9Win', code: 'K9' },
+            { id: 'OP-1004', name: 'M88', code: 'M88' }
         ]
 
         const previewData = merchants.map(m => {

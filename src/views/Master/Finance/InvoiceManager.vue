@@ -17,7 +17,7 @@ const message = useMessage()
 // Models
 interface Invoice {
     id: string
-    merchant_id: number
+    merchant_id: string | number
     merchant_name: string
     period: string
     total_ggr: number
@@ -57,7 +57,7 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
         width: 100
     },
     { 
-        title: t('finance.totalGGR'), 
+        title: () => renderHeaderWithTooltip(t('finance.totalGGR'), 'tips.ggr_formula'), 
         key: 'total_ggr', 
         width: 140,
         align: 'left',
@@ -100,10 +100,10 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
 ])
 
 const previewColumns = [
-    { title: t('finance.merchant'), key: 'merchant_name' },
-    { title: 'GGR', key: 'total_ggr', render: (row: any) => h(MoneyText, { value: row.total_ggr, currency: 'USD' }) },
-    { title: 'Rate', key: 'commission_rate', render: (row: any) => row.commission_rate + '%' },
-    { title: 'Bill', key: 'amount_due', render: (row: any) => h(MoneyText, { value: row.amount_due, currency: 'USD' }) }
+    { title: t('merchant.siteCodeLabel'), key: 'merchant_name' },
+    { title: () => renderHeaderWithTooltip('GGR', 'tips.ggr_formula'), key: 'total_ggr', render: (row: any) => h(MoneyText, { value: row.total_ggr, currency: 'USD' }) },
+    { title: t('finance.commissionRate'), key: 'commission_rate', render: (row: any) => row.commission_rate + '%' },
+    { title: t('finance.amountDue'), key: 'amount_due', render: (row: any) => h(MoneyText, { value: row.amount_due, currency: 'USD' }) }
 ]
 
 // Actions
