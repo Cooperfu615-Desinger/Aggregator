@@ -52,9 +52,9 @@ const toggleReveal = () => {
 </script>
 
 <template>
-    <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-2">
-        <span v-if="label" class="text-sm text-gray-500 mr-2">{{ label }}</span>
-        <code class="flex-1 font-mono text-sm select-all break-all">{{ displayText }}</code>
+    <div class="flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2">
+        <span v-if="label" class="text-sm text-gray-400 mr-2">{{ label }}</span>
+        <code class="flex-1 font-mono text-sm select-all break-all text-gray-200">{{ displayText }}</code>
         
         <!-- Reveal toggle (only for masked) -->
         <n-button 
