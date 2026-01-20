@@ -9,6 +9,7 @@ export interface Merchant {
     currency_type: 'TWD' | 'CNY' | 'USD';
     percent: number; // Keep for backend compat, but UI uses revenue_share
     revenue_share?: number;
+    authorized_providers?: string[]; // List of Provider Codes or IDs
     state: number; // 1=Active, 0=Inactive
     created_at: string;
     // Extended fields

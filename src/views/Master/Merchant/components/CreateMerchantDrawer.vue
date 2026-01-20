@@ -27,8 +27,17 @@ const formValue = reactive({
     currency_type: 'USD',
     walletMode: 'transfer',
     percent: 90.0,
+    authorized_providers: [], // Game Auth
     remarks: ''
 })
+
+const providerOptions = [
+    { label: 'PG Soft', value: 'pg' },
+    { label: 'Evolution', value: 'evo' },
+    { label: 'Pragmatic Play', value: 'pp' },
+    { label: 'JILI', value: 'jili' },
+    { label: 'Habanero', value: 'habanero' }
+]
 
 const rules = {
     site_code: [
@@ -127,6 +136,17 @@ const handleSubmit = async () => {
                 <n-form-item :label="t('merchant.revenueShare')" path="percent">
                     <n-input-number v-model:value="formValue.percent" :min="0" :max="100" />
                     <span class="ml-2">%</span>
+                </n-form-item>
+
+                <!-- Game Auth -->
+                <n-form-item :label="t('merchant.gameAuthorization')" path="authorized_providers">
+                     <n-select
+                        v-model:value="formValue.authorized_providers"
+                        multiple
+                        filterable
+                        :placeholder="t('merchant.selectProviders') + ' (' + t('merchant.defaultNoAuth') + ')'"
+                        :options="providerOptions"
+                     />
                 </n-form-item>
 
                 <n-form-item :label="t('merchant.remarks')" path="remarks">

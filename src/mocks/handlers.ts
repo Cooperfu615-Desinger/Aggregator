@@ -39,6 +39,7 @@ function createRandomMerchant(id: number): Merchant {
         currency_type: faker.helpers.arrayElement(['TWD', 'CNY', 'USD']),
         percent: faker.number.float({ min: 10, max: 90, fractionDigits: 2 }), // Refers to revenue_share
         revenue_share: faker.number.float({ min: 10, max: 90, fractionDigits: 2 }),
+        authorized_providers: faker.helpers.arrayElements(['pg', 'evo', 'pp', 'jili', 'habanero'], { min: 0, max: 3 }),
         state: faker.helpers.arrayElement([0, 1]),
         created_at: faker.date.past().toISOString(),
         // Extended fields

@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { onMounted, h, computed } from 'vue'
-import { NDataTable, NTag, NAlert, NButton } from 'naive-ui'
+import { onMounted, h, computed, ref } from 'vue'
+import { NDataTable, NTag, NAlert, NButton, NSpace, NIcon } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import { ref } from 'vue'
+import { SettingsOutlined, SportsEsportsOutlined } from '@vicons/material'
 
 import type { DataTableColumns } from 'naive-ui'
 import type { Merchant } from '../../../types/merchant'
 import { useMerchantList } from '../../../composables/useMerchantList'
 import CreateMerchantDrawer from './components/CreateMerchantDrawer.vue'
 import ConfigMerchantDrawer from './components/ConfigMerchantDrawer.vue'
+import MerchantGameSettingsDrawer from './components/MerchantGameSettingsDrawer.vue'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 import StatusBadge from '../../../components/Common/StatusBadge.vue'
 
@@ -17,6 +18,7 @@ const { t } = useI18n()
 
 const showCreate = ref(false)
 const showConfig = ref(false)
+const showGameSettings = ref(false)
 const currentMerchant = ref<Merchant | null>(null)
 
 const handleConfig = (row: Merchant) => {
@@ -24,8 +26,13 @@ const handleConfig = (row: Merchant) => {
     showConfig.value = true
 }
 
+const handleGameSettings = (row: Merchant) => {
+    currentMerchant.value = row
+    showGameSettings.value = true
+}
+
 onMounted(() => {
-  fetchList({ level: 1 }) // Default Level 1
+  fetchList({ level: 1 })
 })
 
 const columns = computed<DataTableColumns<Merchant>>(() => [
@@ -36,7 +43,7 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       render: (_, index) => index + 1
     },
     {
-      title: t('merchant.merchantId'), // OP-xxxx
+      title: t('merchant.merchantId'),
       key: 'display_id',
       width: 120,
       render: (row) => h(
@@ -45,15 +52,14 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
             class: 'font-mono cursor-pointer hover:text-primary',
             onClick: () => {
                 navigator.clipboard.writeText(row.display_id || '')
-                // optional: message.success('Copied')
             },
             title: 'Click to Copy'
         },
-        row.display_id || `OP-${row.id}` // Fallback if mock hasn't updated yet? Mock should have it.
+        row.display_id || `OP-${row.id}`
       )
     },
     {
-      title: t('merchant.siteCodeLabel'), // Merchant Name (site_code)
+      title: t('merchant.siteCodeLabel'),
       key: 'site_code',
       width: 150,
       render: (row) => h('span', { class: 'font-bold' }, row.site_code)
@@ -132,16 +138,26 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
     {
       title: t('common.action'),
       key: 'actions',
-      width: 100,
+      width: 140,
       fixed: 'right',
-      render: (row) => h(NButton, {
-        size: 'small',
-        onClick: () => handleConfig(row)
-      }, { default: () => t('merchantConfig.config') })
+      render: (row) => h(NSpace, { size: 'small' }, {
+        default: () => [
+            h(NButton, {
+                size: 'small',
+                secondary: true,
+                onClick: () => handleConfig(row),
+                title: t('merchantConfig.config')
+            }, { icon: () => h(NIcon, null, { default: () => h(SettingsOutlined) }) }),
+            h(NButton, {
+                size: 'small',
+                secondary: true,
+                onClick: () => handleGameSettings(row),
+                title: t('merchant.gameAuthorization')
+            }, { icon: () => h(NIcon, null, { default: () => h(SportsEsportsOutlined) }) })
+        ]
+      })
     }
 ])
-
-
 </script>
 
 <template>
@@ -173,6 +189,12 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
 
     <config-merchant-drawer
         v-model:show="showConfig"
+        :merchant="currentMerchant"
+        @refresh="fetchList"
+    />
+
+    <merchant-game-settings-drawer
+        v-model:show="showGameSettings"
         :merchant="currentMerchant"
         @refresh="fetchList"
     />
