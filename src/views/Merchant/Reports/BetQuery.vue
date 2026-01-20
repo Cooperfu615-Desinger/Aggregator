@@ -6,6 +6,9 @@ import DateRangePicker from '../../../components/Common/DateRangePicker.vue'
 import PageFilterBar from '../../../components/Common/PageFilterBar.vue'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 import JsonViewer from '../../../components/Common/JsonViewer.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface BetLog {
     id: string
@@ -29,45 +32,45 @@ const selectedLog = ref<BetLog | null>(null)
 
 const columns = computed<DataTableColumns<BetLog>>(() => [
     { 
-        title: 'Time', 
+        title: t('betQuery.time'), 
         key: 'time',
         width: 160,
         render: (row) => h('span', { class: 'text-sm' }, new Date(row.time).toLocaleString())
     },
     { 
-        title: 'Round ID', 
+        title: t('betQuery.roundId'), 
         key: 'id',
         width: 140,
         render: (row) => h('span', { class: 'font-mono text-xs' }, row.id)
     },
     { 
-        title: 'Player', 
+        title: t('betQuery.player'), 
         key: 'player_id',
         width: 120,
         render: (row) => h('span', { class: 'font-mono' }, row.player_id)
     },
     { 
-        title: 'Game', 
+        title: t('betQuery.game'), 
         key: 'game_name',
         width: 150,
         ellipsis: { tooltip: true }
     },
     { 
-        title: 'Bet', 
+        title: t('betQuery.bet'), 
         key: 'bet',
         width: 120,
         align: 'right',
         render: (row) => h(MoneyText, { value: row.bet, currency: row.currency })
     },
     { 
-        title: 'Win', 
+        title: t('betQuery.win'), 
         key: 'win',
         width: 120,
         align: 'right',
         render: (row) => h(MoneyText, { value: row.win, currency: row.currency })
     },
     {
-        title: 'Status',
+        title: t('betQuery.status'),
         key: 'status',
         width: 90,
         render: (row) => {
@@ -129,28 +132,28 @@ onMounted(() => fetchData())
     <div class="p-6 space-y-4">
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold flex items-center gap-2">
-                <span>🔎</span> Bet Query
+                <span>🔎</span> {{ t('betQuery.title') }}
             </h1>
         </div>
 
         <!-- Filter Bar -->
         <PageFilterBar
             v-model:searchValue="roundId"
-            searchPlaceholder="Round ID..."
+            :searchPlaceholder="t('betQuery.searchRound')"
             @reset="handleReset"
         >
             <template #filters>
                 <DateRangePicker v-model:value="dateRange" />
                 <n-input 
                     v-model:value="playerId" 
-                    placeholder="Player ID"
+                    :placeholder="t('betQuery.playerId')"
                     class="w-36"
                     clearable
                 />
             </template>
             <template #actions>
                 <n-button type="primary" @click="fetchData" :loading="loading">
-                    Search
+                    {{ t('betQuery.search') }}
                 </n-button>
             </template>
         </PageFilterBar>
@@ -169,7 +172,7 @@ onMounted(() => fetchData())
         <!-- Detail Drawer -->
         <JsonViewer
             v-model:show="showDetail"
-            :title="`Round: ${selectedLog?.id || ''}`"
+            :title="`${t('betQuery.roundId')}: ${selectedLog?.id || ''}`"
             :data="selectedLog"
             :width="550"
         >
@@ -177,15 +180,15 @@ onMounted(() => fetchData())
                 <n-card v-if="selectedLog" size="small" class="mb-4">
                     <div class="grid grid-cols-3 gap-4 text-center">
                         <div>
-                            <div class="text-xs text-gray-400">Player</div>
+                            <div class="text-xs text-gray-400">{{ t('betQuery.player') }}</div>
                             <div class="font-bold font-mono">{{ selectedLog.player_id }}</div>
                         </div>
                         <div>
-                            <div class="text-xs text-gray-400">Game</div>
+                            <div class="text-xs text-gray-400">{{ t('betQuery.game') }}</div>
                             <div class="font-medium">{{ selectedLog.game_name }}</div>
                         </div>
                         <div>
-                            <div class="text-xs text-gray-400">Status</div>
+                            <div class="text-xs text-gray-400">{{ t('betQuery.status') }}</div>
                             <n-tag :type="selectedLog.status === 'win' ? 'success' : 'error'" size="small">
                                 {{ selectedLog.status.toUpperCase() }}
                             </n-tag>

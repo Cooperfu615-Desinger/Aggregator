@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { NSpace, NButton, NInput, NIcon } from 'naive-ui'
 import { SearchRound, RefreshRound } from '@vicons/material'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Props {
     searchPlaceholder?: string
@@ -64,7 +67,7 @@ const handleReset = () => {
                     <template #icon>
                         <n-icon :component="RefreshRound" />
                     </template>
-                    Reset
+                    {{ t('common.reset') }}
                 </n-button>
             </n-space>
         </div>

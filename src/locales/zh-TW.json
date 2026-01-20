@@ -398,6 +398,68 @@
         "whitelist": "後台 IP 白名單",
         "whitelistPlaceholder": "輸入 IP 後按下 Enter 新增"
     },
+    "dateRange": {
+        "today": "今天",
+        "yesterday": "昨天",
+        "last7Days": "近 7 天",
+        "thisMonth": "本月"
+    },
+    "dashboard": {
+        "title": "儀表板",
+        "myBalance": "我的餘額",
+        "todayGgr": "今日 GGR",
+        "activePlayers": "活躍玩家",
+        "enabledGames": "已啟用遊戲",
+        "yesterday": "昨日",
+        "last24h": "近 24 小時",
+        "acrossAllProviders": "所有供應商",
+        "ggrTrend": "📈 GGR 走勢（近 7 天）",
+        "transferWallet": "💼 轉帳錢包",
+        "seamless": "🔗 單一錢包"
+    },
+    "myGames": {
+        "title": "我的遊戲",
+        "alert": "管理您玩家可使用的遊戲。平台停用的遊戲無法啟用。",
+        "game": "遊戲",
+        "provider": "供應商",
+        "type": "類型",
+        "platformStatus": "平台狀態",
+        "myStatus": "我的狀態",
+        "available": "可用",
+        "disabledByAdmin": "管理員已停用",
+        "enabled": "已啟用",
+        "disabled": "已停用",
+        "allTypes": "所有類型",
+        "slots": "老虎機",
+        "liveCasino": "真人娛樂城",
+        "fishing": "捕魚",
+        "search": "搜尋遊戲名稱或代碼...",
+        "gameEnabled": "遊戲已啟用",
+        "gameDisabled": "遊戲已停用",
+        "disabledByPlatform": "此遊戲已被平台管理員停用",
+        "updateFailed": "更新失敗",
+        "loadFailed": "載入遊戲失敗"
+    },
+    "betQuery": {
+        "title": "注單查詢",
+        "time": "時間",
+        "roundId": "局號",
+        "player": "玩家",
+        "game": "遊戲",
+        "bet": "投注",
+        "win": "贏",
+        "status": "狀態",
+        "searchRound": "局號...",
+        "playerId": "玩家 ID",
+        "search": "查詢"
+    },
+    "subAgents": {
+        "title": "下級代理",
+        "createSub": "新增下級",
+        "account": "帳戶",
+        "created": "建立時間",
+        "createPending": "新增下級代理功能待實作"
+    },
     "report": {
         "title": "財務報表",
         "byDate": "依日期",

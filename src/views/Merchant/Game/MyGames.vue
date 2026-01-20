@@ -6,8 +6,9 @@ import {
 import type { DataTableColumns } from 'naive-ui'
 import PageFilterBar from '../../../components/Common/PageFilterBar.vue'
 import StatusSwitch from '../../../components/Common/StatusSwitch.vue'
+import { useI18n } from 'vue-i18n'
 
-
+const { t } = useI18n()
 const message = useMessage()
 const loading = ref(false)
 
@@ -28,12 +29,12 @@ const games = ref<MerchantGame[]>([])
 const searchValue = ref('')
 const typeFilter = ref('all')
 
-const typeOptions = [
-    { label: 'All Types', value: 'all' },
-    { label: 'Slots', value: 'Slot' },
-    { label: 'Live Casino', value: 'Live' },
-    { label: 'Fishing', value: 'Fishing' }
-]
+const typeOptions = computed(() => [
+    { label: t('myGames.allTypes'), value: 'all' },
+    { label: t('myGames.slots'), value: 'Slot' },
+    { label: t('myGames.liveCasino'), value: 'Live' },
+    { label: t('myGames.fishing'), value: 'Fishing' }
+])
 
 // Track switch states
 const switchStates = ref<Record<string, boolean>>({})
@@ -50,7 +51,7 @@ const fetchGames = async () => {
             })
         }
     } catch {
-        message.error('Failed to load games')
+        message.error(t('myGames.loadFailed'))
     } finally {
         loading.value = false
     }
@@ -59,7 +60,7 @@ const fetchGames = async () => {
 const handleToggle = async (row: MerchantGame, newVal: boolean) => {
     // Cannot enable if Master disabled
     if (newVal && !row.master_enabled) {
-        message.warning('This game is disabled by platform admin')
+        message.warning(t('myGames.disabledByPlatform'))
         return
     }
     
@@ -72,12 +73,12 @@ const handleToggle = async (row: MerchantGame, newVal: boolean) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ game_id: row.game_id, enabled: newVal })
         })
-        message.success(newVal ? 'Game enabled' : 'Game disabled')
+        message.success(newVal ? t('myGames.gameEnabled') : t('myGames.gameDisabled'))
     } catch {
         // Revert on error
         switchStates.value[row.game_id] = !newVal
         row.merchant_enabled = !newVal
-        message.error('Update failed')
+        message.error(t('myGames.updateFailed'))
     }
 }
 
@@ -98,7 +99,7 @@ const filteredGames = computed(() => {
 
 const columns: DataTableColumns<MerchantGame> = [
     {
-        title: 'Game',
+        title: t('myGames.game'),
         key: 'name_en',
         width: 280,
         render: (row) => h('div', { class: 'flex items-center gap-3' }, [
@@ -114,13 +115,13 @@ const columns: DataTableColumns<MerchantGame> = [
         ])
     },
     {
-        title: 'Provider',
+        title: t('myGames.provider'),
         key: 'provider',
         width: 120,
         render: (row) => h(NTag, { size: 'small', type: 'info' }, { default: () => row.provider })
     },
     {
-        title: 'Type',
+        title: t('myGames.type'),
         key: 'type',
         width: 100,
         render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => row.type })
@@ -132,15 +133,15 @@ const columns: DataTableColumns<MerchantGame> = [
         render: (row) => h('span', { class: 'font-mono text-green-600' }, `${row.rtp}%`)
     },
     {
-        title: 'Platform Status',
+        title: t('myGames.platformStatus'),
         key: 'master_enabled',
         width: 130,
         render: (row) => row.master_enabled 
-            ? h(NTag, { type: 'success', size: 'small' }, { default: () => 'Available' })
-            : h(NTag, { type: 'error', size: 'small' }, { default: () => 'Disabled by Admin' })
+            ? h(NTag, { type: 'success', size: 'small' }, { default: () => t('myGames.available') })
+            : h(NTag, { type: 'error', size: 'small' }, { default: () => t('myGames.disabledByAdmin') })
     },
     {
-        title: 'My Status',
+        title: t('myGames.myStatus'),
         key: 'merchant_enabled',
         width: 140,
         render: (row) => h(StatusSwitch, {
@@ -153,8 +154,8 @@ const columns: DataTableColumns<MerchantGame> = [
             },
             onConfirm: (val: boolean) => handleToggle(row, val)
         }, {
-            checked: () => 'Enabled',
-            unchecked: () => 'Disabled'
+            checked: () => t('myGames.enabled'),
+            unchecked: () => t('myGames.disabled')
         })
     }
 ]
@@ -165,16 +166,16 @@ onMounted(fetchGames)
 <template>
     <div class="p-6">
         <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
-            <span>🎮</span> My Games
+            <span>🎮</span> {{ t('myGames.title') }}
         </h1>
 
         <n-alert type="info" class="mb-4" :bordered="false">
-            Manage which games are available to your players. Games disabled by the platform cannot be enabled.
+            {{ t('myGames.alert') }}
         </n-alert>
 
         <PageFilterBar
             v-model:searchValue="searchValue"
-            searchPlaceholder="Search game name or code..."
+            :searchPlaceholder="t('myGames.search')"
             @reset="handleReset"
         >
             <template #filters>

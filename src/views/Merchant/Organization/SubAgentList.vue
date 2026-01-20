@@ -35,7 +35,7 @@ const columns = computed(() => [
             { default: () => row.status.toUpperCase() }
         )
     },
-    { title: 'Created At', key: 'created_at' }
+    { title: t('subAgents.created'), key: 'created_at' }
 ])
 
 const fetchData = async () => {
@@ -47,7 +47,7 @@ const fetchData = async () => {
 }
 
 const createSub = () => {
-    message.info('Create Sub-Agent feature pending implementation')
+    message.info(t('subAgents.createPending'))
 }
 
 onMounted(() => fetchData())
@@ -56,8 +56,8 @@ onMounted(() => fetchData())
 <template>
     <div class="p-6 space-y-4">
         <div class="flex justify-between items-center">
-            <h1 class="text-2xl font-bold">{{ t('agent.title') }}</h1>
-            <n-button type="primary" @click="createSub">{{ t('agent.modalTitleCreate') }}</n-button>
+            <h1 class="text-2xl font-bold">{{ t('subAgents.title') }}</h1>
+            <n-button type="primary" @click="createSub">{{ t('subAgents.createSub') }}</n-button>
         </div>
 
         <n-card>
