@@ -22,19 +22,21 @@ onMounted(() => {
 })
 
 // Options
-const merchantOptions = [
-    { label: t('common.all'), value: '' },
-    { label: 'AGT001 - Golden Dragon', value: 'AGT001' },
-    { label: 'AGT002 - Silver Tiger', value: 'AGT002' },
-    { label: 'AGT003 - Diamond Star', value: 'AGT003' }
-]
+const merchantOptions = computed(() => {
+    const opts = [{ label: t('betLog.allOptions'), value: '' }]
+    for (let i = 1; i <= 20; i++) {
+        const id = `OP-${1000 + i}`
+        opts.push({ label: id, value: id })
+    }
+    return opts
+})
 
-const providerOptions = [
-    { label: t('common.all'), value: '' },
+const providerOptions = computed(() => [
+    { label: t('betLog.allOptions'), value: '' },
     { label: 'PG Soft', value: 'pg' },
     { label: 'Evolution', value: 'evo' },
     { label: 'Pragmatic Play', value: 'pp' }
-]
+])
 
 // Drawer Control
 const showJsonViewer = ref(false)
@@ -47,7 +49,8 @@ const jsonData = computed(() => {
         upstreamId: selectedBetLog.value.txId,
         provider: selectedBetLog.value.providerName,
         meta: {
-            merchant: selectedBetLog.value.merchant_code,
+            merchantId: selectedBetLog.value.merchant_code, // Updated key
+            merchantName: selectedBetLog.value['merchant_name'],
             currency: selectedBetLog.value.currency,
             exchangeRate: selectedBetLog.value.exchangeRate
         },
@@ -98,20 +101,14 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
     { 
         title: t('betLog.merchant'), 
         key: 'merchant_code', 
-        width: 100,
+        width: 120,
         render: (row) => h(NTag, { size: 'small', bordered: false, type: 'info' }, { default: () => row.merchant_code })
     },
     { 
         title: t('betLog.provider'), 
-        key: 'providerName', 
-        width: 120,
-        render: (row) => {
-            const typeMap: Record<string, any> = {
-                'pg': 'error', 'evo': 'warning', 'pp': 'success'
-            }
-            const providerCode = row.providerCode || ''
-            return h(NTag, { type: typeMap[providerCode] || 'default', size: 'small' }, { default: () => row.providerName })
-        }
+        key: 'merchant_name', 
+        width: 140,
+        render: (row) => h('span', { class: 'font-bold text-gray-300' }, row['merchant_name'] || 'Unknown') 
     },
     { 
         title: t('betLog.game'), 
@@ -204,7 +201,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
                 <n-input 
                     v-model:value="searchModel.roundId" 
                     :placeholder="t('betLog.roundId') + ' / TX ID...'" 
-                    class="w-64" 
+                    class="w-48" 
                     clearable
                 />
                 <DateRangePicker v-model:value="searchModel.timeRange" />
@@ -216,14 +213,14 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
                     v-model:value="searchModel.merchantCode" 
                     :options="merchantOptions" 
                     :placeholder="t('betLog.merchant')"
-                    class="w-64"
+                    class="w-48"
                     clearable
                 />
                 <n-select 
                     v-model:value="searchModel.provider" 
                     :options="providerOptions" 
-                    :placeholder="t('betLog.provider')"
-                    class="w-64"
+                    :placeholder="t('betLog.vendor')"
+                    class="w-48"
                     clearable
                 />
             </div>
@@ -233,7 +230,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
                 <n-input 
                     v-model:value="searchModel.playerId" 
                     :placeholder="t('betLog.playerAccount')" 
-                    class="w-64"
+                    class="w-48"
                     clearable
                 />
                 <n-button type="primary" @click="handleSearch" :loading="loading" class="px-6">

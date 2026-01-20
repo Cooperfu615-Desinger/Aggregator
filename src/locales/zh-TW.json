@@ -91,7 +91,7 @@
         "platformPnL": "平台損益表",
         "invoiceManagement": "對帳單管理",
         "riskSystem": "風控與系統",
-        "betQuery": "注單查詢",
+        "betQuery": "投注明細",
         "staffPermission": "員工權限",
         "auditLog": "操作日誌",
         "systemSettings": "系統設定",
@@ -436,13 +436,15 @@
         "bet": "投注",
         "win": "贏分",
         "payout": "賠率",
-        "merchant": "商戶",
+        "merchant": "商戶ID",
         "bigWin": "大獎",
         "freeGame": "免費遊戲",
-        "provider": "供應商",
+        "provider": "商戶名稱",
         "originalAmount": "原始金額",
         "baseAmount": "清算金額",
-        "status": "狀態"
+        "status": "狀態",
+        "allOptions": "預設為全部",
+        "vendor": "供應商"
     },
     "finance": {
         "invoiceManager": "帳單管理",

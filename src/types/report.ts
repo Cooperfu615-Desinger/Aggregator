@@ -22,6 +22,7 @@ export interface BetLog {
     game_detail: GameDetail;
     // Aggregator fields
     merchant_code?: string;
+    merchant_name?: string; // Added for UI display
     providerCode?: string;
     providerName?: string;
     originalBet?: number;

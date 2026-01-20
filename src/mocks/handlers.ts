@@ -489,12 +489,16 @@ export const handlers = [
                 created_at = faker.date.between({ from: start, to: end }).toISOString()
             }
 
+            const mCode = match_merchant || `OP-${faker.number.int({ min: 1001, max: 1020 })}`
+            const mName = faker.helpers.arrayElement(['Golden Dragon', 'Silver Tiger', 'Diamond Star', 'Royal Crown', 'Lucky 88', 'Grand Casino'])
+
             return {
                 id: match_roundId || ('PF' + faker.string.numeric(12)),
                 txId: faker.string.uuid(),
                 created_at,
                 player_account: match_playerId || faker.internet.username(),
-                merchant_code: match_merchant || faker.helpers.arrayElement(['AGT001', 'AGT002', 'AGT003']),
+                merchant_code: mCode,
+                merchant_name: mName, // Added Merchant Name
                 game_name: faker.helpers.arrayElement(['Fortune Tiger', 'Super Ace', 'Crazy Time', 'Sweet Bonanza']),
 
                 providerCode,
