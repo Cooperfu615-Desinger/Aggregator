@@ -16,7 +16,6 @@ const list = ref<Provider[]>([])
 const showConfig = ref(false)
 const currentProvider = ref<Provider | null>(null)
 
-// Track switch states for each provider
 const switchStates = ref<Record<number, boolean>>({})
 
 const fetchList = async () => {
@@ -25,13 +24,12 @@ const fetchList = async () => {
         const res = await fetch('/api/v2/providers').then(r => r.json())
         if (res.code === 0) {
             list.value = res.data.list
-            // Initialize switch states
             list.value.forEach(provider => {
                 switchStates.value[provider.id] = provider.status === 'active'
             })
         }
     } catch (e) {
-        message.error('Failed to load providers')
+        message.error(t('common.loadFailed'))
     } finally {
         loading.value = false
     }
@@ -50,14 +48,14 @@ const handleStatusConfirm = async (row: Provider, newVal: boolean) => {
         }).then(r => r.json())
 
         if (res.code === 0) {
-            message.success(newVal ? 'Provider enabled' : 'Provider set to maintenance mode')
+            message.success(newVal ? t('provider.enabled') : t('provider.maintenance'))
         } else {
             throw new Error(res.msg)
         }
     } catch (e) {
         row.status = oldStatus
         switchStates.value[row.id] = oldStatus === 'active'
-        message.error('Failed to update status')
+        message.error(t('common.updateFailed'))
     }
 }
 
@@ -68,7 +66,7 @@ const handleConfig = (row: Provider) => {
 
 const columns: DataTableColumns<Provider> = [
     {
-        title: 'Logo',
+        title: t('provider.logo'),
         key: 'logo',
         width: 80,
         render: (row) => h('div', { 
@@ -91,7 +89,7 @@ const columns: DataTableColumns<Provider> = [
         render: (row) => h(NTag, { type: 'default', size: 'small', class: 'font-mono' }, { default: () => row.code.toUpperCase() })
     },
     {
-        title: 'Game Count',
+        title: t('provider.gameCount'),
         key: 'gameCount',
         width: 120,
         render: (row) => h('span', { class: 'font-mono' }, row.gameCount || '—')
@@ -102,15 +100,15 @@ const columns: DataTableColumns<Provider> = [
         width: 180,
         render: (row) => h(StatusSwitch, {
             value: switchStates.value[row.id] ?? (row.status === 'active'),
-            warningMessage: `Are you sure you want to disable ${row.name}? This will affect all merchants using this provider.`,
-            warningTitle: '⚠️ Disable Provider',
+            warningMessage: t('provider.disableWarning', { name: row.name }),
+            warningTitle: t('provider.disableTitle'),
             'onUpdate:value': (val: boolean) => {
                 switchStates.value[row.id] = val
             },
             onConfirm: (val: boolean) => handleStatusConfirm(row, val)
         }, {
-            checked: () => 'Active',
-            unchecked: () => 'Maintenance'
+            checked: () => t('provider.active'),
+            unchecked: () => t('provider.maintenanceMode')
         })
     },
     {
@@ -122,7 +120,7 @@ const columns: DataTableColumns<Provider> = [
                 h(NButton, {
                     size: 'small',
                     onClick: () => handleConfig(row)
-                }, { default: () => '⚙️ Config' })
+                }, { default: () => t('provider.config') })
             ]
         })
     }
@@ -140,7 +138,7 @@ onMounted(() => {
                 <span>🏢</span> {{ t('provider.title') }}
             </h1>
             <n-tag type="info" size="small">
-                {{ list.length }} Providers
+                {{ list.length }} {{ t('provider.providers') }}
             </n-tag>
         </div>
         

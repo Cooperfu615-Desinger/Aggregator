@@ -81,13 +81,13 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
         })
     },
     {
-        title: 'Action',
+        title: t('columns.action'),
         key: 'action',
         width: 100,
         render: (row) => h(NButton, { 
             size: 'small', 
             onClick: () => openDetail(row) 
-        }, { default: () => '📄 Detail' })
+        }, { default: () => t('finance.detail') })
     }
 ])
 
@@ -143,7 +143,7 @@ const confirmGenerate = async () => {
         })
         const data = await res.json()
         if (data.code === 0) {
-            message.success('✅ Invoices generated successfully')
+            message.success(t('finance.invoicesGenerated'))
             showGenerateModal.value = false
             previewData.value = []
             fetchInvoices()
@@ -165,7 +165,7 @@ const markAsPaid = async () => {
         const res = await fetch(`/api/v2/finance/invoices/${selectedInvoice.value.id}/pay`, { method: 'POST' })
         const data = await res.json()
         if (data.code === 0) {
-            message.success('✅ Marked as Paid')
+            message.success(t('finance.markedPaid'))
             selectedInvoice.value.status = 'paid'
             // Update in list
             const idx = invoices.value.findIndex(i => i.id === selectedInvoice.value?.id)
@@ -174,7 +174,7 @@ const markAsPaid = async () => {
             }
         }
     } catch (e) {
-        message.error('Operation failed')
+        message.error(t('common.operationFailed'))
     } finally {
         markingPaid.value = false
     }
@@ -213,14 +213,14 @@ onMounted(() => {
                     <span class="font-medium">{{ t('finance.period') }}:</span>
                     <n-date-picker v-model:value="generateDate" type="month" clearable class="w-40" />
                     <n-button type="primary" @click="handlePreview" :loading="generating">
-                        Preview
+                        {{ t('finance.preview') }}
                     </n-button>
                 </div>
 
                 <div v-if="previewData.length > 0" class="border border-slate-600 rounded-lg p-4 bg-slate-800/30">
                     <n-data-table size="small" :columns="previewColumns" :data="previewData" max-height="300" />
                     <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-600">
-                        <span class="text-gray-400">{{ previewData.length }} merchants</span>
+                        <span class="text-gray-400">{{ previewData.length }} {{ t('finance.merchants') }}</span>
                         <span class="font-bold text-lg text-green-400">
                             Total: <MoneyText :value="previewData.reduce((acc, curr) => acc + curr.amount_due, 0)" currency="USD" />
                         </span>
@@ -228,7 +228,7 @@ onMounted(() => {
                 </div>
 
                 <div class="flex justify-end gap-2">
-                    <n-button @click="showGenerateModal = false">Cancel</n-button>
+                    <n-button @click="showGenerateModal = false">{{ t('common.cancel') }}</n-button>
                     <n-button 
                         type="primary" 
                         :disabled="previewData.length === 0" 
@@ -259,8 +259,8 @@ onMounted(() => {
                             />
                         </div>
                         <div class="mt-3 text-sm text-gray-400">
-                            Period: <span class="text-white">{{ selectedInvoice.period }}</span> • 
-                            Merchant: <span class="text-white">{{ selectedInvoice.merchant_name }}</span>
+                            {{ t('finance.period') }}: <span class="text-white">{{ selectedInvoice.period }}</span> • 
+                            {{ t('finance.merchant') }}: <span class="text-white">{{ selectedInvoice.merchant_name }}</span>
                         </div>
                     </n-card>
 
