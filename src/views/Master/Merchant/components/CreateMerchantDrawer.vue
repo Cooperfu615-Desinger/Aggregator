@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive } from 'vue'
 import { 
     NDrawer, NDrawerContent, NForm, NFormItem, NInput, 
     NSelect, NInputNumber, NButton, useMessage 
@@ -21,46 +21,8 @@ const formRef = ref()
 const loading = ref(false)
 
 const formValue = reactive({
-    site_code: '', // Merchant Name (3 chars)
-    account: '', // Merchant Login ID (auto generated or input?) -> "商戶代碼 (Login Code, Required)". Wait, user prompt said: "商戶代碼(3位大小字母)名稱改為"商戶名稱"". But prompt step 4 says: "商戶代碼 (Login Code, Required)".
-    // So "Site Code" is "Merchant Name" (Display Name?).
-    // And "Merchant Login Code" is needed.
-    // Let's re-read Step 4:
-    // "商戶名稱 (Required)" -> usually Name/Display Name.
-    // "商戶代碼 (Login Code, Required)" -> This is likely `account` or a new field?
-    // In Mock: `site_code` is 3 chars. `account` is username.
-    // User Step 4: "商戶名稱", "商戶代碼(Login Code)".
-    // In List View, I mapped `site_code` to "Merchant Name".
-    // So "商戶名稱" in form -> `site_code`?
-    // "商戶代碼 (Login Code)" -> `account`?
-    // Let's assume:
-    // Form Field "Merchant Name" -> `site_code` (validated as 3 uppercase chars? User said "3位大小字母" for the column "Merchant Name").
-    // Form Field "Login Account" -> `account`.
-    // But `name` field? User prompt "Remarks (原 name 欄位用途)". So `name` is remarks.
-    // Form Field "Remarks" -> `remarks` (or `name` in payload).
-    
-    // Actually, looking at Step 2: `merchantId`: "商戶 ID" -> `display_id` (OP-xxxx auto gen).
-    // `siteCodeLabel`: "商戶名稱" (Merchant Name).
-    
-    // So:
-    // 1. Merchant Name (Input) -> `site_code` (3 chars uppercase).
-    // 2. Login Code (Input) -> `account`.
-    // 3. Currency
-    // 4. Wallet Mode
-    // 5. Revenue Share (InputNumber) -> `percent` (or revenue_share).
-    // 6. Initial Password -> `password`.
-    // 7. Remarks -> `remarks` (or `name` in payload if reusing).
-    
-    // In Create Payload:
-    // site_code: string (Merchant Name)
-    // account: string (Login Code)
-    // password: string
-    // currency_type: 'TWD'|'CNY'|'USD'
-    // walletMode: 'seamless'|'transfer'
-    // percent: number
-    // remarks: string
-    // name: string (map remarks to this?)
-    
+    site_code: '', 
+    account: '', 
     password: '',
     currency_type: 'USD',
     walletMode: 'transfer',
@@ -82,7 +44,7 @@ const rules = {
         { required: true, message: 'Required', trigger: 'blur' }
     ],
     percent: [
-        { required: true, type: 'number', min: 0, max: 100, message: '0-100', trigger: 'blur' }
+        { required: true, type: 'number' as const, min: 0, max: 100, message: '0-100', trigger: 'blur' }
     ]
 }
 
@@ -110,9 +72,7 @@ const handleSubmit = async () => {
                 const payload = {
                     ...formValue,
                     name: formValue.remarks, // Map remarks to name if name is repurposed
-                    state: 1, // Default Active? User didn't specify, assume active.
-                    // Wait, Step 5 says "唯一可以修改 Active/Suspended 的地方 (方案 B)". 
-                    // Create usually creates Active.
+                    state: 1, // Default Active
                 }
 
                 const res = await fetch('/api/v2/agent/management/agents', {

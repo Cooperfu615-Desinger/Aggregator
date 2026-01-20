@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, h, computed } from 'vue'
 import { NDataTable, NTag, NAlert, NButton } from 'naive-ui'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
 
@@ -14,7 +13,6 @@ import MoneyText from '../../../components/Common/MoneyText.vue'
 import StatusBadge from '../../../components/Common/StatusBadge.vue'
 
 const { list, loading, error, fetchList } = useMerchantList()
-const router = useRouter()
 const { t } = useI18n()
 
 const showCreate = ref(false)
@@ -68,19 +66,8 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
         return h(
           NTag,
           {
-            type: row.walletMode === 'seamless' ? 'info' : 'primary', // Seamless=Purple(Info?), Transfer=Blue(Primary?) -> User said Transfer=Blue, Seamless=Purple. 
-            // NaiveUI 'info' is usually blue-ish/grey, 'primary' is green. 'success' is green. 
-            // Let's use: Transfer -> 'info' (often blue), Seamless -> 'error' (red) or custom color.
-            // Wait, Standard NaiveUI: default(grey), primary(green), info(blue), success(green), warning(orange), error(red).
-            // User asked: Transfer=Blue, Seamless=Purple.
-            // I'll stick to 'info' for Transfer (Blue) and maybe custom style for Seamless or just 'success' (Green) if purple is hard, 
-            // but let's try color prop if needed. Or just map to closest.
-            // Let's use 'info' for Transfer and 'warning' for Seamless? No, Purple usually implies special.
-            // I will use bordered: false and standard types for now. Transfer=Info(Blue), Seamless=Primary(Green) or similar.
-            // User request: Transfer=Blue, Seamless=Purple.
-            // I will use style for purple.
-            color: row.walletMode === 'seamless' ? { color: '#f3e8ff', textColor: '#9333ea', borderColor: '#f3e8ff' } : undefined, // Purple
-            type: row.walletMode === 'transfer' ? 'info' : undefined, // Blue
+            color: row.walletMode === 'seamless' ? { color: '#f3e8ff', textColor: '#9333ea', borderColor: '#f3e8ff' } : undefined,
+            type: row.walletMode === 'transfer' ? 'info' : undefined,
             bordered: false,
             size: 'small'
           },

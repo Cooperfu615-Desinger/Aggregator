@@ -47,7 +47,7 @@ const rules = {
         { min: 3, max: 3, message: 'Must be 3 chars', trigger: 'blur' }
     ],
     percent: [
-        { required: true, type: 'number', min: 0, max: 100, message: '0-100', trigger: 'blur' }
+        { required: true, type: 'number' as const, min: 0, max: 100, message: '0-100', trigger: 'blur' }
     ]
 }
 
