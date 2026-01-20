@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, h, computed } from 'vue'
 import { 
-    NCard, NDataTable, NButton, NTag, useMessage, NSpin
+    NCard, NDataTable, NButton, useMessage, NSpin
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import type { DataTableColumns } from 'naive-ui'
