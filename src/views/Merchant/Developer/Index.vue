@@ -35,9 +35,9 @@ const updateWhitelist = async (newList: string[]) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ whitelist: newList })
         })
-        message.success('IP Whitelist updated')
+        message.success(t('developerCenter.whitelistUpdated'))
     } catch {
-        message.error('Failed to update whitelist')
+        message.error(t('developerCenter.whitelistFailed'))
     }
 }
 
@@ -51,16 +51,16 @@ onMounted(() => fetchCreds())
 <template>
     <div class="p-6 max-w-4xl">
         <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
-            <span>🔧</span> {{ t('agent.developerCenter') || 'Developer Center' }}
+            <span>🔧</span> {{ t('developerCenter.title') }}
         </h1>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- API Credentials Card -->
-            <n-card title="🔑 API Credentials" class="h-fit">
+            <n-card :title="t('developerCenter.apiCredentials')" class="h-fit">
                 <div class="space-y-5">
                     <!-- Merchant Code -->
                     <div>
-                        <div class="text-sm text-gray-500 mb-2">Merchant Code</div>
+                        <div class="text-sm text-gray-400 mb-2">{{ t('developerCenter.merchantCode') }}</div>
                         <CopyableText 
                             :text="credentials.merchant_code || 'Loading...'" 
                         />
@@ -68,9 +68,9 @@ onMounted(() => fetchCreds())
 
                     <!-- Secret Key (Masked by default) -->
                     <div>
-                        <div class="text-sm text-gray-500 mb-2">
-                            Secret Key
-                            <n-tag size="small" type="warning" class="ml-2">Sensitive</n-tag>
+                        <div class="text-sm text-gray-400 mb-2">
+                            {{ t('developerCenter.secretKey') }}
+                            <n-tag size="small" type="warning" class="ml-2">{{ t('developerCenter.sensitive') }}</n-tag>
                         </div>
                         <CopyableText 
                             :text="credentials.secret_key || 'Loading...'" 
@@ -79,28 +79,28 @@ onMounted(() => fetchCreds())
                     </div>
 
                     <n-alert type="warning" :bordered="false">
-                        <template #header>Security Notice</template>
-                        Never share your Secret Key. Use IP whitelist to restrict API access.
+                        <template #header>{{ t('developerCenter.securityNotice') }}</template>
+                        {{ t('developerCenter.securityWarning') }}
                     </n-alert>
                 </div>
             </n-card>
 
             <!-- IP Whitelist Card -->
-            <n-card title="🛡️ IP Whitelist" class="h-fit">
+            <n-card :title="t('developerCenter.ipWhitelist')" class="h-fit">
                 <div class="space-y-4">
-                    <p class="text-sm text-gray-500">
-                        Only requests from these IPs will be accepted. Leave empty to allow all.
+                    <p class="text-sm text-gray-400">
+                        {{ t('developerCenter.ipWhitelistDesc') }}
                     </p>
 
                     <n-dynamic-tags
                         :value="credentials.whitelist"
                         @update:value="updateWhitelist"
                         :max="10"
-                        :input-props="{ placeholder: 'Add IP (e.g. 1.2.3.4)' }"
+                        :input-props="{ placeholder: t('developerCenter.addIpPlaceholder') }"
                     />
 
-                    <p class="text-xs text-gray-400">
-                        Tip: Add your server's public IP addresses. Max 10 entries.
+                    <p class="text-xs text-gray-500">
+                        {{ t('developerCenter.ipTip') }}
                     </p>
                 </div>
             </n-card>
@@ -109,29 +109,29 @@ onMounted(() => fetchCreds())
         <n-divider />
 
         <!-- API Documentation Section -->
-        <n-card title="📚 API Documentation">
+        <n-card :title="t('developerCenter.apiDocs')">
             <div class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg">
-                        <h4 class="font-medium mb-1">Quick Start</h4>
-                        <p class="text-sm text-gray-500">Integration guide for new developers</p>
+                    <div class="bg-gray-800 border border-gray-700 p-4 rounded-lg">
+                        <h4 class="font-medium mb-1 text-white">{{ t('developerCenter.quickStart') }}</h4>
+                        <p class="text-sm text-gray-400">{{ t('developerCenter.quickStartDesc') }}</p>
                     </div>
-                    <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg">
-                        <h4 class="font-medium mb-1">API Reference</h4>
-                        <p class="text-sm text-gray-500">Complete endpoint documentation</p>
+                    <div class="bg-gray-800 border border-gray-700 p-4 rounded-lg">
+                        <h4 class="font-medium mb-1 text-white">{{ t('developerCenter.apiReference') }}</h4>
+                        <p class="text-sm text-gray-400">{{ t('developerCenter.apiReferenceDesc') }}</p>
                     </div>
-                    <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg">
-                        <h4 class="font-medium mb-1">SDK Downloads</h4>
-                        <p class="text-sm text-gray-500">PHP, Node.js, Python libraries</p>
+                    <div class="bg-gray-800 border border-gray-700 p-4 rounded-lg">
+                        <h4 class="font-medium mb-1 text-white">{{ t('developerCenter.sdkDownloads') }}</h4>
+                        <p class="text-sm text-gray-400">{{ t('developerCenter.sdkDownloadsDesc') }}</p>
                     </div>
                 </div>
 
                 <n-space>
                     <n-button type="primary" @click="openDocs">
-                        📄 View Full Documentation
+                        {{ t('developerCenter.viewDocs') }}
                     </n-button>
                     <n-button secondary>
-                        💬 Contact Support
+                        {{ t('developerCenter.contactSupport') }}
                     </n-button>
                 </n-space>
             </div>
