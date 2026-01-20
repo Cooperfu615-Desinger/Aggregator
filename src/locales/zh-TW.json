@@ -4,6 +4,8 @@
         "transfer": "轉帳錢包"
     },
     "common": {
+        "hi": "您好,",
+        "logout": "登出",
         "save": "儲存",
         "cancel": "取消",
         "edit": "編輯",

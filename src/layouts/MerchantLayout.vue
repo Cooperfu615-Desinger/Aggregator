@@ -3,11 +3,11 @@ import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { 
   NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, NLayoutFooter,
-  NMenu, NButton, NAvatar, NDropdown, NTag, NConfigProvider, NDrawer, NDrawerContent,
+  NMenu, NButton, NTag, NConfigProvider, NDrawer, NDrawerContent, NIcon,
   darkTheme
 } from 'naive-ui'
 import type { MenuOption, GlobalThemeOverrides } from 'naive-ui'
-import { NIcon } from 'naive-ui'
+import { ExitToAppOutlined } from '@vicons/material'
 import { useAuthStore } from '../stores/auth'
 import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
 import LanguageSwitcher from '../components/LanguageSwitcher.vue'
@@ -34,16 +34,9 @@ const menuOptions = computed<MenuOption[]>(() => merchantMenuOptions(t))
 // Active Key Logic
 const activeKey = computed(() => currentRoute.name as string)
 
-// Header Dropdown
-const userOptions = computed(() => [
-    { label: t('menu.profile'), key: 'profile' },
-    { label: t('menu.logout'), key: 'logout' }
-])
-const handleUserSelect = (key: string) => {
-    if (key === 'logout') {
-        authStore.logout()
-        router.push('/login')
-    }
+const handleLogout = () => {
+    authStore.logout()
+    router.push('/login')
 }
 
 const handleVersionClick = () => {
@@ -136,9 +129,15 @@ const themeOverrides: GlobalThemeOverrides = {
                    <div class="text-xs text-gray-400">{{ t('layout.merchantOperator') }}</div>
                </div>
                <LanguageSwitcher />
-               <n-dropdown :options="userOptions" @select="handleUserSelect">
-                  <n-avatar round size="medium" src="https://ui-avatars.com/api/?name=Merchant&background=2080f0&color=fff" class="cursor-pointer" />
-               </n-dropdown>
+               <div class="flex items-center gap-3 ml-2">
+                  <span class="text-gray-400 text-sm">
+                    {{ t('common.hi') }} <span class="font-bold text-gray-200">Merchant01</span>
+                  </span>
+                  <n-button strong secondary type="error" size="small" @click="handleLogout">
+                    <template #icon><n-icon><ExitToAppOutlined /></n-icon></template>
+                    {{ t('common.logout') }}
+                  </n-button>
+                </div>
            </div>
         </n-layout-header>
         

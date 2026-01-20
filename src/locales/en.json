@@ -4,6 +4,8 @@
         "transfer": "Transfer"
     },
     "common": {
+        "hi": "Hi,",
+        "logout": "Logout",
         "save": "Save",
         "cancel": "Cancel",
         "edit": "Edit",
