@@ -13,6 +13,9 @@ import {
     NText
 } from 'naive-ui'
 import { useAuthStore } from '../../stores/auth'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const message = useMessage()
@@ -26,8 +29,8 @@ const model = ref({
 })
 
 const rules = computed(() => ({
-    username: { required: true, message: 'Username is required', trigger: 'blur' },
-    password: { required: true, message: 'Password is required', trigger: 'blur' }
+    username: { required: true, message: t('form.required', { field: t('login.account') }), trigger: 'blur' },
+    password: { required: true, message: t('form.required', { field: t('login.password') }), trigger: 'blur' }
 }))
 
 const handleLogin = async () => {
@@ -85,8 +88,8 @@ const quickLogin = (type: 'master' | 'merchant') => {
             <template #header>
                 <div class="text-center py-2">
                     <div class="text-4xl mb-4">🎮</div>
-                    <h1 class="text-2xl font-bold text-white mb-1">Antigravity Aggregator</h1>
-                    <p class="text-slate-400 text-sm">B2B Game Aggregation Platform</p>
+                    <h1 class="text-2xl font-bold text-white mb-1">{{ t('login.appName') }}</h1>
+                    <p class="text-slate-400 text-sm">{{ t('login.subtitle') }}</p>
                 </div>
             </template>
             
@@ -96,10 +99,10 @@ const quickLogin = (type: 'master' | 'merchant') => {
                 :rules="rules"
                 size="large"
             >
-                <n-form-item path="username" label="Username">
+                <n-form-item path="username" :label="t('login.account')">
                     <n-input 
                         v-model:value="model.username" 
-                        placeholder="Enter username"
+                        :placeholder="t('login.placeholderUsername')"
                         @keydown.enter="handleLogin"
                     >
                         <template #prefix>
@@ -108,12 +111,12 @@ const quickLogin = (type: 'master' | 'merchant') => {
                     </n-input>
                 </n-form-item>
                 
-                <n-form-item path="password" label="Password">
+                <n-form-item path="password" :label="t('login.password')">
                     <n-input 
                         v-model:value="model.password" 
                         type="password" 
                         show-password-on="click" 
-                        placeholder="Enter password"
+                        :placeholder="t('login.placeholderPassword')"
                         @keydown.enter="handleLogin"
                     >
                         <template #prefix>
@@ -130,12 +133,12 @@ const quickLogin = (type: 'master' | 'merchant') => {
                     class="mt-4 h-12"
                     strong
                 >
-                    {{ loading ? 'Authenticating...' : 'Sign In' }}
+                    {{ loading ? t('login.authenticating') : t('login.submit') }}
                 </n-button>
             </n-form>
 
             <n-divider class="!my-6">
-                <n-text depth="3" class="text-xs">QUICK LOGIN</n-text>
+                <n-text depth="3" class="text-xs">{{ t('login.quickLogin') }}</n-text>
             </n-divider>
 
             <n-space vertical :size="12">
@@ -148,7 +151,7 @@ const quickLogin = (type: 'master' | 'merchant') => {
                     <template #icon>
                         <span>👑</span>
                     </template>
-                    Master Admin (admin / admin123)
+                    {{ t('login.masterAdmin') }} (admin / admin123)
                 </n-button>
                 
                 <n-button 
@@ -160,7 +163,7 @@ const quickLogin = (type: 'master' | 'merchant') => {
                     <template #icon>
                         <span>💼</span>
                     </template>
-                    Merchant (merchant / 123456)
+                    {{ t('login.merchant') }} (merchant / 123456)
                 </n-button>
             </n-space>
 

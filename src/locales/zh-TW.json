@@ -129,7 +129,14 @@
         "account": "帳號",
         "password": "密碼",
         "submit": "登入",
-        "subtitle": "後台管理系統"
+        "subtitle": "B2B 遊戲聚合平台",
+        "appName": "Games Aggregator Backend",
+        "placeholderUsername": "請輸入帳號",
+        "placeholderPassword": "請輸入密碼",
+        "quickLogin": "快速登入",
+        "masterAdmin": "總管理者",
+        "merchant": "商戶",
+        "authenticating": "驗證中..."
     },
     "columns": {
         "id": "ID",
