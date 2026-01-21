@@ -368,6 +368,7 @@
     },
     "invoices": {
         "myInvoices": "我的帳單",
+        "financeCenter": "財務中心",
         "invoiceNo": "帳單編號",
         "period": "週期",
         "billingPeriod": "帳單週期",
@@ -375,10 +376,24 @@
         "status": "狀態",
         "pending": "待付款",
         "paid": "已付款",
+        "verifying": "審核中",
         "downloadPdf": "下載 PDF",
         "viewDetail": "查看詳情",
         "noInvoices": "無帳單記錄",
-        "loadError": "載入帳單失敗"
+        "loadError": "載入帳單失敗",
+        "creditLimit": "信用額度",
+        "balance": "錢包餘額",
+        "outstanding": "待付帳單總額",
+        "topUp": "立即充值",
+        "payNow": "前往付款",
+        "uploadProof": "上傳支付憑證",
+        "paymentAddress": "收款地址 (USDT-TRC20)",
+        "txid": "交易序號 (TXID)",
+        "uploadScreenshot": "上傳截圖 (選填)",
+        "submitSuccess": "憑證提交成功，財務審核中",
+        "topUpSuccess": "充值申請已提交",
+        "topUpAmount": "充值金額",
+        "submit": "送出"
     },
     "game": {
         "title": "遊戲中心",

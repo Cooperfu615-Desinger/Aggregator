@@ -869,6 +869,64 @@ export const handlers = [
         })
     }),
 
+    // ================== MERCHANT FINANCE CENTER ==================
+    // Get Merchant Wallet
+    http.get('/api/v2/merchant/wallet', async () => {
+        await delay(300)
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: {
+                credit_limit: 100000,
+                balance: 23456.78,
+                outstanding_amount: 15800.50
+            }
+        })
+    }),
+
+    // Submit Top-up Request
+    http.post('/api/v2/merchant/wallet/top-up', async () => {
+        await delay(500)
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: { request_id: faker.string.uuid() }
+        })
+    }),
+
+    // Get Invoices with verification_status
+    http.get('/api/v2/merchant/invoices', async () => {
+        await delay(400)
+        const list = Array.from({ length: 6 }).map((_, i) => {
+            const isPaid = i < 2
+            return {
+                id: `INV-${2026}${String(i + 1).padStart(2, '0')}`,
+                period: `2025-${String(12 - i).padStart(2, '0')}`,
+                total_ggr: Number(faker.finance.amount({ min: 5000, max: 50000, dec: 2 })),
+                commission_rate: 15,
+                amount_due: Number(faker.finance.amount({ min: 1000, max: 10000, dec: 2 })),
+                status: isPaid ? 'paid' : 'pending',
+                verification_status: isPaid ? 'verified' : (i === 2 ? 'verifying' : 'none'),
+                created_at: faker.date.past().toISOString()
+            }
+        })
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: { list, total: list.length }
+        })
+    }),
+
+    // Submit Invoice Payment Proof
+    http.post('/api/v2/merchant/invoices/:id/payment', async () => {
+        await delay(600)
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: { verification_status: 'verifying' }
+        })
+    }),
+
     ...financeHandlers,
     ...systemHandlers
 ]
