@@ -879,8 +879,21 @@ export const handlers = [
             data: {
                 credit_limit: 100000,
                 balance: 23456.78,
-                outstanding_amount: 15800.50
+                outstanding_amount: 15800.50,
+                currency: 'CNY',
+                exchange_rate: 7.15,
+                credit_request_status: 'none' // 'none' | 'pending' | 'rejected'
             }
+        })
+    }),
+
+    // Submit Credit Limit Request
+    http.post('/api/v2/merchant/wallet/credit-limit-request', async () => {
+        await delay(500)
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: { request_id: faker.string.uuid() }
         })
     }),
 

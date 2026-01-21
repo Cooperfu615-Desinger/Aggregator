@@ -393,7 +393,16 @@
         "submitSuccess": "憑證提交成功，財務審核中",
         "topUpSuccess": "充值申請已提交",
         "topUpAmount": "充值金額",
-        "submit": "送出"
+        "submit": "送出",
+        "currentCurrency": "結算幣別",
+        "exchangeRate": "參考匯率",
+        "exchangeRateHint": "1 USD ≈ {rate} {currency}",
+        "requestLimit": "申請調額",
+        "desiredLimit": "期望額度",
+        "reason": "申請理由",
+        "submitRequestSuccess": "調額申請已送出",
+        "payAmountHint": "折合約 {amount} USDT",
+        "requestPending": "額度審核中"
     },
     "game": {
         "title": "遊戲中心",
