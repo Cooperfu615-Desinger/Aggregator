@@ -735,6 +735,47 @@ export const handlers = [
         })
     }),
 
+    // Agent Game List (Phase 9.1)
+    http.get('/api/v2/agent/games', async () => {
+        await delay(600)
+
+        // Transform mockGames into MerchantGame format
+        const list = mockGames.map(game => ({
+            game_id: game.game_id,
+            game_code: game.game_id, // simple mapping
+            name_en: game.name_en,
+            name_zh: game.name_zh,
+            provider: game.provider,
+            type: game.type,
+            rtp: game.rtp_default,
+            // Randomly assign states for demo
+            merchant_enabled: faker.datatype.boolean(),
+            master_enabled: game.status === 'active', // 'maintenance' or 'disabled' -> false
+            thumbnail: game.thumbnail,
+            // New fields for Phase 9.1
+            release_date: faker.date.past({ years: 2 }).toISOString().split('T')[0],
+            admin_status: game.status // 'active' | 'maintenance' | 'disabled'
+        }))
+
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: {
+                list,
+                total: list.length
+            }
+        })
+    }),
+
+    // Toggle Agent Game Status
+    http.post('/api/v2/agent/games/toggle', async () => {
+        await delay(400)
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success'
+        })
+    }),
+
     ...financeHandlers,
     ...systemHandlers
 ]

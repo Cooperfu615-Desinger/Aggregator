@@ -238,7 +238,13 @@
         "gameDisabled": "遊戲已停用",
         "updateFailed": "更新失敗",
         "loadFailed": "無法載入遊戲",
-        "disabledByPlatform": "此遊戲已被平台管理員停用"
+        "disabledByPlatform": "此遊戲已被平台管理員停用",
+        "filterProvider": "供應商",
+        "releaseDate": "上架時間",
+        "batchAction": "批量操作",
+        "enableSelected": "啟用所選",
+        "disableSelected": "停用所選",
+        "selectedCount": "已選擇 {count} 項"
     },
     "developerCenter": {
         "title": "開發者中心",

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, h, computed } from 'vue'
 import { 
-    NDataTable, NTag, NSelect, useMessage, NAlert
+    NDataTable, NTag, NSelect, useMessage, NAlert, NButton, NSpace, NTooltip
 } from 'naive-ui'
-import type { DataTableColumns } from 'naive-ui'
+import type { DataTableColumns, DataTableRowKey } from 'naive-ui'
 import PageFilterBar from '../../../components/Common/PageFilterBar.vue'
 import StatusSwitch from '../../../components/Common/StatusSwitch.vue'
 import { useI18n } from 'vue-i18n'
@@ -20,21 +20,33 @@ interface MerchantGame {
     provider: string
     type: string
     rtp: number
-    merchant_enabled: boolean  // Merchant's own toggle
-    master_enabled: boolean    // Master's global toggle (readonly)
+    merchant_enabled: boolean
+    master_enabled: boolean
     thumbnail?: string
+    release_date: string
+    admin_status: 'active' | 'maintenance' | 'disabled'
 }
 
 const games = ref<MerchantGame[]>([])
 const searchValue = ref('')
 const typeFilter = ref('all')
+const providerFilter = ref('all')
+const checkedRowKeys = ref<DataTableRowKey[]>([])
 
 const typeOptions = computed(() => [
-    { label: t('myGames.allTypes'), value: 'all' },
-    { label: t('myGames.slots'), value: 'Slot' },
-    { label: t('myGames.liveCasino'), value: 'Live' },
-    { label: t('myGames.fishing'), value: 'Fishing' }
+    { label: t('merchantGame.allTypes'), value: 'all' },
+    { label: t('merchantGame.slots'), value: 'Slot' },
+    { label: t('merchantGame.liveCasino'), value: 'Live' },
+    { label: t('merchantGame.fishing'), value: 'Fishing' }
 ])
+
+const providerOptions = computed(() => {
+    const providers = Array.from(new Set(games.value.map(g => g.provider)))
+    return [
+        { label: t('common.all'), value: 'all' },
+        ...providers.map(p => ({ label: p, value: p }))
+    ]
+})
 
 // Track switch states
 const switchStates = ref<Record<string, boolean>>({})
@@ -51,16 +63,15 @@ const fetchGames = async () => {
             })
         }
     } catch {
-        message.error(t('myGames.loadFailed'))
+        message.error(t('merchantGame.loadFailed'))
     } finally {
         loading.value = false
     }
 }
 
 const handleToggle = async (row: MerchantGame, newVal: boolean) => {
-    // Cannot enable if Master disabled
     if (newVal && !row.master_enabled) {
-        message.warning(t('myGames.disabledByPlatform'))
+        message.warning(t('merchantGame.disabledByPlatform'))
         return
     }
     
@@ -73,18 +84,48 @@ const handleToggle = async (row: MerchantGame, newVal: boolean) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ game_id: row.game_id, enabled: newVal })
         })
-        message.success(newVal ? t('myGames.gameEnabled') : t('myGames.gameDisabled'))
+        message.success(newVal ? t('merchantGame.gameEnabled') : t('merchantGame.gameDisabled'))
     } catch {
-        // Revert on error
         switchStates.value[row.game_id] = !newVal
         row.merchant_enabled = !newVal
-        message.error(t('myGames.updateFailed'))
+        message.error(t('merchantGame.updateFailed'))
+    }
+}
+
+const handleBatchAction = async (enable: boolean) => {
+    const selectedIds = checkedRowKeys.value as string[]
+    if (selectedIds.length === 0) return
+
+    loading.value = true
+    try {
+        // Optimistic update
+        selectedIds.forEach(id => {
+            const game = games.value.find(g => g.game_id === id)
+            if (game) {
+                // Skip if platform disabled and trying to enable
+                if (enable && !game.master_enabled) return
+                
+                game.merchant_enabled = enable
+                switchStates.value[id] = enable
+            }
+        })
+
+        // In real app, call batch API
+        await new Promise(r => setTimeout(r, 800))
+        message.success(t('common.success'))
+        checkedRowKeys.value = []
+    } catch {
+        message.error(t('merchantGame.updateFailed'))
+        await fetchGames() // Revert
+    } finally {
+        loading.value = false
     }
 }
 
 const handleReset = () => {
     searchValue.value = ''
     typeFilter.value = 'all'
+    providerFilter.value = 'all'
 }
 
 const filteredGames = computed(() => {
@@ -93,70 +134,90 @@ const filteredGames = computed(() => {
             g.name_en.toLowerCase().includes(searchValue.value.toLowerCase()) ||
             g.game_code.toLowerCase().includes(searchValue.value.toLowerCase())
         const matchesType = typeFilter.value === 'all' || g.type === typeFilter.value
-        return matchesSearch && matchesType
+        const matchesProvider = providerFilter.value === 'all' || g.provider === providerFilter.value
+        return matchesSearch && matchesType && matchesProvider
     })
 })
 
 const columns: DataTableColumns<MerchantGame> = [
+    { type: 'selection' },
     {
-        title: t('myGames.game'),
+        title: t('merchantGame.game'),
         key: 'name_en',
-        width: 280,
+        width: 250,
+        sorter: 'default',
         render: (row) => h('div', { class: 'flex items-center gap-3' }, [
             h('img', { 
                 src: row.thumbnail || 'https://placehold.co/60x60?text=Game', 
-                class: 'w-12 h-12 rounded-lg object-cover bg-gray-200',
+                class: 'w-10 h-10 rounded-lg object-cover bg-gray-200',
                 onError: (e: Event) => (e.target as HTMLImageElement).src = 'https://placehold.co/60x60?text=Game'
             }),
             h('div', {}, [
-                h('div', { class: 'font-medium' }, row.name_en),
-                h('div', { class: 'text-xs text-gray-500 font-mono' }, row.game_code)
+                h('div', { class: 'font-medium text-sm' }, row.name_en),
+                h('div', { class: 'text-xs text-gray-400 font-mono' }, row.game_code)
             ])
         ])
     },
     {
-        title: t('myGames.provider'),
+        title: t('merchantGame.provider'),
         key: 'provider',
         width: 120,
-        render: (row) => h(NTag, { size: 'small', type: 'info' }, { default: () => row.provider })
+        sorter: 'default',
+        render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => row.provider })
     },
     {
-        title: t('myGames.type'),
-        key: 'type',
-        width: 100,
-        render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => row.type })
+        title: t('merchantGame.releaseDate'),
+        key: 'release_date',
+        width: 120,
+        sorter: (row1, row2) => new Date(row1.release_date).getTime() - new Date(row2.release_date).getTime()
     },
     {
         title: 'RTP',
         key: 'rtp',
         width: 80,
+        sorter: (row1, row2) => row1.rtp - row2.rtp,
         render: (row) => h('span', { class: 'font-mono text-green-600' }, `${row.rtp}%`)
     },
     {
-        title: t('myGames.platformStatus'),
-        key: 'master_enabled',
+        title: t('merchantGame.platformStatus'),
+        key: 'admin_status',
         width: 130,
-        render: (row) => row.master_enabled 
-            ? h(NTag, { type: 'success', size: 'small' }, { default: () => t('myGames.available') })
-            : h(NTag, { type: 'error', size: 'small' }, { default: () => t('myGames.disabledByAdmin') })
+        render: (row) => {
+            const type = row.admin_status === 'active' ? 'success' : 
+                         row.admin_status === 'maintenance' ? 'warning' : 'error'
+            const label = row.admin_status === 'active' ? t('merchantGame.available') :
+                          row.admin_status === 'maintenance' ? t('status.maintenance') : t('merchantGame.disabledByAdmin')
+            
+            return h(NTag, { type, size: 'small', bordered: false }, { default: () => label })
+        }
     },
     {
-        title: t('myGames.myStatus'),
+        title: t('merchantGame.myStatus'),
         key: 'merchant_enabled',
         width: 140,
-        render: (row) => h(StatusSwitch, {
-            value: switchStates.value[row.game_id] ?? row.merchant_enabled,
-            disabled: !row.master_enabled,
-            'onUpdate:value': (val: boolean) => {
-                if (row.master_enabled) {
-                    switchStates.value[row.game_id] = val
-                }
-            },
-            onConfirm: (val: boolean) => handleToggle(row, val)
-        }, {
-            checked: () => t('myGames.enabled'),
-            unchecked: () => t('myGames.disabled')
-        })
+        render: (row) => {
+            const switchComp = h(StatusSwitch, {
+                value: switchStates.value[row.game_id] ?? row.merchant_enabled,
+                disabled: !row.master_enabled,
+                'onUpdate:value': (val: boolean) => {
+                     // Optimistic update
+                    if (row.master_enabled) switchStates.value[row.game_id] = val
+                },
+                onConfirm: (val: boolean) => handleToggle(row, val)
+            }, {
+                checked: () => t('merchantGame.enabled'),
+                unchecked: () => t('merchantGame.disabled')
+            })
+
+            if (!row.master_enabled) {
+                return h(NTooltip, null, {
+                    trigger: () => h('div', { class: 'inline-block cursor-not-allowed opacity-60' }, [switchComp]),
+                    default: () => t('merchantGame.disabledByPlatform')
+                })
+            }
+            
+            return switchComp
+        }
     }
 ]
 
@@ -166,16 +227,16 @@ onMounted(fetchGames)
 <template>
     <div class="p-6">
         <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
-            <span>🎮</span> {{ t('myGames.title') }}
+            <span>🎮</span> {{ t('merchantGame.title') }}
         </h1>
 
         <n-alert type="info" class="mb-4" :bordered="false">
-            {{ t('myGames.alert') }}
+            {{ t('merchantGame.alertInfo') }}
         </n-alert>
 
         <PageFilterBar
             v-model:searchValue="searchValue"
-            :searchPlaceholder="t('myGames.search')"
+            :searchPlaceholder="t('merchantGame.searchPlaceholder')"
             @reset="handleReset"
         >
             <template #filters>
@@ -183,15 +244,39 @@ onMounted(fetchGames)
                     v-model:value="typeFilter" 
                     :options="typeOptions"
                     class="w-36"
+                    placeholder="Type"
+                />
+                <n-select 
+                    v-model:value="providerFilter" 
+                    :options="providerOptions"
+                    class="w-40"
+                    placeholder="Provider"
                 />
             </template>
         </PageFilterBar>
 
+        <!-- Batch Action Bar -->
+        <div v-if="checkedRowKeys.length > 0" class="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-between">
+            <span class="text-blue-700 font-medium ml-2">
+                {{ t('merchantGame.selectedCount', { count: checkedRowKeys.length }) }}
+            </span>
+            <n-space>
+                <n-button size="small" type="error" ghost @click="handleBatchAction(false)">
+                    {{ t('merchantGame.disableSelected') }}
+                </n-button>
+                <n-button size="small" type="primary" @click="handleBatchAction(true)">
+                    {{ t('merchantGame.enableSelected') }}
+                </n-button>
+            </n-space>
+        </div>
+
         <n-data-table
+            v-model:checked-row-keys="checkedRowKeys"
             :columns="columns"
             :data="filteredGames"
             :loading="loading"
             :pagination="{ pageSize: 15 }"
+            :row-key="(row) => row.game_id"
             striped
         />
     </div>
