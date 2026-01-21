@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue'
 import { 
-    NCard, NStatistic, NGrid, NGridItem, NDataTable, NButton, NTag, useMessage, NDatePicker
+    NCard, NStatistic, NGrid, NGridItem, NDataTable, NButton, useMessage, NDatePicker
 } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
@@ -104,19 +104,19 @@ const columns: DataTableColumns<DailyReportItem> = [
         title: t('merchantReports.txCount'),
         key: 'tx_count',
         align: 'right',
-        render: (row: any) => row.children ? row.tx_count : '-'
+        render: (row: any) => row.children ? row.tx_count.toLocaleString() : '-'
     },
     {
         title: t('merchantReports.totalBet'),
         key: 'total_bet',
         align: 'right',
-        render: (row) => row.total_bet.toFixed(2)
+        render: (row) => row.total_bet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     },
     {
         title: t('merchantReports.totalPayout'),
         key: 'total_payout',
         align: 'right',
-        render: (row) => row.total_payout.toFixed(2)
+        render: (row) => row.total_payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     },
     {
         title: t('merchantReports.netWin'),
@@ -124,31 +124,16 @@ const columns: DataTableColumns<DailyReportItem> = [
         align: 'right',
         render: (row) => {
             const val = row.net_win
+            const formatted = val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
             return h(
                 'span',
                 { class: val >= 0 ? 'text-green-500 font-bold' : 'text-red-500 font-bold' },
-                val > 0 ? `+${val.toFixed(2)}` : val.toFixed(2)
+                val > 0 ? `+${formatted}` : formatted
             )
         }
     },
     {
-        title: t('merchantReports.rtp'), // Changed Title
-        key: 'rtp',
-        align: 'right',
-        render: (row: any) => {
-            // Only show RTP for Category rows (no children)
-            if (!row.children) {
-                 return h(
-                    NTag,
-                    { type: row.rtp > 100 ? 'error' : 'success', bordered: false, size: 'small' },
-                    { default: () => `${row.rtp}%` }
-                )
-            }
-            return '' // Parent (Date) row shows nothing
-        }
-    },
-    {
-        title: '',
+        title: t('merchantReports.details'),
         key: 'actions',
         width: 100,
         render: (row: any) => {
@@ -164,7 +149,7 @@ const columns: DataTableColumns<DailyReportItem> = [
                             handleViewDetails(row.date)
                         }
                     },
-                    { default: () => t('merchantReports.viewDetails') }
+                    { default: () => t('merchantReports.view') }
                 )
             }
             return null
@@ -191,27 +176,32 @@ onMounted(fetchData)
 
         <!-- Summary Cards -->
         <n-card :title="t('merchantReports.summaryTitle')" size="small">
-            <n-grid :cols="4" gap="12">
+            <n-grid :cols="5" gap="12">
                 <n-grid-item>
                     <n-statistic :label="t('merchantReports.activePlayers')">
                         {{ summary.active_players.toLocaleString() }}
                     </n-statistic>
                 </n-grid-item>
                 <n-grid-item>
+                    <n-statistic :label="t('merchantReports.txCount')">
+                        {{ summary.tx_count.toLocaleString() }}
+                    </n-statistic>
+                </n-grid-item>
+                <n-grid-item>
                     <n-statistic :label="t('merchantReports.totalBet')">
-                        {{ summary.total_bet.toLocaleString() }}
+                        {{ summary.total_bet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                     </n-statistic>
                 </n-grid-item>
                 <n-grid-item>
                     <n-statistic :label="t('merchantReports.totalPayout')">
-                        {{ summary.total_payout.toLocaleString() }}
+                        {{ summary.total_payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                     </n-statistic>
                 </n-grid-item>
                 <n-grid-item>
                     <n-statistic :label="t('merchantReports.netWin')">
                         <template #default>
                             <span :class="summary.net_win >= 0 ? 'text-green-500' : 'text-red-500'">
-                                {{ summary.net_win > 0 ? '+' : '' }}{{ summary.net_win.toLocaleString() }}
+                                {{ summary.net_win > 0 ? '+' : '' }}{{ summary.net_win.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                             </span>
                         </template>
                     </n-statistic>
