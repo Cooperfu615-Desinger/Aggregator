@@ -94,6 +94,8 @@
         "invoiceManagement": "對帳單管理",
         "riskSystem": "風控與系統",
         "betQuery": "投注明細",
+        "jobLevels": "職等管理",
+        "staffList": "員工列表",
         "staffPermission": "員工權限",
         "auditLog": "操作日誌",
         "systemSettings": "系統設定",

@@ -94,6 +94,8 @@
         "invoiceManagement": "Invoice Manager",
         "riskSystem": "Risk & System",
         "betQuery": "Bet Details",
+        "jobLevels": "Job Levels",
+        "staffList": "Staff List",
         "staffPermission": "Staff Permission",
         "auditLog": "Audit Log",
         "systemSettings": "System Settings",

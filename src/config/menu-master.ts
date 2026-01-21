@@ -92,7 +92,12 @@ export const masterMenuOptions = (t: (key: string) => string): MenuOption[] => [
                 icon: renderIcon(BarChartOutlined)
             },
             {
-                label: () => h(RouterLink, { to: '/admin/system/staff' }, { default: () => t('menu.staffPermission') }),
+                label: () => h(RouterLink, { to: '/admin/system/job-levels' }, { default: () => t('menu.jobLevels') }),
+                key: 'JobLevelList',
+                icon: renderIcon(AdminPanelSettingsOutlined)
+            },
+            {
+                label: () => h(RouterLink, { to: '/admin/system/staff' }, { default: () => t('menu.staffList') }),
                 key: 'StaffList',
                 icon: renderIcon(AdminPanelSettingsOutlined)
             },
