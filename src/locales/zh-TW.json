@@ -317,7 +317,12 @@
         "avgRtp": "平均 RTP",
         "player": "玩家",
         "game": "遊戲",
-        "betTime": "投注時間"
+        "betTime": "投注時間",
+        "category": "遊戲分類",
+        "rtp": "RTP (%)",
+        "Slot": "電子老虎機",
+        "Live": "真人視訊",
+        "Arcade": "街機捕魚"
     },
     "provider": {
         "title": "供應商管理",

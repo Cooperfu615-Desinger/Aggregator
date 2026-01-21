@@ -785,18 +785,36 @@ export const handlers = [
             date.setDate(date.getDate() - i)
             const dateStr = date.toISOString().split('T')[0]
 
-            const totalBet = Number(faker.finance.amount({ min: 10000, max: 500000, dec: 2 }))
-            const rtp = faker.number.int({ min: 80, max: 110 })
-            const totalPayout = Number((totalBet * (rtp / 100)).toFixed(2))
-            const netWin = Number((totalPayout - totalBet).toFixed(2))
+            // Generate nested items first
+            const categories = ['Slot', 'Live', 'Arcade']
+            const children = categories.map(cat => {
+                const bet = Number(faker.finance.amount({ min: 1000, max: 100000, dec: 2 }))
+                const rtp = faker.number.int({ min: 85, max: 105 })
+                const payout = Number((bet * (rtp / 100)).toFixed(2))
+                return {
+                    key: `${dateStr}-${cat}`,
+                    date: cat, // Display name for UI
+                    tx_count: faker.number.int({ min: 10, max: 500 }),
+                    total_bet: bet,
+                    total_payout: payout,
+                    net_win: Number((payout - bet).toFixed(2)),
+                    rtp: rtp
+                }
+            })
+
+            // Sum up for daily total
+            const dailyTotal = children.reduce((acc, curr) => ({
+                tx_count: acc.tx_count + curr.tx_count,
+                total_bet: acc.total_bet + curr.total_bet,
+                total_payout: acc.total_payout + curr.total_payout,
+                net_win: acc.net_win + curr.net_win
+            }), { tx_count: 0, total_bet: 0, total_payout: 0, net_win: 0 })
 
             return {
+                key: dateStr,
                 date: dateStr,
-                tx_count: faker.number.int({ min: 50, max: 2000 }),
-                total_bet: totalBet,
-                total_payout: totalPayout,
-                net_win: netWin,
-                rtp: rtp
+                ...dailyTotal,
+                children // Nested data
             }
         })
 
@@ -808,20 +826,12 @@ export const handlers = [
             tx_count: acc.tx_count + curr.tx_count
         }), { total_bet: 0, total_payout: 0, net_win: 0, tx_count: 0 })
 
-        // Calculate Avg RTP
-        const avgRtp = summary.total_bet > 0
-            ? (summary.total_payout / summary.total_bet * 100).toFixed(2)
-            : 0
-
         return HttpResponse.json({
             code: 0,
             msg: 'success',
             data: {
                 items,
-                summary: {
-                    ...summary,
-                    rtp: Number(avgRtp)
-                }
+                summary
             }
         })
     }),

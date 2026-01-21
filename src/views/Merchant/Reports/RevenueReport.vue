@@ -18,12 +18,14 @@ const dateRange = ref<[number, number]>([
 ])
 
 interface DailyReportItem {
+    key?: string
     date: string
     tx_count: number
     total_bet: number
     total_payout: number
     net_win: number
     rtp: number
+    children?: DailyReportItem[]
 }
 
 const items = ref<DailyReportItem[]>([])
@@ -68,34 +70,49 @@ const handleViewDetails = (date: string) => {
 
 const columns: DataTableColumns<DailyReportItem> = [
     {
-        title: t('merchantReports.dailySummary'), // Date
+        title: t('merchantReports.dailySummary'), // Date or Category
         key: 'date',
-        sorter: (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        width: 180,
+        render: (row: any) => {
+            // Check if it's a category row (has no children but is a child of a date row strictly in this context? 
+            // Actually our data structure: DateRow has children. CategoryRow has NO children.
+            // If row has children -> It's a Date row.
+            // If row has NO children -> It's a Category row.
+            
+            // Wait, we need a better way to distinguish.
+            // In our mock data:
+            // Date row: { key: '2023-01-01', date: '2023-01-01', children: [...] }
+            // Category row: { key: '2023-01-01-Slot', date: 'Slot', ... } (We put category name in 'date' field in mock)
+
+            if (row.children) {
+                return row.date 
+            } else {
+                // It's a category. Translate it.
+                return t(`merchantReports.${row.date}`)
+            }
+        }
     },
     {
         title: t('merchantReports.txCount'),
         key: 'tx_count',
-        sorter: (a, b) => a.tx_count - b.tx_count,
-        align: 'right'
+        align: 'right',
+        render: (row: any) => row.children ? row.tx_count : '-'
     },
     {
         title: t('merchantReports.totalBet'),
         key: 'total_bet',
-        sorter: (a, b) => a.total_bet - b.total_bet,
         align: 'right',
         render: (row) => row.total_bet.toFixed(2)
     },
     {
         title: t('merchantReports.totalPayout'),
         key: 'total_payout',
-        sorter: (a, b) => a.total_payout - b.total_payout,
         align: 'right',
         render: (row) => row.total_payout.toFixed(2)
     },
     {
         title: t('merchantReports.netWin'),
         key: 'net_win',
-        sorter: (a, b) => a.net_win - b.net_win,
         align: 'right',
         render: (row) => {
             const val = row.net_win
@@ -107,29 +124,43 @@ const columns: DataTableColumns<DailyReportItem> = [
         }
     },
     {
-        title: t('merchantReports.avgRtp'),
+        title: t('merchantReports.rtp'), // Changed Title
         key: 'rtp',
-        sorter: (a, b) => a.rtp - b.rtp,
         align: 'right',
-        render: (row) => h(
-            NTag,
-            { type: row.rtp > 100 ? 'error' : 'success', bordered: false, size: 'small' },
-            { default: () => `${row.rtp}%` }
-        )
+        render: (row: any) => {
+            // Only show RTP for Category rows (no children)
+            if (!row.children) {
+                 return h(
+                    NTag,
+                    { type: row.rtp > 100 ? 'error' : 'success', bordered: false, size: 'small' },
+                    { default: () => `${row.rtp}%` }
+                )
+            }
+            return '' // Parent (Date) row shows nothing
+        }
     },
     {
         title: '',
         key: 'actions',
         width: 100,
-        render: (row) => h(
-            NButton,
-            {
-                size: 'small',
-                secondary: true,
-                onClick: () => handleViewDetails(row.date)
-            },
-            { default: () => t('merchantReports.viewDetails') }
-        )
+        render: (row: any) => {
+            // Only show Action for Date rows
+            if (row.children) {
+                return h(
+                    NButton,
+                    {
+                        size: 'small',
+                        secondary: true,
+                        onClick: (e) => {
+                            e.stopPropagation()
+                            handleViewDetails(row.date)
+                        }
+                    },
+                    { default: () => t('merchantReports.viewDetails') }
+                )
+            }
+            return null
+        }
     }
 ]
 
@@ -172,13 +203,6 @@ onMounted(fetchData)
                         </template>
                     </n-statistic>
                 </n-grid-item>
-                <n-grid-item>
-                    <n-statistic :label="t('merchantReports.avgRtp')">
-                        <span :class="summary.rtp > 100 ? 'text-red-500' : 'text-green-500'">
-                            {{ summary.rtp }}%
-                        </span>
-                    </n-statistic>
-                </n-grid-item>
             </n-grid>
         </n-card>
 
@@ -187,7 +211,7 @@ onMounted(fetchData)
             :data="items"
             :loading="loading"
             :pagination="{ pageSize: 10 }"
-            :row-key="(row) => row.date"
+            :row-key="(row: any) => row.key"
             striped
         />
 
