@@ -256,8 +256,8 @@ onMounted(fetchGames)
         </PageFilterBar>
 
         <!-- Batch Action Bar -->
-        <div v-if="checkedRowKeys.length > 0" class="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-between">
-            <span class="text-blue-700 font-medium ml-2">
+        <div v-if="checkedRowKeys.length > 0" class="mb-4 p-3 bg-gray-800 border border-gray-700 rounded-lg flex items-center justify-between">
+            <span class="text-gray-200 font-medium ml-2">
                 {{ t('merchantGame.selectedCount', { count: checkedRowKeys.length }) }}
             </span>
             <n-space>
