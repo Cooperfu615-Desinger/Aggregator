@@ -10,10 +10,14 @@ import { useI18n } from 'vue-i18n'
 import type { Provider } from '../../../../types/provider'
 import MaintenanceSettingsModal from './MaintenanceSettingsModal.vue'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
     show: boolean
-    provider: Provider | null
-}>()
+    provider?: Provider | null
+    mode?: 'create' | 'edit'
+}>(), {
+    mode: 'edit',
+    provider: null
+})
 
 const emit = defineEmits<{
     (e: 'update:show', value: boolean): void
@@ -26,6 +30,8 @@ const loading = ref(false)
 const showMaintenance = ref(false)
 
 const formModel = ref<Partial<Provider>>({
+    name: '',
+    code: '',
     apiConfig: {},
     contract: {
         costPercent: 0,
@@ -43,24 +49,39 @@ const formModel = ref<Partial<Provider>>({
 
 // Deep copy provider data when modal opens
 watch(() => props.show, (newVal) => {
-    if (newVal && props.provider) {
-        formModel.value = JSON.parse(JSON.stringify(props.provider))
-        if (!formModel.value.apiConfig) {
-            formModel.value.apiConfig = {}
-        }
-        if (!formModel.value.contract) {
-            formModel.value.contract = {
-                costPercent: 0,
-                expiryDate: Date.now()
+    if (newVal) {
+        if (props.mode === 'create') {
+            // Reset for create
+            formModel.value = {
+                name: '',
+                code: '',
+                status: 'active',
+                type: 'Slot',
+                apiConfig: {},
+                contract: { costPercent: 0, expiryDate: Date.now() },
+                contractConfig: {
+                    settlement_currency: 'USD',
+                    rules: {
+                        slot_free_spin: { enabled: false, provider_share: 0 },
+                        live_tip: { enabled: false, provider_share: 0 },
+                        card_fee: { enabled: false, provider_share: 0 }
+                    }
+                }
             }
-        }
-        if (!formModel.value.contractConfig) {
-            formModel.value.contractConfig = {
-                settlement_currency: 'USD',
-                rules: {
-                    slot_free_spin: { enabled: false, provider_share: 0 },
-                    live_tip: { enabled: false, provider_share: 0 },
-                    card_fee: { enabled: false, provider_share: 0 }
+        } else if (props.provider) {
+            // Edit mode: copy provider
+            formModel.value = JSON.parse(JSON.stringify(props.provider))
+            // Ensure nested objects exist
+            if (!formModel.value.apiConfig) formModel.value.apiConfig = {}
+            if (!formModel.value.contract) formModel.value.contract = { costPercent: 0, expiryDate: Date.now() }
+            if (!formModel.value.contractConfig) {
+                formModel.value.contractConfig = {
+                    settlement_currency: 'USD',
+                    rules: {
+                        slot_free_spin: { enabled: false, provider_share: 0 },
+                        live_tip: { enabled: false, provider_share: 0 },
+                        card_fee: { enabled: false, provider_share: 0 }
+                    }
                 }
             }
         }
@@ -81,19 +102,26 @@ const handleClose = () => {
 const handleSave = async () => {
     loading.value = true
     try {
-        const response = await fetch('/api/v2/providers/update', {
+        const url = props.mode === 'create' ? '/api/admin/providers' : '/api/v2/providers/update'
+        const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formModel.value)
         })
         
-        if (!response.ok) throw new Error('API Error')
+        if (!response.ok) {
+            const res = await response.json()
+            throw new Error(res.msg || 'API Error')
+        }
         
-        message.success(t('merchantConfig.saveSuccess'))
+        const res = await response.json()
+        if (res.code !== 0) throw new Error(res.msg)
+
+        message.success(props.mode === 'create' ? t('provider.createSuccess') : t('merchantConfig.saveSuccess'))
         handleClose()
         emit('refresh')
-    } catch (e) {
-        message.error('Error saving provider config')
+    } catch (e: any) {
+        message.error(e.message || 'Error saving provider config')
     } finally {
         loading.value = false
     }
@@ -106,12 +134,12 @@ const handleSave = async () => {
         @update:show="$emit('update:show', $event)"
         class="w-[600px]"
         preset="card"
-        :title="`${t('provider.config')} - ${provider?.name}`"
+        :title="mode === 'create' ? t('provider.addProvider') : `${t('provider.config')} - ${provider?.name}`"
         :bordered="false"
         size="huge"
     >
         <template #header-extra>
-            <n-button size="small" secondary type="warning" @click="showMaintenance = true">
+            <n-button v-if="mode === 'edit'" size="small" secondary type="warning" @click="showMaintenance = true">
                 <template #icon>
                     <n-icon :component="SettingsOutlined" />
                 </template>
@@ -120,7 +148,7 @@ const handleSave = async () => {
         </template>
 
         <n-tabs type="line" animated>
-            <!-- Tab 1: API Connection -->
+            <!-- Tab 1: Basic & API Connection -->
             <n-tab-pane name="integration" :tab="t('provider.integration')">
                 <n-form
                     label-placement="left"
@@ -128,6 +156,19 @@ const handleSave = async () => {
                     require-mark-placement="right-hanging"
                     class="mt-4"
                 >
+                    <!-- Basic Info -->
+                    <n-form-item :label="t('provider.name')" required>
+                        <n-input v-model:value="formModel.name" :placeholder="t('provider.namePlaceholder')" />
+                    </n-form-item>
+
+                    <n-form-item :label="t('provider.code')" required>
+                        <n-input 
+                            v-model:value="formModel.code" 
+                            :disabled="mode === 'edit'"
+                            :placeholder="t('provider.codePlaceholder')" 
+                        />
+                    </n-form-item>
+
                     <n-form-item :label="t('provider.apiUrl')">
                         <n-input v-model:value="formModel.apiConfig!.apiUrl" placeholder="https://api.provider.com" />
                     </n-form-item>

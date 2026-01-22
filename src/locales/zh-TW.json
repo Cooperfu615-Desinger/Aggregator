@@ -365,6 +365,10 @@
         "games": "遊戲",
         "costPlaceholder": "輸入百分比",
         "searchGame": "搜尋遊戲...",
+        "addProvider": "新增供應商",
+        "createSuccess": "供應商建立成功",
+        "namePlaceholder": "請輸入供應商名稱",
+        "codePlaceholder": "請輸入唯一代碼 (如: pg_soft)",
         "settlementCurrency": "結算幣種",
         "advancedRules": "進階分成設定",
         "rules": {

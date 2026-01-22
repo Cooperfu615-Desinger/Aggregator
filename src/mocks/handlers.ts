@@ -330,6 +330,46 @@ export const handlers = [
             msg: 'Game Updated'
         })
     }),
+    // Create Provider
+    http.post('/api/admin/providers', async ({ request }) => {
+        await delay(800)
+        const body = await request.json() as any
+
+        if (mockProviders.some(p => p.code === body.code)) {
+            return HttpResponse.json({
+                code: 409,
+                msg: 'Provider Code already exists'
+            })
+        }
+
+        const newProvider = {
+            id: mockProviders.length + 1,
+            code: body.code,
+            name: body.name,
+            status: 'active',
+            type: body.type || 'Slot',
+            gameCount: 0,
+            apiConfig: body.apiConfig || {},
+            contractConfig: body.contractConfig || {
+                settlement_currency: 'USD',
+                rules: {
+                    slot_free_spin: { enabled: false, provider_share: 0 },
+                    live_tip: { enabled: false, provider_share: 0 },
+                    card_fee: { enabled: false, provider_share: 0 }
+                }
+            },
+            contract: body.contract || { costPercent: 0, expiryDate: '' }
+        }
+
+        mockProviders.push(newProvider)
+
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: newProvider
+        })
+    }),
+
     // Provider List
     http.get('/api/v2/providers', async () => {
         await delay(600)

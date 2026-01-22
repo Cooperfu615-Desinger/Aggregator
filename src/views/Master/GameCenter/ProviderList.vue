@@ -16,6 +16,7 @@ const loading = ref(false)
 const list = ref<Provider[]>([])
 const showConfig = ref(false)
 const showGameList = ref(false)
+const mode = ref<'create' | 'edit'>('edit')
 const currentProvider = ref<Provider | null>(null)
 
 const switchStates = ref<Record<number, boolean>>({})
@@ -63,6 +64,13 @@ const handleStatusConfirm = async (row: Provider, newVal: boolean) => {
 
 const handleConfig = (row: Provider) => {
     currentProvider.value = row
+    mode.value = 'edit'
+    showConfig.value = true
+}
+
+const handleAdd = () => {
+    currentProvider.value = null
+    mode.value = 'create'
     showConfig.value = true
 }
 
@@ -149,9 +157,14 @@ onMounted(() => {
             <h1 class="text-2xl font-bold flex items-center gap-2">
                 <span>🏢</span> {{ t('provider.title') }}
             </h1>
-            <n-tag type="info" size="small">
-                {{ list.length }} {{ t('provider.providers') }}
-            </n-tag>
+            <div class="flex gap-3 items-center">
+                <n-tag type="info" size="small">
+                    {{ list.length }} {{ t('provider.providers') }}
+                </n-tag>
+                <n-button type="primary" @click="handleAdd">
+                    + {{ t('provider.addProvider') }}
+                </n-button>
+            </div>
         </div>
         
         <n-data-table
@@ -166,6 +179,7 @@ onMounted(() => {
         <provider-config-modal
             v-model:show="showConfig"
             :provider="currentProvider"
+            :mode="mode"
             @refresh="fetchList"
         />
 
