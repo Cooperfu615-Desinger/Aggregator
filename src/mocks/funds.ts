@@ -52,7 +52,7 @@ const generateMockFunds = () => {
         let proof = undefined
         if (type === 'top-up') {
             amount = Number(faker.finance.amount({ min: 1000, max: 50000, dec: 2 }))
-            proof = faker.image.urlPlaceholder()
+            proof = faker.image.url()
         } else if (type === 'credit-limit') {
             amount = Number(faker.finance.amount({ min: 100000, max: 1000000, dec: 0 })) // Round numbers for limits usually
             proof = faker.lorem.sentence()

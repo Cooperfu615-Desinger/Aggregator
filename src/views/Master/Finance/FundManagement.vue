@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, h, computed } from 'vue'
 import { 
-    NCard, NSpace, NInput, NDatePicker, NSelect, NButton, NDataTable, NTag,
-    NModal, NForm, NFormItem, NInputNumber, useMessage, NPopconfirm, NImage
+    NCard, NSpace, NInput, NSelect, NButton, NDataTable, NTag,
+    NModal, NForm, NFormItem, NInputNumber, useMessage, NImage
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import type { DataTableColumns } from 'naive-ui'
-import type { FundRecord, FundType, FundStatus } from '../../../types/finance'
-import { SearchOutlined, PlusOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@vicons/material'
+import type { FundRecord } from '../../../types/finance'
+import { SearchOutlined, PlusOutlined, CheckCircleOutlined, CancelOutlined } from '@vicons/material'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -217,7 +217,7 @@ const columns = computed<DataTableColumns<FundRecord>>(() => [
                   h(NButton, { 
                       size: 'small', type: 'error', ghost: true,
                       onClick: () => handleReview(row, 'reject')
-                  }, { icon: () => h(CloseCircleOutlined) }),
+                  }, { icon: () => h(CancelOutlined) }),
               ]
           })
       }

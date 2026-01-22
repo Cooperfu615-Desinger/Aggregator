@@ -18,6 +18,7 @@ export interface Merchant {
     ipWhitelist?: string[];
     baseCurrency?: string;
     balance?: number; // Transfer wallet balance
+    credit_limit?: number;
 }
 
 export interface MerchantDetail extends Merchant {
