@@ -1026,7 +1026,50 @@ export const handlers = [
             data: { verification_status: 'verifying' }
         })
     }),
-
+    // Dashboard Statistics (War Room)
+    http.get('/api/v2/merchant/dashboard/stats', async () => {
+        await delay(500);
+        const wallet = {
+            balance: Number(faker.finance.amount({ min: 50000, max: 200000, dec: 2 })),
+            credit_limit: Number(faker.finance.amount({ min: 100000, max: 500000, dec: 2 })),
+            currency: faker.helpers.arrayElement(['TWD', 'USD', 'CNY']),
+            exchange_rate: Number(faker.finance.amount({ min: 0.8, max: 1.2, dec: 4 }))
+        };
+        const totalBet = Number(faker.finance.amount({ min: 1000000, max: 5000000, dec: 2 }));
+        const totalWin = totalBet * faker.number.float({ min: 0.9, max: 1.05, fractionDigits: 4 });
+        const today_kpi = {
+            total_bet: totalBet,
+            net_win: Number((totalBet - totalWin).toFixed(2)),
+            active_players: faker.number.int({ min: 2000, max: 5000 }),
+            tx_count: faker.number.int({ min: 10000, max: 50000 }),
+            comparison: {
+                bet_pct: faker.number.float({ min: -5, max: 5, fractionDigits: 2 }),
+                win_pct: faker.number.float({ min: -5, max: 5, fractionDigits: 2 }),
+                player_pct: faker.number.float({ min: -5, max: 5, fractionDigits: 2 })
+            }
+        };
+        const trend_7d = Array.from({ length: 7 }, (_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() - (6 - i));
+            const bet = Number(faker.finance.amount({ min: 50000, max: 300000, dec: 2 }));
+            const win = bet * faker.number.float({ min: 0.9, max: 1.05, fractionDigits: 4 });
+            return { date: date.toISOString().split('T')[0], bet, net_win: Number((bet - win).toFixed(2)) };
+        });
+        const alerts = [
+            { type: 'invoice', message: '您有 2 筆待付帳單', count: 2 },
+            { type: 'reject', message: '最近有 1 筆充值申請被拒絕', count: 1 }
+        ];
+        const top_games = faker.helpers.multiple(() => ({
+            name: faker.lorem.words(2),
+            bet: Number(faker.finance.amount({ min: 20000, max: 150000, dec: 2 })),
+            win: Number(faker.finance.amount({ min: 15000, max: 140000, dec: 2 }))
+        }), { count: 5 });
+        return HttpResponse.json({
+            code: 0,
+            msg: 'success',
+            data: { wallet, today_kpi, trend_7d, alerts, top_games }
+        });
+    }),
     ...financeHandlers,
     ...systemHandlers
 ]

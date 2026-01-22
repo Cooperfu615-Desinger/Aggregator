@@ -249,16 +249,27 @@
         }
     },
     "merchantDashboard": {
-        "myBalance": "我的餘額",
-        "todaysGGR": "今日盈虧",
-        "yesterday": "昨日",
-        "activePlayers": "活躍玩家",
-        "last24h": "過去 24 小時",
-        "enabledGames": "已啟用遊戲",
-        "acrossProviders": "來自所有供應商",
-        "ggrTrend": "📈 GGR 走勢 (近 7 天)",
-        "transferWallet": "💼 轉帳錢包",
-        "seamlessWallet": "🔗 單一錢包"
+        "welcome": "早安，{name}",
+        "walletTitle": "資金錢包",
+        "creditUsage": "額度使用率",
+        "todayStats": "今日營運概況",
+        "compareYesterday": "較昨日",
+        "revenueTrend": "近 7 日營收趨勢",
+        "alerts": "待辦事項與警報",
+        "topGames": "今日熱門遊戲",
+        "quickActions": "快速入口",
+        "actions": {
+            "topUp": "立即充值",
+            "requestCredit": "申請調額",
+            "payBills": "支付帳單",
+            "addAgent": "新增代理"
+        },
+        "kpi": {
+            "bet": "總投注",
+            "win": "總盈虧",
+            "players": "活躍玩家",
+            "tx": "注單數"
+        }
     },
     "merchantGame": {
         "title": "我的遊戲",
