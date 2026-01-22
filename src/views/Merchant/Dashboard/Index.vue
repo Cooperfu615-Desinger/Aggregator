@@ -1,46 +1,26 @@
 <template>
   <div class="p-6 space-y-8">
-    <!-- Top Layer: Wallet and KPI -->
-    <div class="flex flex-col md:flex-row md:justify-between gap-6">
-      <!-- Wallet Info -->
-      <n-card class="flex-1" :title="t('merchantDashboard.walletTitle')">
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.myBalance') }}</div>
-            <div class="text-2xl font-bold">
-              <MoneyText :value="stats.wallet.balance" :currency="stats.wallet.currency" />
-            </div>
-          </div>
-          <n-button type="primary" size="small" @click="onTopUp">{{ t('merchantDashboard.actions.topUp') }}</n-button>
-        </div>
-        <div class="mt-4">
-          <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.creditUsage') }}</div>
-          <n-progress :percentage="creditUsage" />
-          <div class="text-xs text-gray-500 mt-1">{{ stats.wallet.credit_limit }} {{ stats.wallet.currency }}</div>
-        </div>
+    <!-- Top Layer: KPI Cards (Full Width) -->
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <n-card class="border-l-4 border-green-500">
+        <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.kpi.bet') }}</div>
+        <div class="text-2xl font-bold"><MoneyText :value="stats.today_kpi.total_bet" :currency="stats.wallet.currency" /></div>
+        <div class="text-xs text-gray-400 mt-1">{{ formatPct(stats.today_kpi.comparison.bet_pct) }}</div>
       </n-card>
-      <!-- KPI Cards -->
-      <div class="grid grid-cols-2 gap-4 md:grid-cols-4 flex-1">
-        <n-card class="border-l-4 border-green-500">
-          <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.kpi.bet') }}</div>
-          <div class="text-2xl font-bold"><MoneyText :value="stats.today_kpi.total_bet" :currency="stats.wallet.currency" /></div>
-          <div class="text-xs text-gray-400 mt-1">{{ formatPct(stats.today_kpi.comparison.bet_pct) }}</div>
-        </n-card>
-        <n-card class="border-l-4 border-red-500">
-          <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.kpi.win') }}</div>
-          <div class="text-2xl font-bold"><MoneyText :value="stats.today_kpi.net_win" :currency="stats.wallet.currency" /></div>
-          <div class="text-xs text-gray-400 mt-1">{{ formatPct(stats.today_kpi.comparison.win_pct) }}</div>
-        </n-card>
-        <n-card class="border-l-4 border-purple-500">
-          <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.kpi.players') }}</div>
-          <div class="text-2xl font-bold">{{ stats.today_kpi.active_players }}</div>
-          <div class="text-xs text-gray-400 mt-1">{{ formatPct(stats.today_kpi.comparison.player_pct) }}</div>
-        </n-card>
-        <n-card class="border-l-4 border-amber-500">
-          <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.kpi.tx') }}</div>
-          <div class="text-2xl font-bold">{{ stats.today_kpi.tx_count }}</div>
-        </n-card>
-      </div>
+      <n-card class="border-l-4 border-red-500">
+        <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.kpi.win') }}</div>
+        <div class="text-2xl font-bold"><MoneyText :value="stats.today_kpi.net_win" :currency="stats.wallet.currency" /></div>
+        <div class="text-xs text-gray-400 mt-1">{{ formatPct(stats.today_kpi.comparison.win_pct) }}</div>
+      </n-card>
+      <n-card class="border-l-4 border-purple-500">
+        <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.kpi.players') }}</div>
+        <div class="text-2xl font-bold">{{ stats.today_kpi.active_players }}</div>
+        <div class="text-xs text-gray-400 mt-1">{{ formatPct(stats.today_kpi.comparison.player_pct) }}</div>
+      </n-card>
+      <n-card class="border-l-4 border-amber-500">
+        <div class="text-sm text-gray-400 mb-1">{{ t('merchantDashboard.kpi.tx') }}</div>
+        <div class="text-2xl font-bold">{{ stats.today_kpi.tx_count }}</div>
+      </n-card>
     </div>
 
     <!-- Middle Layer: Trend Chart -->
@@ -84,7 +64,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NCard, NButton, NProgress, NAlert, NList, NListItem, NSkeleton } from 'naive-ui'
+import { NCard, NButton, NAlert, NList, NListItem, NSkeleton } from 'naive-ui'
 import VChart from 'vue-echarts'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 
@@ -100,10 +80,7 @@ const stats = ref<any>({
   top_games: []
 })
 
-const creditUsage = computed(() => {
-  const { balance, credit_limit } = stats.value.wallet
-  return credit_limit ? Math.min(100, (balance / credit_limit) * 100) : 0
-})
+
 
 const chartOption = computed(() => ({
   tooltip: { trigger: 'axis' },
@@ -119,11 +96,6 @@ const chartOption = computed(() => ({
 function formatPct(value: number) {
   const sign = value > 0 ? '+' : ''
   return `${sign}${value.toFixed(2)}%`
-}
-
-function onTopUp() {
-  // Placeholder for top‑up modal trigger
-  console.log('Top Up clicked')
 }
 
 function onProcessAlert(alert: any) {
