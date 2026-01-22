@@ -269,18 +269,18 @@ onMounted(() => {
                 <div>{{ reviewAction === 'approve' ? t('finance.funds.dialog.approve') : t('finance.funds.dialog.reject') }}</div>
             </template>
             <div class="py-4 space-y-4">
-                <div class="bg-gray-50 p-3 rounded">
+                <div class="bg-[#18181c] p-4 rounded border border-gray-800">
                     <div class="flex justify-between mb-2">
-                        <span class="text-gray-500">{{ t('finance.funds.merchant') }}</span>
-                        <span class="font-bold">{{ currentRecord?.merchant_name }}</span>
+                        <span class="text-gray-400">{{ t('finance.funds.merchant') }}</span>
+                        <span class="font-bold text-white">{{ currentRecord?.merchant_name }}</span>
                     </div>
                     <div class="flex justify-between mb-2">
-                        <span class="text-gray-500">{{ t('finance.funds.type') }}</span>
-                        <span>{{ currentRecord?.type ? t(`finance.funds.types.${currentRecord.type}`) : '' }}</span>
+                        <span class="text-gray-400">{{ t('finance.funds.type') }}</span>
+                        <span class="text-gray-200">{{ currentRecord?.type ? t(`finance.funds.types.${currentRecord.type}`) : '' }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">{{ t('finance.funds.amount') }}</span>
-                        <span class="font-mono text-lg font-bold">{{ currentRecord?.amount.toLocaleString() }}</span>
+                        <span class="text-gray-400">{{ t('finance.funds.amount') }}</span>
+                        <span class="font-mono text-lg font-bold text-emerald-400">{{ currentRecord?.amount.toLocaleString() }}</span>
                     </div>
                 </div>
 
