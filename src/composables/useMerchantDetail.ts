@@ -20,10 +20,11 @@ export function useMerchantDetail() {
             if (res.code !== 0) throw new Error(res.msg || 'Unknown API Error')
 
             formModel.value = res.data
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Fetch Merchant Detail Error:', err)
-            error.value = err.message || 'Failed to load merchant details'
-            message.error(error.value || 'Error loading data')
+            const errorMessage = err instanceof Error ? err.message : 'Failed to load merchant details'
+            error.value = errorMessage
+            message.error(errorMessage)
         } finally {
             loading.value = false
         }
@@ -48,9 +49,10 @@ export function useMerchantDetail() {
             if (res.code !== 0) throw new Error(res.msg || 'Update failed')
 
             message.success('Merchant configuration updated successfully')
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Update Merchant Error:', err)
-            message.error(err.message || 'Failed to update configuration')
+            const errorMessage = err instanceof Error ? err.message : 'Failed to update configuration'
+            message.error(errorMessage)
         } finally {
             saving.value = false
         }

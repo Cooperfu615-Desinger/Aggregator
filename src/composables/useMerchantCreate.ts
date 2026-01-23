@@ -78,9 +78,10 @@ export function useMerchantCreate() {
 
                     message.success('Merchant Created Successfully')
                     router.push('/admin/merchant/list')
-                } catch (err: any) {
+                } catch (err: unknown) {
                     console.error(err)
-                    message.error(err.message || 'Error creating merchant')
+                    const errorMessage = err instanceof Error ? err.message : 'Error creating merchant'
+                    message.error(errorMessage)
                 } finally {
                     loading.value = false
                 }
