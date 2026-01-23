@@ -1,6 +1,6 @@
 import { http, HttpResponse, delay } from 'msw'
 import { faker } from '@faker-js/faker'
-import type { JobLevel, Permission, Staff } from '../types/system'
+import type { JobLevel, Permission, Staff, AuditLog, AuditAction } from '../types/system'
 
 // ==================== JOB LEVELS ====================
 // Default Job Levels (RBAC Roles)
@@ -79,10 +79,10 @@ function getJobLevelName(jobLevelId: number): string {
 // ==================== AUDIT LOGS ====================
 // ==================== AUDIT LOGS ====================
 // Mock Data Generation
-const auditLogs: any[] = faker.helpers.multiple(() => {
-    const action = faker.helpers.arrayElement(['login', 'logout', 'create', 'update', 'delete', 'other']) as 'login' | 'logout' | 'create' | 'update' | 'delete' | 'other'
+const auditLogs: AuditLog[] = faker.helpers.multiple(() => {
+    const action: AuditAction = faker.helpers.arrayElement(['login', 'logout', 'create', 'update', 'delete', 'other'])
     let target = ''
-    let details: any = {}
+    let details: Record<string, unknown> = {}
 
     switch (action) {
         case 'login':
@@ -129,7 +129,7 @@ const auditLogs: any[] = faker.helpers.multiple(() => {
         ip: faker.internet.ip(),
         details
     }
-}, { count: 60 }).sort((a: any, b: any) => new Date(b.time).getTime() - new Date(a.time).getTime())
+}, { count: 60 }).sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
 
 // ==================== GLOBAL SETTINGS ====================
 let globalSettings = {

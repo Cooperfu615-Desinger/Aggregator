@@ -1,8 +1,9 @@
 import { http, HttpResponse, delay } from 'msw'
 import { faker } from '@faker-js/faker'
+import type { Invoice } from '../types/finance'
 
 // In-memory store for invoices
-let invoices: any[] = []
+let invoices: Invoice[] = []
 
 // Helper to generate initial mock data
 const generateInitialInvoices = () => {
@@ -95,7 +96,7 @@ export const financeHandlers = [
         const body = await request.json() as any
         const { month, items } = body // items = previewData array
 
-        const newInvoices = items.map((item: any) => ({
+        const newInvoices: Invoice[] = items.map((item: { merchant_id: string; merchant_name: string; total_ggr: number; commission_rate: number; amount_due: number }) => ({
             id: `INV-${item.merchant_name.substring(0, 3).toUpperCase()}-${month.replace('-', '')}-${faker.string.numeric(4)}`,
             merchant_id: item.merchant_id,
             merchant_name: item.merchant_name,
