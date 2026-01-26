@@ -8,7 +8,6 @@ import type { DataTableColumns } from 'naive-ui'
 import type { Provider } from '../../../types/provider'
 import ProviderConfigModal from './components/ProviderConfigModal.vue'
 import ProviderGameListDrawer from './components/ProviderGameListDrawer.vue'
-import StatusSwitch from '../../../components/Common/StatusSwitch.vue'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -19,46 +18,17 @@ const showGameList = ref(false)
 const mode = ref<'create' | 'edit'>('edit')
 const currentProvider = ref<Provider | null>(null)
 
-const switchStates = ref<Record<number, boolean>>({})
-
 const fetchList = async () => {
     loading.value = true
     try {
         const res = await fetch('/api/v2/providers').then(r => r.json())
         if (res.code === 0) {
             list.value = res.data.list
-            list.value.forEach(provider => {
-                switchStates.value[provider.id] = provider.status === 'active'
-            })
         }
     } catch (e) {
         message.error(t('common.loadFailed'))
     } finally {
         loading.value = false
-    }
-}
-
-const handleStatusConfirm = async (row: Provider, newVal: boolean) => {
-    const oldStatus = row.status
-    row.status = newVal ? 'active' : 'maintenance'
-    switchStates.value[row.id] = newVal
-    
-    try {
-        const res = await fetch('/api/v2/providers/update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: row.id, status: row.status })
-        }).then(r => r.json())
-
-        if (res.code === 0) {
-            message.success(newVal ? t('provider.enabled') : t('provider.maintenance'))
-        } else {
-            throw new Error(res.msg)
-        }
-    } catch (e) {
-        row.status = oldStatus
-        switchStates.value[row.id] = oldStatus === 'active'
-        message.error(t('common.updateFailed'))
     }
 }
 
@@ -112,19 +82,17 @@ const columns: DataTableColumns<Provider> = [
     {
         title: t('provider.status'),
         key: 'status',
-        width: 180,
-        render: (row) => h(StatusSwitch, {
-            value: switchStates.value[row.id] ?? (row.status === 'active'),
-            warningMessage: t('provider.disableWarning', { name: row.name }),
-            warningTitle: t('provider.disableTitle'),
-            'onUpdate:value': (val: boolean) => {
-                switchStates.value[row.id] = val
-            },
-            onConfirm: (val: boolean) => handleStatusConfirm(row, val)
-        }, {
-            checked: () => t('provider.active'),
-            unchecked: () => t('provider.maintenanceMode')
-        })
+        width: 120,
+        render: (row) => {
+            const isActive = row.status === 'active'
+            return h(NTag, {
+                type: isActive ? 'success' : 'error',
+                size: 'small',
+                bordered: false
+            }, { 
+                default: () => isActive ? t('provider.active') : t('provider.maintenanceMode') 
+            })
+        }
     },
     {
         title: t('common.action'),
