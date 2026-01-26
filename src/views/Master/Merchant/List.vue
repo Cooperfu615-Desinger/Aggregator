@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, h, computed, ref } from 'vue'
-import { NDataTable, NTag, NAlert, NButton, NSpace, NIcon } from 'naive-ui'
+import { onMounted, h, computed, ref, watch } from 'vue'
+import { NDataTable, NTag, NAlert, NButton, NSpace, NIcon, NInput } from 'naive-ui'
+import { useDebounceFn } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import { SettingsOutlined, SportsEsportsOutlined } from '@vicons/material'
 
@@ -20,6 +21,15 @@ const showCreate = ref(false)
 const showConfig = ref(false)
 const showGameSettings = ref(false)
 const currentMerchant = ref<Merchant | null>(null)
+const searchText = ref('')
+
+const debouncedFetch = useDebounceFn((search: string) => {
+  fetchList({ level: 1, search })
+}, 500)
+
+watch(searchText, (val) => {
+  debouncedFetch(val)
+})
 
 const handleConfig = (row: Merchant) => {
     currentMerchant.value = row
@@ -175,6 +185,19 @@ const columns = computed<DataTableColumns<Merchant>>(() => [
       <n-button type="primary" @click="showCreate = true">
         + {{ t('merchant.create') }}
       </n-button>
+    </div>
+
+    <div class="flex items-center space-x-4 bg-white/5 p-4 rounded-lg">
+      <n-input
+        v-model:value="searchText"
+        :placeholder="t('merchant.tips')"
+        clearable
+        style="max-width: 300px"
+      >
+        <template #prefix>
+          <n-icon :component="SettingsOutlined" class="opacity-50" />
+        </template>
+      </n-input>
     </div>
 
     <!-- Debug Alert -->

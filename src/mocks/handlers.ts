@@ -415,25 +415,28 @@ export const handlers = [
     ...agentHandlers,
     ...fundsHandlers,
 
-    http.get('/api/v2/agent/list', async () => {
+    http.get('/api/v2/agent/list', async ({ request }) => {
         await delay(500) // Simulate network latency
+        const url = new URL(request.url)
+        const search = url.searchParams.get('search')?.toLowerCase()
 
         // Generate 20 mock merchants
-        const mockList = Array.from({ length: 20 }).map((_, i) => createRandomMerchant(i + 1))
+        let mockList = Array.from({ length: 20 }).map((_, i) => createRandomMerchant(i + 1))
 
-        // Return standard API response structure (assuming a common wrapper, but user didn't specify, so returning array or basic wrapper)
-        // Based on "API_CONTRACT.md" mention, usually there's a { code, data, msg } structure, but looking at user prompt:
-        // "Logic: 使用 FakerJS 生成 20 筆資料。" without wrapper details.
-        // I will return the list directly or in a 'data' field. Let's assume a simple structure `data: [...]` or just the array.
-        // Spec Keeper check: API_CONTRACT.md usually defines this. 
-        // To be safe and compliant with typical 'list' endpoints, I'll return { data: mockList, total: 20 }.
+        if (search) {
+            mockList = mockList.filter(m =>
+                m.display_id?.toLowerCase().includes(search) ||
+                m.site_code?.toLowerCase().includes(search) ||
+                m.name?.toLowerCase().includes(search)
+            )
+        }
 
         return HttpResponse.json({
             code: 0,
             msg: 'success',
             data: {
                 list: mockList,
-                total: 20,
+                total: mockList.length,
                 page: 1,
                 limit: 20
             }
