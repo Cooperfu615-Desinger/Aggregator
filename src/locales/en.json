@@ -494,7 +494,9 @@
         "statusPaid": "Paid",
         "statusPending": "Pending",
         "confirmMarkPaid": "Are you sure to mark invoice {id} as paid?",
-        "detail": "View Detail"
+        "detail": "View Detail",
+        "paidAt": "Paid At",
+        "paidBy": "Operator"
     },
     "invoices": {
         "myInvoices": "My Invoices",

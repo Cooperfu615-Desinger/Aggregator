@@ -32,6 +32,8 @@ const generateInitialInvoices = () => {
                 amount_due: Number(commission.toFixed(2)),
                 status: Math.random() > 0.3 ? 'paid' : 'pending',
                 created_at: new Date(month + '-05').toISOString(),
+                paid_at: Math.random() > 0.3 ? new Date(month + '-10').toISOString() : undefined,
+                paid_by: Math.random() > 0.3 ? 'admin_sys' : undefined,
                 breakdown: [
                     { provider: 'PG Soft', ggr: ggr * 0.6, rate: 10, amount: ggr * 0.6 * 0.1 },
                     { provider: 'Evolution', ggr: ggr * 0.4, rate: 10, amount: ggr * 0.4 * 0.1 }
@@ -149,10 +151,20 @@ export const financeHandlers = [
         const invoice = invoices.find(i => i.id === id)
 
         if (invoice) {
-            if (body.status) invoice.status = body.status
+            if (body.status) {
+                invoice.status = body.status
+                if (body.status === 'paid') {
+                    invoice.paid_at = new Date().toISOString()
+                    invoice.paid_by = 'admin_sys'
+                }
+            }
             return HttpResponse.json({
                 code: 0,
-                msg: 'Status Updated'
+                msg: 'Status Updated',
+                data: {
+                    paid_at: invoice.paid_at,
+                    paid_by: invoice.paid_by
+                }
             })
         }
         return HttpResponse.json({ code: 404, msg: 'Invoice not found' })

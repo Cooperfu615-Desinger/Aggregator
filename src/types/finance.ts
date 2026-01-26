@@ -8,6 +8,8 @@ export interface Invoice {
     amount_due: number
     status: 'pending' | 'paid' | 'verifying'
     created_at: string
+    paid_at?: string
+    paid_by?: string
     breakdown: InvoiceBreakdown[]
 }
 

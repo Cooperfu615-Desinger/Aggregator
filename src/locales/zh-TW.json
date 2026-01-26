@@ -610,6 +610,8 @@
         "statusPending": "待支付",
         "confirmMarkPaid": "確定要將帳單 {id} 標記為已結算嗎？",
         "detail": "查看詳情",
+        "paidAt": "銷帳日期",
+        "paidBy": "操作人員",
         "funds": {
             "title": "資金管理",
             "type": "交易類型",

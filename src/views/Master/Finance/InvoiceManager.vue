@@ -10,22 +10,11 @@ import { DescriptionOutlined, CheckCircleOutlined, SearchOutlined } from '@vicon
 import { useI18n } from 'vue-i18n'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 import { renderHeaderWithTooltip } from '../../../utils/renderHelpers'
+import type { Invoice } from '../../../types/finance'
 
 const { t } = useI18n()
 const message = useMessage()
 
-// Models
-interface Invoice {
-    id: string
-    merchant_id: string | number
-    merchant_name: string
-    period: string
-    total_ggr: number
-    commission_rate: number
-    amount_due: number
-    status: 'pending' | 'paid'
-    breakdown?: any[]
-}
 
 interface InvoicePreviewItem {
     merchant_id: string
@@ -131,6 +120,20 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
             bordered: false,
             round: true
         }, { default: () => row.status === 'paid' ? t('finance.statusPaid') : t('finance.statusPending') })
+    },
+    {
+        title: t('finance.paidAt'),
+        key: 'paid_at',
+        width: 160,
+        align: 'right',
+        render: (row) => row.paid_at ? new Date(row.paid_at).toLocaleString() : '-'
+    },
+    {
+        title: t('finance.paidBy'),
+        key: 'paid_by',
+        width: 120,
+        align: 'right',
+        render: (row) => row.paid_by || '-'
     },
     {
         title: t('columns.action'),
@@ -250,13 +253,14 @@ const markAsPaid = async (row?: Invoice) => {
         if (data.code === 0) {
             message.success(t('finance.markedPaid'))
             target.status = 'paid'
-            // Update in list if it's not the same reference (it usually is in Vue if passed from row)
-            // But if we are in drawer working on copy or if list needs refresh.
-            // Since we mutate `target` which is `row` or `selectedInvoice` (which is ref to row usually), it should be fine.
-            // But to be safe, find in list.
+            target.paid_at = data.data?.paid_at
+            target.paid_by = data.data?.paid_by
+            
             const idx = invoices.value.findIndex(i => i.id === target.id)
             if (idx !== -1 && invoices.value[idx]) {
                 invoices.value[idx].status = 'paid'
+                invoices.value[idx].paid_at = data.data?.paid_at
+                invoices.value[idx].paid_by = data.data?.paid_by
             }
         }
     } catch (e) {
@@ -367,6 +371,16 @@ onMounted(() => {
                         <div class="mt-3 text-sm text-gray-400">
                             {{ t('finance.period') }}: <span class="text-white">{{ selectedInvoice.period }}</span> • 
                             {{ t('merchant.siteCodeLabel') }}: <span class="text-white">{{ selectedInvoice.merchant_name }}</span>
+                        </div>
+                        <div v-if="selectedInvoice.status === 'paid'" class="mt-2 pt-2 border-t border-slate-700 space-y-1 text-xs text-gray-400">
+                            <div class="flex justify-between">
+                                <span>{{ t('finance.paidAt') }}:</span>
+                                <span class="text-gray-300">{{ new Date(selectedInvoice.paid_at!).toLocaleString() }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>{{ t('finance.paidBy') }}:</span>
+                                <span class="text-gray-300">{{ selectedInvoice.paid_by }}</span>
+                            </div>
                         </div>
                     </n-card>
 
