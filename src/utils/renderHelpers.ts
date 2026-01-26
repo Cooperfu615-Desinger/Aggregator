@@ -17,14 +17,28 @@ const InfoCircleIcon = () => h('svg', {
  * Renders a table header with an info icon tooltip
  * @param label - The column header label text
  * @param tooltipKey - The i18n key for the tooltip content
+ * @param align - Alignment of the header content ('left' | 'center' | 'right')
  * @returns VNode for the table header with tooltip
  */
-export function renderHeaderWithTooltip(label: string, tooltipKey: string) {
+export function renderHeaderWithTooltip(label: string, tooltipKey: string, align: 'left' | 'center' | 'right' = 'left') {
     const { t } = useI18n()
+
+    const justifyMapping = {
+        left: 'flex-start',
+        center: 'center',
+        right: 'flex-end'
+    }
 
     return h(
         'div',
-        { style: { display: 'flex', alignItems: 'center', gap: '4px' } },
+        {
+            style: {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                justifyContent: justifyMapping[align]
+            }
+        },
         [
             h('span', label),
             h(

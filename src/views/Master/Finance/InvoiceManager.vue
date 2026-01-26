@@ -95,14 +95,14 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
         align: 'right'
     },
     { 
-        title: () => renderHeaderWithTooltip(t('finance.totalGGR'), 'tips.ggr_formula'), 
+        title: () => renderHeaderWithTooltip(t('finance.totalGGR'), 'tips.ggr_formula', 'right'), 
         key: 'total_ggr', 
         width: 140,
         align: 'right',
         render: (row) => h(MoneyText, { value: row.total_ggr, currency: 'USD' })
     },
     { 
-        title: () => renderHeaderWithTooltip(t('finance.amountDue'), 'tips.invoice_amount'), 
+        title: () => renderHeaderWithTooltip(t('finance.amountDue'), 'tips.invoice_amount', 'right'), 
         key: 'amount_due', 
         width: 140,
         align: 'right',
