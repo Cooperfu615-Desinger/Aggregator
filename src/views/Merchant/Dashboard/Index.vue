@@ -46,7 +46,7 @@
         </div>
       </n-card>
       <n-card :title="t('merchantDashboard.topGames')">
-        <div class="flex justify-between items-center px-4 py-2 bg-gray-50 dark:bg-gray-800 text-xs text-gray-400 font-medium rounded-t border-b dark:border-gray-700">
+        <div class="flex justify-between items-center px-4 py-2 bg-gray-800 text-xs text-gray-400 font-medium rounded-t border-b border-gray-700">
           <div>遊戲名稱</div>
           <div>總投注 / 總盈虧</div>
         </div>
@@ -68,12 +68,14 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { NCard, NButton, NAlert, NList, NListItem, NSkeleton } from 'naive-ui'
 import VChart from 'vue-echarts'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 import TrendValue from '../../../components/Common/TrendValue.vue'
 
 const { t } = useI18n()
+const router = useRouter()
 
 const loading = ref(true)
 const loadingAlerts = ref(true)
@@ -99,8 +101,11 @@ const chartOption = computed(() => ({
 }))
 
 function onProcessAlert(alert: any) {
-  // Placeholder for alert processing navigation
-  console.log('Process alert', alert)
+  if (alert.type === 'invoice') {
+    router.push('/merchant/finance/invoices')
+  } else if (alert.type === 'reject') {
+    router.push('/merchant/finance/funds')
+  }
 }
 
 onMounted(async () => {
