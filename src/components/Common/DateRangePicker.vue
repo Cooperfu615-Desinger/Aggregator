@@ -55,10 +55,6 @@ const handleChange = (val: [number, number] | null) => {
     
     // Emit ISO string format for API calls
     if (val) {
-        console.log('[DateRangePicker] Selected range:', {
-            start: new Date(val[0]).toISOString(),
-            end: new Date(val[1]).toISOString()
-        })
         emit('change', {
             start: new Date(val[0]).toISOString(),
             end: new Date(val[1]).toISOString()

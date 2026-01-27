@@ -1,4 +1,4 @@
-# 前端技術規格書 (Phase 10.14)
+# 前端技術規格書 (Final Release v1.0.0)
 
 ## 1. 概述 (Overview)
 
@@ -13,6 +13,10 @@
 * **狀態管理 (State Management)**：Pinia
 * **路由 (Router)**：Vue Router
 * **國際化 (I18n)**：Vue I18n
+* **工具庫 (Utils)**：
+  * **Date**: `date-fns` (必用)
+  * **State Persistence**: `@vueuse/core` (`useSessionStorage`) (必用)
+  * **Math**: `big.js` (封裝於 `src/utils/math.ts`) (必用)
 
 ## 3. 狀態管理結構 (Pinia Store Structure)
 
@@ -59,79 +63,68 @@
 
 ### 4.2 權限路由守衛 (RBAC Guards)
 
-* **全域守衛 (`router.beforeEach`)**：
-  * 驗證 Token 是否存在。
-  * 驗證 Token 是否過期。
-* **角色守衛**：
-  * Master Routes (`/admin/*`) 僅允許 `role === 'MASTER'`。
-  * Merchant Routes (`/merchant/*`) 僅允許 `role === 'MERCHANT'`。
-* **功能守衛**：
-  * 使用 `v-permission="'finance:view'"` 指令控制按鈕顯示。
-  * 無權限路由導向 `403 Forbidden` 頁面。
+系統實作嚴格的 **四層防護機制**：
+
+1. **白名單檢查**: 若目標路徑為 `/login` 或 `/404` 且未登入，直接放行；若已登入則強制導向 Dashboard。
+2. **Token 驗證**: 檢查 `localStorage` 中是否存在有效 Token，否則強制導向登入頁。
+3. **角色隔離 (Role Isolation)**:
+   * **Master Role**: 可訪問所有 `/admin/*` 與 `/merchant/*` 路徑 (God Mode)。
+   * **Merchant Role**: 僅可訪問 `/merchant/*` 路徑；若嘗試訪問 `/admin/*`，強制導向 `/merchant/dashboard`。
+4. **功能守衛**:
+   * 使用 `v-permission="'finance:view'"` 指令控制按鈕細微性權限。
+   * 無權限 API 呼叫將被 Global Interceptor 攔截並提示 403。
 
 ## 5. UI/UX 標準 (UI/UX Standards)
 
 ### 5.1 共用元件 (Common Components)
 
-* **MoneyText**: 顯示金額的標準元件。
-  * Props: `value` (數值/字串), `currency` (字串)。
-  * 行為：自動千分位格式化與顏色標示 (正數綠色，負數紅色)。
+* **MoneyText**: 顯示金額的唯一標準元件。
+  * **Props**: `value` (數值/字串), `currency` (字串), `compact` (是否縮略顯示)。
+  * **邏輯**: 使用 `Intl.NumberFormat` 進行千分位與小數點 (2位) 格式化。
+  * **視覺**: 正數為綠色 (`text-green-500`)，負數為紅色 (`text-red-500`)，零為灰色。
 * **StatusBadge / StatusTag**: 狀態欄位的視覺指標。
   * Props: `status` (字串), `type` (success/warning/error/info)。
   * 行為：將狀態代碼映射為本地化標籤與顏色。
 * **DateRangePicker**: 標準化日期選擇器。
   * 行為：回傳時間戳陣列 `[start, end]`。
+  * **輸出**: 配合 `date-fns` 透過事件 `change` 發送 ISO String 或 yyyy-MM-dd 格式字串。
 
-### 5.2 互動模式 (Interaction Patterns)
+### 5.2 狀態保存 (State Persistence)
 
-* **表格 (`NDataTable`)**：
-  * 必須支援伺服器端分頁 (Server-side Pagination) 與排序。
-  * 操作欄位應使用帶有 Tooltip 的圖示 (編輯、刪除、檢視)。
-  * 必須優雅地處理空狀態 (Empty States)。
-* **抽屜 (`NDrawer`)**：
-  * 用於詳細視圖 (例如：交易明細、帳單詳情)，以保持在當前頁面脈絡中。
-* **模態框 (`NModal`)**：
-  * 用於簡單操作 (表單、確認對話框)。
-  * 模態框內的表單必須具備驗證功能。
+所有報表類頁面 (如 `BetQuery`, `RevenueReport`, `BetLog`) 的篩選條件必須具備 **刷新不丟失** 特性。
 
-## 6. 表單驗證規則 (Validation Rules)
+* **實作**: 使用 `@vueuse/core` 的 `useSessionStorage`。
+* **命名規範**: Key 必須具備命名空間，例如 `merchant-bet-query-filter`, `master-bet-log-search`。
+* **範圍**: 僅限 Session Storage (瀏覽器關閉後清除)，不使用 Local Storage 以避免過期狀態干擾。
 
-### 6.1 核心欄位規則
+## 6. 財務精度與資料處理 (Financial Precision & Data Handling)
 
-* **商戶代碼 (Merchant Code)**: `^[A-Z0-9]{3,6}$` (3-6 碼大寫英數)。
-* **密碼 (Password)**: `^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$` (至少 8 碼，含大小寫與數字)。
-* **金額 (Amount)**:
-  * 必須大於 0。
-  * 提款/轉出時，必須 `<=` 當前餘額。
-  * 充值時，必須 `<=` 單筆限額 (如配置)。
-* **IP 白名單**: 必須符合標準 IPv4 格式 (CIDR 可選)。
+### 6.1 數值運算 (`src/utils/math.ts`)
 
-### 6.2 錯誤提示UX
+所有涉及金額的加減乘除 **嚴禁** 使用原生 JavaScript 運算符 (`+`, `-`, `*`, `/`)。必須使用 `src/utils/math.ts` (基於 `Big.js`)：
 
-* **即時驗證**: 輸入框 `blur` 或 `input` 時觸發單一欄位驗證。
-* **提交驗證**: 按下 Submit 時觸發全表單驗證，並 Scroll 至第一個錯誤欄位。
-* **後端錯誤**: 若 API 回傳 `400/409`，顯示 Toast Message (例如: "商戶代碼已存在")。
+* `math.add(a, b)`: 精確加法
+* `math.sub(a, b)`: 精確減法
+* `math.mul(a, b)`: 精確乘法
+* `math.div(a, b)`: 精確除法 (預設 四捨五入)
+* `math.toPercent(val)`: 轉換為百分比字串
+
+### 6.2 時區處理 (Timezone Handling)
+
+前端向後端發送日期區間查詢時，為避免 UTC 時間偏移 (Time Shift) 導致的資料誤差，**必須** 遵循：
+
+* **API Payload**: 一律將日期轉換為 **商戶當地時間的 `yyyy-MM-dd` 字串** (例如 `2025-01-01`)。
+* **工具**: 使用 `date-fns` 的 `format(date, 'yyyy-MM-dd')` 進行轉換。
+* **禁止**: 直接發送 `Date` 物件或未經處理的 UTC Timestamp。
 
 ## 7. 整合指南 (Integration Guidelines)
 
 * **API 呼叫**：使用標準 `fetch` 封裝或 Axios 實例。
 * **錯誤處理**：全域處理 401/403/500 錯誤。
 * **Mocking**：優先針對 `src/mocks/` handlers 進行開發 (TDD 模式)。
+* **型別定義**: 必須使用 `src/types/` 下定義的 Interface，盡量避免使用 `any`。
 
-## 8. 錯誤處理策略 (Error Handling Strategy)
-
-應由全域攔截器 (Global Interceptor) 統一處理 API 錯誤，避免在每個 Component 重複撰寫 `try-catch`。
-
-1. **攔截層級**: `Axios Interceptor` 或 `fetch wrapper`。
-2. **邏輯判斷**:
-    * **HTTP 錯誤 (401/403/500)**: 顯示通用錯誤頁面或重新登入 Modal。
-    * **業務錯誤 (Code != 0)**:
-        * 讀取 `response.data.code` (e.g., `1001`)。
-        * 查找 i18n key: `errors.code_1001` (例如 "餘額不足")。
-        * 若找不到對應 Key，顯示 `response.data.msg`。
-        * 使用 `message.error()` (Toast) 顯示錯誤訊息。
-
-## 9. 儀表板輪詢策略 (Dashboard Polling)
+## 8. 儀表板輪詢策略 (Dashboard Polling)
 
 即時監控使用「短輪詢 (Short Polling)」機制，兼顧即時性與伺服器負載。
 

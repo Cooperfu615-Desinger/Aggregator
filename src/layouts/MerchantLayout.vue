@@ -40,7 +40,8 @@ const handleLogout = () => {
 }
 
 const handleVersionClick = () => {
-    window.alert('Merchant Portal v0.1.0')
+    // Initial checks if needed
+    console.log('Merchant Portal v0.1.0')
 }
 
 // Light Theme Overrides for Merchant Layout

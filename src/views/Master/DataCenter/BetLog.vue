@@ -2,7 +2,7 @@
 import { ref, h, onMounted, computed } from 'vue'
 import {
   NGrid, NGridItem, NInput, NSelect, NButton,
-  NDataTable, NTag, NTooltip, NIcon
+  NDataTable, NTag, NTooltip, NIcon, useMessage
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import type { DataTableColumns } from 'naive-ui'
@@ -13,6 +13,7 @@ import JsonViewer from '../../../components/Common/JsonViewer.vue'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 
 const { t } = useI18n()
+const message = useMessage()
 const { loading, searchModel, logs, handleSearch } = useRoundSearch()
 
 // Initialize
@@ -77,11 +78,11 @@ const openDetail = (row: BetLog) => {
 }
 
 const handleReset = () => {
-    searchModel.timeRange = null
-    searchModel.merchantCode = ''
-    searchModel.provider = ''
-    searchModel.playerId = ''
-    searchModel.roundId = ''
+    searchModel.value.timeRange = null
+    searchModel.value.merchantCode = ''
+    searchModel.value.provider = ''
+    searchModel.value.playerId = ''
+    searchModel.value.roundId = ''
 }
 
 // Helper function to render header with tooltip
@@ -106,14 +107,9 @@ const renderHeaderWithTooltip = (labelKey: string, tooltipKey: string) => {
 }
 
 // Helper function to copy text
-const copyToClipboard = async (text: string) => {
-    try {
-        await navigator.clipboard.writeText(text)
-        // Simple alert since we don't have $message globally
-        console.log('Copied:', text)
-    } catch (err) {
-        console.error('Failed to copy:', err)
-    }
+const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text)
+    message.success(t('common.copied'))
 }
 
 // Columns Definition
@@ -128,7 +124,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
             class: 'font-mono text-xs cursor-pointer hover:text-primary',
             onClick: (e: Event) => {
                 e.stopPropagation()
-                copyToClipboard(row.round_id)
+                handleCopy(row.round_id)
             }
         }, row.round_id)
     },

@@ -43,7 +43,8 @@ const handleLogout = () => {
 }
 
 const handleVersionClick = () => {
-    window.alert('Master Admin Console v0.1.0')
+    // Initial checks if needed
+    console.log('Master Admin Console v0.1.0')
 }
 </script>
 

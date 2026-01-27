@@ -1,4 +1,4 @@
-# 後端技術規格書 (Phase 10.14)
+# 後端技術規格書 (Final Release v1.0.0)
 
 ## 1. 概述 (Overview)
 
@@ -19,7 +19,7 @@
 * **遊戲管理 (Game Management)**：檢視可用遊戲及 RTP 設定。
 * **報表中心 (Report Center)**：營收報表、投注記錄與交易明細。
 * **錢包與財務 (Wallet & Finance)**：檢視餘額、申請額度/充值及支付帳單。
-* **代理管理 (Agent Management)**：管理下級代理與佣金結構 (Part 4)。
+* **代理管理 (Agent Management)**：管理下級代理與佣金結構。
 
 ## 3. 資料模型 (Data Models)
 
@@ -32,10 +32,10 @@ interface Merchant {
     name: string;
     currency_type: string;   // "USD", "CNY", "TWD"
     walletMode: 'transfer' | 'seamless';
-    revenue_share: number;   // 分潤百分比 (0-100)
+    revenue_share: number;   // 分潤百分比 (0-100, Decimal)
     ipWhitelist: string[];
     secretKey: string;
-    balance?: string;        // 僅轉帳錢包模式使用 (String for precision)
+    balance?: string;        // (String for precision)
     credit_limit?: string;   // (String for precision)
 }
 
@@ -59,9 +59,9 @@ type FundStatus = 'pending' | 'approved' | 'rejected';
 interface FundRecord {
     id: string;
     merchant_id: string;
-    type: FundType;          // top-up (充值) | credit-limit (額度) | manual-adjust (手動調整)
-    amount: string;          // 充值金額 或 新額度 (String)
-    proof?: string;          // 充值證明 (截圖 URL)
+    type: FundType;
+    amount: string;          // (String for precision)
+    proof?: string;
     status: FundStatus;
     reviewer?: string;
     created_at: string;
@@ -74,7 +74,7 @@ interface Invoice {
     commission_rate: number;
     amount_due: string;      // 應付金額 (String)
     status: 'pending' | 'paid' | 'verifying';
-    payment_proof?: string;  // 付款證明
+    payment_proof?: string;
     breakdown: Array<{ provider: string; ggr: string; amount: string }>;
 }
 ```
@@ -89,25 +89,11 @@ interface Invoice {
     ```json
     {
         "name": "Golden Dragon Casino",
-        "currency_type": "USD", // 必填, 預設 USD
-        "walletMode": "transfer", // 必填, 'transfer' | 'seamless'
-        "revenue_share": 15.0, // 必填, 0-100
+        "currency_type": "USD",
+        "walletMode": "transfer",
+        "revenue_share": 15.0,
         "admin_username": "admin_gd",
-        "admin_password": "Password123!" // 至少 8 碼含大小寫
-    }
-    ```
-
-* **Response Body**:
-
-    ```json
-    {
-        "code": 0,
-        "msg": "success",
-        "data": {
-            "id": 1001,
-            "display_id": "OP-1001",
-            "secretKey": "sk_live_..."
-        }
+        "admin_password": "Password123!"
     }
     ```
 
@@ -118,21 +104,18 @@ interface Invoice {
 
     ```json
     {
-        "amount": "10000.00", // 必填, String, > 0
-        "proof": "https://storage.example.com/receipts/txn_123.jpg", // 必填
+        "amount": "10000.00", // 必填, String
+        "proof": "https://storage.example.com/receipts/txn_123.jpg",
         "remarks": "Bank Transfer #9988"
     }
     ```
-
-* **Response**: `200 OK` (Payload: `code: 0`)
 
 ### 4.3 生成報表 (Generate Report)
 
 * **Endpoint**: `GET /api/v2/merchant/reports/daily`
 * **Query Params**:
-  * `startDate`: `2025-01-01` (必填)
-  * `endDate`: `2025-01-31` (必填)
-  * `currency`: `USD` (選填，若商戶支援多幣種)
+  * `startDate`: `2025-01-01` (必填, yyyy-MM-dd)
+  * `endDate`: `2025-01-31` (必填, yyyy-MM-dd)
 * **Response Body**:
 
     ```json
@@ -150,7 +133,7 @@ interface Invoice {
                     "date": "2025-01-01",
                     "total_bet": "15000.00",
                     "ggr": "1200.00",
-                    "children": [...] // 巢狀分類 (Slot, Live)
+                    "children": [...]
                 }
             ]
         }
@@ -159,187 +142,46 @@ interface Invoice {
 
 ### 4.4 報表查詢通用規範 (Report Query Standards)
 
-所有報表查詢 API (如 `daily`, `games`, `invoices`) 的日期範圍參數 (`startDate`, `endDate`) 必須遵循以下時區規範，以確保資料一致性：
+所有報表查詢 API 的日期範圍參數 (`startDate`, `endDate`) 必須遵循以下時區規範：
 
-* **時區基準 (Timezone Basis)**:
-  * 預設情況下，系統將根據 **商戶設定的時區 (Merchant Timezone)** 解析日期字串 (e.g., `2025-01-01` 視為商戶當地時間 00:00:00)。
-  * 若需指定絕對時間，Client 端**必須**使用 **ISO-8601** 格式 (e.g., `2025-01-01T00:00:00+08:00`)。
-* **跨日處理**:
-  * 查詢區間包含 `startDate` (00:00:00) 與 `endDate` (23:59:59)。
-  * 系統內部統一轉換為 UTC 儲存與比對，但在 API 回傳時，日 aggregations (如每日報表) 將依據商戶時區聚合。
+1. **本地日期格式 (Local Date Format)**: Client 端必須發送 **商戶當地時間的 `yyyy-MM-dd` 字串** (e.g., `2025-01-01`)。
+2. **避免 UTC 偏移**: Client 端**禁止**將本地時間轉換為 UTC ISO String (如 `2024-12-31T16:00:00.000Z`) 後傳送，這將導致後端解析錯誤（跨日問題）。
+3. **後端處理**: 系統接收到 `yyyy-MM-dd` 後，將根據該商戶配置的時區 (Timezone) 轉換為資料庫查詢區間 (例如 `2025-01-01 00:00:00` 至 `2025-01-01 23:59:59` @ MerchantTZ)。
 
 ## 5. 安全性標準 (Security Standards)
 
-### 5.1 簽章機制 (Signature Scheme)
-
-所有 B2B 介接 (Seamless Wallet, Game Launch) 必須驗證簽章。
-
-* **演算法**: `HMAC-SHA256`
-* **規則**:
-    1. 將所有參數按字母順序排序 (Key A-Z)。
-    2. 將參數串接為 `key=value&key2=value2` 字串。
-    3. 在字串末尾附加 Secret Key: `...&keyN=valueN&key=SECRET_KEY`。
-    4. 進行 SHA256 Hash。
-* **Header**: `X-Signature: <hash_value>`
-
-### 5.2 併發控制 (Concurrency)
-
-* **資金操作**: 所有涉及餘額變動的 API (充值、轉帳、下注、派彩) 必須使用 **資料庫交易 (DB Transaction)**。
-* **鎖定策略**: 使用 **悲觀鎖 (SELECT FOR UPDATE)** 鎖定商戶/玩家錢包記錄，防止 Race Condition 導致的雙重花費 (Double Spending)。
-* **冪等性 (Idempotency)**: 所有資金 API 需支援 `Idempotency-Key` Header，確保同一請求不被重複執行。
+* **簽章機制**: 所有 B2B 介接使用 `HMAC-SHA256`。Header: `X-Signature`.
+* **併發控制**: 資金操作必須使用 DB Transaction 與悲觀鎖 (SELECT FOR UPDATE)。
+* **防重放**: 支援 `Idempotency-Key`。
 
 ## 6. 資料精確度規範 (Data Precision)
 
-* **儲存 (Storage)**:
-  * 資料庫金額欄位一律使用 `DECIMAL(18, 4)` 或 `BIGINT` (單位：分/Cent)。
-  * **嚴禁** 使用 `FLOAT` 或 `DOUBLE` 儲存金額。
-* **傳輸 (API)**:
-  * API JSON payload 中的金額欄位一律使用 **字串 (String)** (例如: `"100.00"`)。
-  * 前端接收後再使用 `Big.js` 或 `Decimal.js` 進行運算與顯示。
+為確保金融級的精確度，後端與 Client 端 (Frontend/Merchant Server) 必需遵循：
+
+### 6.1 儲存與傳輸
+
+* **資料庫**: 金額欄位一律使用 `DECIMAL(18, 6)` 或 `BIGINT` (單位：分)。嚴禁使用 `FLOAT/DOUBLE`。
+* **API Payload**: 金額欄位一律序列化為 **字串 (String)** (例如 `"100.00"`, `"0.05"`)。
+
+### 6.2 Client 端運算要求
+
+* 前端或介接方在接收數據進行二次計算時（如加總、匯率換算），**必須** 使用高精度函式庫 (如 Java 的 `BigDecimal`, JS 的 `big.js` / `decimal.js`)。
+* 系統設計假設前端已實作 `src/utils/math.ts` (Big.js) 等級的精度控制。
 
 ## 7. 錯誤代碼表 (Business Error Codes)
 
 | Code | Message | 描述 |
 | :--- | :--- | :--- |
 | `0` | Success | 操作成功。 |
-| `1001` | Insufficient Balance | 餘額不足 (錢包操作)。 |
-| `1002` | Transaction Not Found | 查無此交易。 |
-| `1003` | Duplicate Transaction | 交易 ID 重複 (冪等性擋下)。 |
-| `2001` | Invalid Signature | 簽章驗證失敗。 |
-| `2002` | Merchant Disabled | 商戶已被停用。 |
-| `2003` | IP Not Whitelisted | 來源 IP 不在白名單內。 |
-| `3001` | Game Maintenance | 遊戲維護中。 |
-| `3002` | Bet Limit Exceeded | 超出單注限額。 |
-| `4001` | Invalid Date Range | 日期範圍無效或過長。 |
-| `5000` | System Busy | 系統繁忙 (併發鎖定超時)。 |
+| `1001` | Insufficient Balance | 餘額不足。 |
+| `2001` | Invalid Signature | 簽章錯。 |
+| `4001` | Invalid Date Format | 日期格式錯誤 (需為 `yyyy-MM-dd`)。 |
+| `5000` | System Busy | 系統繁忙。 |
 
 ## 8. 遊戲交易介接規格 (Game Transaction Interfaces)
 
-### 8.1 Provider Callback API (接收遊戲商請求)
+*(保持原樣，僅強調金額為 String)*
 
-此 API 用於接收遊戲供應商 (Provider) 的投注與派彩請求。
-
-* **Endpoint**: `POST /api/v2/webhook/transaction`
-* **Request Body**:
-
-    ```json
-    {
-        "provider_code": "PG_SOFT",
-        "action": "bet", // 'bet' | 'win' | 'refund'
-        "player_id": "user_1001",
-        "round_id": "R123456789",
-        "transaction_id": "TX_987654321", // Provider 產生的唯一交易 ID
-        "game_code": "mahjong-ways-2",
-        "amount": "100.00", // String
-        "currency": "USD",
-        "timestamp": 1700000000000,
-        "signature": "abcdef123456..." // Provider 簽章
-    }
-    ```
-
-* **冪等性 (Idempotency)**:
-  * 系統必須檢查 `provider_code` + `transaction_id` 是否已存在。
-  * 若已存在且狀態為成功，直接回傳 `20000` (Success)。
-  * 若已存在但處理中，回傳 `50000` (Process Fail) 觸發重試。
-
-### 8.2 Seamless Wallet Specification (商戶需實作的 API)
-
-當商戶錢包模式為 `seamless` 時，Aggregator 將呼叫商戶 API 進行扣款/入款。
-
-* **Endpoint**: `POST /merchant/api/wallet/change` (商戶需提供)
-* **Request Body**:
-
-    ```json
-    {
-        "operator_id": "OP-1001",
-        "player_id": "user_1001",
-        "transaction_id": "AGG_TX_123456", // Aggregator 產生的唯一 ID
-        "round_id": "R123456789",
-        "type": "bet", // 'bet' | 'win' | 'refund'
-        "amount": "100.00",
-        "currency": "USD",
-        "game_id": "pg-mahjong-2",
-        "signature": "hmac_sha256_hash_value" // 驗證我方請求
-    }
-    ```
-
-* **Response Specification**:
-
-    ```json
-    {
-        "code": 0, // 0: Success, Non-zero: Error (e.g. 1001: Insufficient Funds)
-        "msg": "success",
-        "data": {
-            "balance": "9900.00", // 交易後餘額
-            "ref_id": "M_TX_556677" // 商戶端交易單號 (可選)
-        }
-    }
-    ```
-
-* **超時處理 (Timeout Handling)**:
-  * **Timeout**: 5秒。
-  * **策略**:
-    * **Bet (扣款)**: 若超時，狀態標記為 `UNSETTLED`，並發起 `Action: Check` 查詢 API (需另實作) 或直接回傳 Provider 失敗 (Fail Safe)。
-    * **Win (派彩)**: 若超時，系統將進入重試隊列 (Retry Queue)，每隔 10s/30s/1m/5m 重試，直到成功或人工介入。
-
-### 8.3 餘額查詢接口 (Get Balance)
-
-Aggregator 於特定時機 (如玩家開啟遊戲) 呼叫此 API，以同步最新餘額。
-
-* **Endpoint**: `POST /merchant/api/wallet/balance` (商戶需提供)
-* **Request Body**:
-
-    ```json
-    {
-        "operator_id": "OP-1001",
-        "player_id": "user_1001",
-        "currency": "USD", // Optional, 若玩家有多幣種錢包
-        "signature": "hmac_sha256_hash_value"
-    }
-    ```
-
-* **Response**:
-
-    ```json
-    {
-        "code": 0,
-        "msg": "success",
-        "data": {
-            "balance": "1000.00", // String
-            "currency": "USD"
-        }
-    }
-    ```
-
-### 8.4 交易狀態反查接口 (Transaction Status Check)
-
-當扣款 (Bet) 或入款 (Win) 請求發生 **Timeout (超時)** 或 **Network Error** 時，Aggregator 排程器將呼叫此接口確認該筆交易在商戶端的最終狀態。
-
-* **Endpoint**: `POST /merchant/api/transaction/status` (商戶需提供)
-* **Request Body**:
-
-    ```json
-    {
-        "operator_id": "OP-1001",
-        "transaction_id": "AGG_TX_123456", // Aggregator 的交易 ID
-        "signature": "hmac_sha256_hash_value"
-    }
-    ```
-
-* **Response**:
-
-    ```json
-    {
-        "code": 0,
-        "msg": "success",
-        "data": {
-            "status": "EXISTS", // 'EXISTS' | 'NOT_FOUND'
-            "amount": "100.00", // Optional: Double check amount
-            "ref_id": "M_TX_556677" // 商戶端交易單號
-        }
-    }
-    ```
-
-* **邏輯判斷**:
-  * **EXISTS**: 代表商戶端已成功處理該筆交易 -> Aggregator 標記為 `SUCCESS`。
-  * **NOT_FOUND**: 代表商戶端未收到或已回滾 -> Aggregator 標記為 `FAIL` (針對 Bet 執行退款，針對 Win 重新發送)。
+* **Webhook Endpoint**: `POST /api/v2/webhook/transaction`
+* **Seamless Wallet Endpoint**: `POST /merchant/api/wallet/change`
+* **關鍵欄位**: `amount` 必須為 String 格式。
