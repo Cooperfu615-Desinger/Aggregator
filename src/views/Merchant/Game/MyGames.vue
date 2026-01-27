@@ -170,7 +170,7 @@ const columns: DataTableColumns<MerchantGame> = [
         key: 'release_date',
         width: 120,
         sorter: (row1, row2) => new Date(row1.release_date).getTime() - new Date(row2.release_date).getTime(),
-        render: (row) => h('span', { class: 'font-mono' }, row.release_date.split('T')[0])
+        render: (row) => h('span', { class: 'font-mono' }, row.release_date ? row.release_date.split('T')[0] : '-')
     },
     {
         title: 'RTP',

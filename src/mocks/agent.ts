@@ -152,7 +152,9 @@ export const agentHandlers = [
                     rtp: 96.92,
                     merchant_enabled: true,
                     master_enabled: true,
-                    thumbnail: 'https://placehold.co/60x60?text=MW'
+                    thumbnail: 'https://placehold.co/60x60?text=MW',
+                    release_date: faker.date.past({ years: 1 }).toISOString(),
+                    admin_status: 'active'
                 }
             }
             if (i === 1) {
@@ -165,7 +167,9 @@ export const agentHandlers = [
                     rtp: 95.00,
                     merchant_enabled: false,
                     master_enabled: false, // Disabled by platform
-                    thumbnail: 'https://placehold.co/60x60?text=X'
+                    thumbnail: 'https://placehold.co/60x60?text=X',
+                    release_date: faker.date.past({ years: 1 }).toISOString(),
+                    admin_status: 'disabled'
                 }
             }
             return {
@@ -177,7 +181,9 @@ export const agentHandlers = [
                 rtp: faker.number.float({ min: 90, max: 98, fractionDigits: 2 }),
                 merchant_enabled: faker.datatype.boolean(),
                 master_enabled: true,
-                thumbnail: `https://placehold.co/60x60?text=${provider.substring(0, 2)}`
+                thumbnail: `https://placehold.co/60x60?text=${provider.substring(0, 2)}`,
+                release_date: faker.date.past({ years: 2 }).toISOString(),
+                admin_status: 'active'
             }
         })
 
