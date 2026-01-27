@@ -12,7 +12,7 @@
 
 此頁面匯總了平台最關鍵的指標與趨勢圖表。
 
-![全域儀表板](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_dashboard_1769399051586.png)
+![全域儀表板](./assets/screenshots/master/master_dashboard_1769399051586.png)
 
 #### A. 核心統計指標 (Summary Cards)
 
@@ -56,7 +56,7 @@
 
 管理所有接入平台的商戶帳號。
 
-![商戶管理](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_merchant_list_1769399200423.png)
+![商戶管理](./assets/screenshots/master/master_merchant_list_1769399200423.png)
 
 #### A. 篩選列與操作
 
@@ -89,7 +89,7 @@
 
 ### 供應商管理 (Provider List)
 
-![供應商管理](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_provider_list_1769399073259.png)
+![供應商管理](./assets/screenshots/master/master_provider_list_1769399073259.png)
 
 #### A. 功能概述
 
@@ -109,7 +109,7 @@
 
 集中管理全平台數千款遊戲的顯示、分類與開關。
 
-![遊戲庫存](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_game_inventory_1769399215384.png)
+![遊戲庫存](./assets/screenshots/master/master_game_inventory_1769399215384.png)
 
 #### A. 多維篩選
 
@@ -132,7 +132,7 @@
 
 處理商戶的充值、扣款與額度調整。
 
-![資金管理](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_fund_management_1769399090155.png)
+![資金管理](./assets/screenshots/master/master_fund_management_1769399090155.png)
 
 #### A. 資金調整流程
 
@@ -145,7 +145,7 @@
 
 提供高密度的財務數據分析，支援從不同維度檢視營收。
 
-![平台損益表](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_platform_pl_1769399106913.png)
+![平台損益表](./assets/screenshots/master/master_platform_pl_1769399106913.png)
 
 #### A. 數據維度與篩選
 
@@ -165,7 +165,7 @@
 
 管理每個月度或週期的結算單據，追蹤商戶的繳費進度。
 
-![到帳單管理](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_invoice_management_1769399120512.png)
+![到帳單管理](./assets/screenshots/master/master_invoice_management_1769399120512.png)
 
 #### A. 狀態定義
 
@@ -184,7 +184,7 @@
 
 全平台最細顆粒度的注單查詢工具，用於處理玩家糾紛或風控調查。
 
-![投注明細](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_bet_query_1769399134709.png)
+![投注明細](./assets/screenshots/master/master_bet_query_1769399134709.png)
 
 #### A. 查詢維度
 
@@ -201,7 +201,7 @@
 
 基於角色存取控制 (RBAC) 的權限管理系統。
 
-![職等管理](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_job_levels_1769399149287.png)
+![職等管理](./assets/screenshots/master/master_job_levels_1769399149287.png)
 
 #### A. 權限樹操作
 
@@ -214,7 +214,7 @@
 
 管理後台登錄帳號的安全性與角色掛載。
 
-![員工列表](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_staff_list_1769399161878.png)
+![員工列表](./assets/screenshots/master/master_staff_list_1769399161878.png)
 
 #### A. 資安管理
 
@@ -225,7 +225,7 @@
 
 完整記錄管理員在後台的所有操作，確保「凡走過必留下痕跡」。
 
-![操作日誌](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_audit_log_1769399174557.png)
+![操作日誌](./assets/screenshots/master/master_audit_log_1769399174557.png)
 
 - **核心內容**: 包含「操作人」、「操作類型（如：修改分成比例）」、「舊值」、「新值」及「操作時間」。
 
@@ -233,7 +233,7 @@
 
 定義平台的全局維護開關與安全性原則。
 
-![系統設定](file:///Users/cooperfu/Desktop/Aggregator/docs/assets/screenshots/master/master_system_settings_1769399186231.png)
+![系統設定](./assets/screenshots/master/master_system_settings_1769399186231.png)
 
 - **全平台維護**: 一鍵切換平台進入維護模式。
 - **API 通訊密鑰**: 生成與更新與商戶通訊時使用的加密因子。
