@@ -375,7 +375,9 @@
         "rtp": "RTP (%)",
         "Slot": "電子老虎機",
         "Live": "真人視訊",
-        "Arcade": "街機捕魚"
+        "Arcade": "街機捕魚",
+        "exportSummary": "匯出總表",
+        "exportDetails": "匯出交易明細"
     },
     "provider": {
         "title": "供應商管理",

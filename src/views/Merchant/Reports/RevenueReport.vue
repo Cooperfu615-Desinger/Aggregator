@@ -7,6 +7,7 @@ import type { DataTableColumns } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import TransactionDetailDrawer from './components/TransactionDetailDrawer.vue'
 import type { RevenueReportRow } from '../../../types/table'
+import { exportToCSV } from '../../../utils/csvExport'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -60,6 +61,71 @@ const fetchData = async () => {
 const handleViewDetails = (date: string) => {
     selectedDate.value = date
     showDrawer.value = true
+}
+
+const exportLoading = ref(false)
+
+const handleExportSummary = () => {
+    const filename = `Revenue_Summary_${new Date().toISOString().split('T')[0]}`
+    const headers = {
+        date: t('merchantReports.dailySummary'),
+        active_players: t('merchantReports.activePlayers'),
+        tx_count: t('merchantReports.txCount'),
+        total_bet: t('merchantReports.totalBet'),
+        total_payout: t('merchantReports.totalPayout'),
+        net_win: t('merchantReports.netWin')
+    }
+    
+    // Flatten or filter to only primary date rows if needed, or just export current items
+    // Current items includes children, for CSV we might want to flatten or only take top level
+    const exportData = items.value.map(row => ({
+        date: row.children ? row.date : `  - ${t(`merchantReports.${row.date}`)}`,
+        active_players: row.active_players,
+        tx_count: row.children ? row.tx_count : '-',
+        total_bet: row.total_bet,
+        total_payout: row.total_payout,
+        net_win: row.net_win
+    }))
+    
+    exportToCSV(exportData, filename, headers)
+    message.success(t('common.success'))
+}
+
+const handleExportDetails = async () => {
+    exportLoading.value = true
+    try {
+        const [start, end] = dateRange.value
+        const startDate = new Date(start).toISOString().split('T')[0]
+        const endDate = new Date(end).toISOString().split('T')[0]
+        
+        // Fetch all transactions for the date range (simulated via API)
+        const res = await fetch(`/api/v2/merchant/reports/transactions?startDate=${startDate}&endDate=${endDate}&all=true`)
+        const data = await res.json()
+        
+        if (data.code === 0) {
+            const filename = `Transaction_Details_${startDate}_${endDate}`
+            const headers = {
+                created_at: t('merchantReports.betTime'),
+                player_id: t('merchantReports.player'),
+                game_name: t('merchantReports.game'),
+                bet_amount: t('merchantReports.totalBet'),
+                payout_amount: t('merchantReports.totalPayout'),
+                net_win: t('merchantReports.netWin')
+            }
+            
+            const exportData = data.data.list.map((row: any) => ({
+                ...row,
+                created_at: new Date(row.created_at).toLocaleString()
+            }))
+            
+            exportToCSV(exportData, filename, headers)
+            message.success(t('common.success'))
+        }
+    } catch {
+        message.error('Export failed')
+    } finally {
+        exportLoading.value = false
+    }
 }
 
 const columns: DataTableColumns<DailyReportItem> = [
@@ -149,12 +215,20 @@ onMounted(fetchData)
             <h1 class="text-2xl font-bold flex items-center gap-2">
                 <span>📈</span> {{ t('merchantReports.title') }}
             </h1>
-            <n-date-picker 
-                v-model:value="dateRange" 
-                type="daterange" 
-                clearable 
-                @update:value="fetchData" 
-            />
+            <div class="flex items-center gap-3">
+                <n-date-picker 
+                    v-model:value="dateRange" 
+                    type="daterange" 
+                    clearable 
+                    @update:value="fetchData" 
+                />
+                <n-button secondary type="primary" @click="handleExportSummary">
+                    📥 {{ t('merchantReports.exportSummary') }}
+                </n-button>
+                <n-button secondary type="info" :loading="exportLoading" @click="handleExportDetails">
+                    📊 {{ t('merchantReports.exportDetails') }}
+                </n-button>
+            </div>
         </div>
 
         <!-- Summary Cards -->
