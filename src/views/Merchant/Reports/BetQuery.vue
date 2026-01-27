@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, h } from 'vue'
-import { NDataTable, NButton, NCard, NInput, NTag } from 'naive-ui'
+import { NDataTable, NButton, NCard, NInput, NTag, NSpace, NIcon } from 'naive-ui'
+import { SearchRound, RefreshRound } from '@vicons/material'
 import type { DataTableColumns } from 'naive-ui'
 import DateRangePicker from '../../../components/Common/DateRangePicker.vue'
-import PageFilterBar from '../../../components/Common/PageFilterBar.vue'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 import JsonViewer from '../../../components/Common/JsonViewer.vue'
 import { useI18n } from 'vue-i18n'
@@ -142,27 +142,57 @@ onMounted(() => fetchData())
             </h1>
         </div>
 
-        <!-- Filter Bar -->
-        <PageFilterBar
-            v-model:searchValue="roundId"
-            :searchPlaceholder="t('betQuery.searchRound')"
-            @reset="handleReset"
-        >
-            <template #filters>
+        <!-- Custom Filter Section -->
+        <div class="bg-slate-800/50 p-4 rounded-lg mb-6 border border-slate-700/50 space-y-4">
+            <!-- Row 1: Date Range -->
+            <div class="flex items-center">
                 <DateRangePicker v-model:value="dateRange" />
-                <n-input 
-                    v-model:value="playerId" 
-                    :placeholder="t('betQuery.playerId')"
-                    class="w-36"
-                    clearable
-                />
-            </template>
-            <template #actions>
-                <n-button type="primary" @click="fetchData" :loading="loading">
-                    {{ t('betQuery.search') }}
-                </n-button>
-            </template>
-        </PageFilterBar>
+            </div>
+
+            <!-- Row 2: Inputs & Actions -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <!-- Round ID Input (Width set to match User ID) -->
+                    <n-input 
+                        v-model:value="roundId" 
+                        :placeholder="t('betQuery.searchRound')"
+                        class="w-64"
+                        clearable
+                        @keydown.enter="fetchData"
+                    >
+                        <template #prefix>
+                            <n-icon :component="SearchRound" class="text-gray-400" />
+                        </template>
+                    </n-input>
+
+                    <!-- Player ID Input (Width set to w-64 as requested) -->
+                    <n-input 
+                        v-model:value="playerId" 
+                        :placeholder="t('betQuery.playerId')"
+                        class="w-64"
+                        clearable
+                        @keydown.enter="fetchData"
+                    />
+                </div>
+                
+                <n-space>
+                    <!-- Search Button -->
+                    <n-button type="primary" @click="fetchData" :loading="loading">
+                        <template #icon>
+                            <n-icon :component="SearchRound" />
+                        </template>
+                        {{ t('betQuery.search') }}
+                    </n-button>
+                    <!-- Reset Button -->
+                    <n-button @click="handleReset" tertiary>
+                        <template #icon>
+                            <n-icon :component="RefreshRound" />
+                        </template>
+                        {{ t('common.reset') }}
+                    </n-button>
+                </n-space>
+            </div>
+        </div>
 
         <!-- Data Table -->
         <n-card>
