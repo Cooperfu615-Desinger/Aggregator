@@ -88,7 +88,7 @@ const themeOverrides: GlobalThemeOverrides = {
       </n-layout-sider>
 
       <!-- Mobile Drawer -->
-      <n-drawer v-model:show="showMobileMenu" :width="240" placement="left" style="background-color: #18181c;">
+      <n-drawer v-model:show="showMobileMenu" :width="240" placement="left" class="bg-[#18181c]">
           <n-drawer-content body-content-style="padding: 0;">
               <div class="h-16 flex items-center justify-center border-b border-[#333] bg-[#18181c]">
                   <span class="text-xl font-bold text-white tracking-widest">{{ t('layout.merchantPortal') }}</span>
@@ -137,7 +137,7 @@ const themeOverrides: GlobalThemeOverrides = {
            </div>
         </n-layout-header>
         
-        <n-layout-content content-style="padding: 24px; min-height: 85vh; background: #101014;">
+        <n-layout-content class="bg-[#101014] p-6 min-h-[85vh]">
            <router-view v-slot="{ Component }">
               <transition name="fade" mode="out-in">
                 <component :is="Component" />

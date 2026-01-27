@@ -31,6 +31,7 @@ const generateInitialInvoices = () => {
                 commission_rate: rate,
                 amount_due: Number(commission.toFixed(2)),
                 status: Math.random() > 0.3 ? 'paid' : 'pending',
+                payment_proof: Math.random() > 0.3 ? 'https://fakerapi.it/img/attachments/1.png' : undefined,
                 created_at: new Date(month + '-05').toISOString(),
                 paid_at: Math.random() > 0.3 ? new Date(month + '-10').toISOString() : undefined,
                 paid_by: Math.random() > 0.3 ? 'admin_sys' : undefined,

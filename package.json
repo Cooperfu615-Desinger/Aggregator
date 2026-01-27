@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "@faker-js/faker": "^10.2.0",
+    "@types/big.js": "^6.2.2",
     "@types/nprogress": "^0.2.3",
     "@vicons/material": "^0.13.0",
     "@vicons/utils": "^0.1.4",
     "@vueuse/core": "^14.1.0",
+    "big.js": "^7.0.1",
+    "date-fns": "^4.1.0",
     "echarts": "^6.0.0",
     "msw": "^2.12.7",
     "naive-ui": "^2.43.2",

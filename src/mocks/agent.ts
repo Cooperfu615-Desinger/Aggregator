@@ -236,7 +236,7 @@ export const agentHandlers = [
     }),
 
     // Bet Query (Sanitized - No Provider)
-    http.post('/api/v2/agent/report/bet-query', async ({ request }) => {
+    http.post('/api/v2/merchant/reports/bet-logs', async ({ request }) => {
         await delay(700)
         const body = await request.json() as any
         const count = body.pageSize || 15
@@ -248,7 +248,7 @@ export const agentHandlers = [
 
             return {
                 id: 'R-' + faker.string.alphanumeric(12).toUpperCase(),
-                time: faker.date.recent().toISOString(),
+                created_at: faker.date.recent().toISOString(),
                 player_id: 'user_' + faker.string.numeric(4),
                 game_name: faker.helpers.arrayElement(['Mahjong Ways', 'Super Ace', 'Crazy Time', 'Baccarat']),
                 bet: bet,

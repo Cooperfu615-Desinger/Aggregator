@@ -4,6 +4,7 @@ import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
 // Configure NProgress
+// Configure NProgress
 NProgress.configure({ showSpinner: false })
 
 /**
@@ -38,83 +39,83 @@ const routes: RouteRecordRaw[] = [
                 path: 'dashboard',
                 name: 'admin-dashboard',
                 component: () => import('../views/Master/Dashboard/Overview.vue'),
-                meta: { title: '戰情中心', roles: ['admin'] }
+                meta: { title: 'menu.dashboard', roles: ['admin'] } // i18n key
             },
             // Downstream Management (下游管理)
             {
                 path: 'merchant/list',
                 name: 'merchant-list',
                 component: () => import('../views/Master/Merchant/List.vue'),
-                meta: { title: '運營商列表', roles: ['admin'] }
+                meta: { title: 'menu.merchantList', roles: ['admin'] }
             },
             {
                 path: 'merchant/create',
                 name: 'merchant-create',
                 component: () => import('../views/Master/Merchant/Create.vue'),
-                meta: { title: '新增運營商', roles: ['admin'] }
+                meta: { title: 'menu.createMerchant', roles: ['admin'] }
             },
             // Upstream Management (上游管理)
             {
                 path: 'game-center/providers',
                 name: 'provider-list',
                 component: () => import('../views/Master/GameCenter/ProviderList.vue'),
-                meta: { title: '供應商列表', roles: ['admin'] }
+                meta: { title: 'menu.providerList', roles: ['admin'] }
             },
             {
                 path: 'game-center/list',
                 name: 'game-center',
                 component: () => import('../views/Master/GameCenter/GameList.vue'),
-                meta: { title: '遊戲庫存', roles: ['admin'] }
+                meta: { title: 'menu.gameList', roles: ['admin'] }
             },
             // Finance & Settlement (財務與清算)
             {
                 path: 'data-center/bet-log',
                 name: 'BetLog',
                 component: () => import('../views/Master/DataCenter/BetLog.vue'),
-                meta: { title: '投注明細', roles: ['admin'] }
+                meta: { title: 'menu.betLog', roles: ['admin'] }
             },
             {
                 path: 'data-center/report',
                 name: 'FinancialReport',
                 component: () => import('../views/Master/DataCenter/Report.vue'),
-                meta: { title: '平台損益表', roles: ['admin'] }
+                meta: { title: 'menu.financialReport', roles: ['admin'] }
             },
             {
                 path: 'finance/invoices',
                 name: 'InvoiceManager',
                 component: () => import('../views/Master/Finance/InvoiceManager.vue'),
-                meta: { title: '對帳單管理', roles: ['admin'] }
+                meta: { title: 'menu.invoiceManager', roles: ['admin'] }
             },
             {
                 path: 'finance/funds',
                 name: 'FundManagement',
                 component: () => import('../views/Master/Finance/FundManagement.vue'),
-                meta: { title: '資金管理', roles: ['admin'] }
+                meta: { title: 'menu.fundManagement', roles: ['admin'] }
             },
             // Risk & System (風控與系統)
             {
                 path: 'system/staff',
                 name: 'StaffList',
                 component: () => import('../views/Master/System/StaffList.vue'),
-                meta: { title: '員工權限', roles: ['admin'] }
+                meta: { title: 'menu.staffList', roles: ['admin'] }
             },
             {
                 path: 'system/job-levels',
                 name: 'JobLevelList',
                 component: () => import('../views/Master/System/JobLevelList.vue'),
-                meta: { title: '職等管理', roles: ['admin'] }
+                meta: { title: 'menu.jobLevels', roles: ['admin'] }
             },
             {
                 path: 'system/audit-logs',
                 name: 'AuditLogs',
                 component: () => import('../views/Master/System/AuditLogs.vue'),
-                meta: { title: '操作日誌', roles: ['admin'] }
+                meta: { title: 'menu.auditLogs', roles: ['admin'] }
             },
             {
                 path: 'system/settings',
                 name: 'SystemSettings',
                 component: () => import('../views/Master/System/Settings.vue'),
-                meta: { title: '系統設定', roles: ['admin'] }
+                meta: { title: 'menu.systemSettings', roles: ['admin'] }
             }
         ]
     },
@@ -131,33 +132,33 @@ const routes: RouteRecordRaw[] = [
                 path: 'dashboard',
                 name: 'merchant-dashboard',
                 component: () => import('../views/Merchant/Dashboard/Index.vue'),
-                meta: { title: '商戶儀表板', roles: ['agent', 'merchant'] }
+                meta: { title: 'merchant.dashboard.title', roles: ['agent', 'merchant'] }
             },
             // Game Management (遊戲管理)
             {
                 path: 'games',
                 name: 'merchant-games',
                 component: () => import('../views/Merchant/Game/MyGames.vue'),
-                meta: { title: '我的遊戲', roles: ['agent', 'merchant'] }
+                meta: { title: 'merchant.games.title', roles: ['agent', 'merchant'] }
             },
             // Report Center (報表中心)
             {
                 path: 'reports/daily',
                 name: 'DailyReport',
                 component: () => import('../views/Merchant/Reports/RevenueReport.vue'),
-                meta: { title: '營收報表', roles: ['agent', 'merchant'] }
+                meta: { title: 'merchant.reports.daily', roles: ['agent', 'merchant'] }
             },
             {
                 path: 'reports/win-loss',
                 name: 'WinLossReport',
                 component: () => import('../views/Merchant/Reports/WinLoss.vue'),
-                meta: { title: '營收日報', roles: ['agent', 'merchant'] }
+                meta: { title: 'merchant.reports.winLoss', roles: ['agent', 'merchant'] }
             },
             {
                 path: 'reports/bet-query',
                 name: 'merchant-bet-query',
                 component: () => import('../views/Merchant/Reports/BetQuery.vue'),
-                meta: { title: '投注明細', roles: ['agent', 'merchant'] }
+                meta: { title: 'merchant.reports.betQuery', roles: ['agent', 'merchant'] }
             },
             {
                 path: 'finance/invoices',
@@ -184,14 +185,14 @@ const routes: RouteRecordRaw[] = [
                 path: 'organization/sub-list',
                 name: 'sub-agent-list',
                 component: () => import('../views/Merchant/Organization/SubAgentList.vue'),
-                meta: { title: '下級代理', roles: ['agent', 'merchant'] }
+                meta: { title: 'merchant.org.subAgents', roles: ['agent', 'merchant'] }
             },
             // Developer (開發者)
             {
                 path: 'developer',
                 name: 'DeveloperCenter',
                 component: () => import('../views/Merchant/Developer/Index.vue'),
-                meta: { title: '介接資訊', roles: ['agent', 'merchant'] }
+                meta: { title: 'merchant.developer.title', roles: ['agent', 'merchant'] }
             }
         ]
     },
@@ -201,7 +202,7 @@ const routes: RouteRecordRaw[] = [
         path: '/login',
         name: 'login',
         component: () => import('../views/Auth/index.vue'),
-        meta: { title: '登入' }
+        meta: { title: 'common.login' }
     },
 
     // ================== FALLBACK ==================
@@ -210,7 +211,7 @@ const routes: RouteRecordRaw[] = [
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
         component: () => import('../views/Error/404.vue'),
-        meta: { title: '404' }
+        meta: { title: 'common.404' }
     }
 ]
 

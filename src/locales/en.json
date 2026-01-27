@@ -524,7 +524,8 @@
         "confirmMarkPaid": "Are you sure to mark invoice {id} as paid?",
         "detail": "View Detail",
         "paidAt": "Paid At",
-        "paidBy": "Operator"
+        "paidBy": "Operator",
+        "attachment": "Attachment"
     },
     "invoices": {
         "myInvoices": "My Invoices",

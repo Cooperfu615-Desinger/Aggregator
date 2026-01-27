@@ -123,7 +123,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         key: 'round_id',
         width: 160,
         fixed: 'left',
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.round_id.localeCompare(rowB.round_id),
         render: (row) => h('span', {
             class: 'font-mono text-xs cursor-pointer hover:text-primary',
             onClick: (e: Event) => {
@@ -136,7 +136,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         title: t('betLog.time'),
         key: 'created_at',
         width: 140,
-        sorter: 'default',
+        sorter: (rowA, rowB) => new Date(rowA.created_at).getTime() - new Date(rowB.created_at).getTime(),
         render: (row) => {
             const date = new Date(row.created_at)
             return h('div', { class: 'text-xs' }, [
@@ -149,7 +149,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         title: t('betLog.merchantId'),
         key: 'merchant_display_id',
         width: 110,
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.merchant_display_id.localeCompare(rowB.merchant_display_id),
         render: (row) => h(NTag, { size: 'small', bordered: false, type: 'info' }, {
             default: () => row.merchant_display_id
         })
@@ -158,14 +158,14 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         title: t('betLog.merchantName'),
         key: 'merchant_name',
         width: 140,
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.merchant_name.localeCompare(rowB.merchant_name),
         render: (row) => h('span', { class: 'font-medium' }, row.merchant_name)
     },
     {
         title: t('betLog.provider'),
         key: 'provider_name',
         width: 130,
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.provider_name.localeCompare(rowB.provider_name),
         render: (row) => {
             const typeMap: Record<string, any> = {
                 'PG Soft': 'error',
@@ -182,21 +182,21 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         title: t('betLog.game'),
         key: 'game_name',
         width: 150,
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.game_name.localeCompare(rowB.game_name),
         ellipsis: true
     },
     {
         title: t('betLog.aggPlayer'),
         key: 'agg_player_id',
         width: 120,
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.agg_player_id.localeCompare(rowB.agg_player_id),
         render: (row) => h('span', { class: 'font-mono text-xs text-cyan-400' }, row.agg_player_id)
     },
     {
         title: t('betLog.merchantPlayer'),
         key: 'merchant_member_id',
         width: 140,
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.merchant_member_id.localeCompare(rowB.merchant_member_id),
         render: (row) => h('span', { class: 'font-mono text-xs text-purple-400' }, row.merchant_member_id)
     },
     {
@@ -204,7 +204,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         key: 'bet_amount',
         width: 110,
         align: 'right',
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.bet_amount - rowB.bet_amount,
         render: (row) => h(MoneyText, { value: row.bet_amount, currency: row.currency, color: 'text-white' })
     },
     {
@@ -212,7 +212,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         key: 'net_win',
         width: 120,
         align: 'right',
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.net_win - rowB.net_win,
         render: (row) => {
             const value = row.net_win
             const color = value > 0 ? 'text-green-500' : value < 0 ? 'text-red-500' : 'text-gray-600'
@@ -227,7 +227,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         title: t('betLog.status'),
         key: 'status',
         width: 100,
-        sorter: 'default',
+        sorter: (rowA, rowB) => rowA.status.localeCompare(rowB.status),
         render: (row) => {
             const statusMap: Record<string, { type: 'success' | 'warning' | 'default', label: string }> = {
                 settled: { type: 'success', label: t('betLog.statusSettled') },

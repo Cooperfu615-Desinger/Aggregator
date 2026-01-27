@@ -8,6 +8,7 @@ import { useI18n } from 'vue-i18n'
 import type { DataTableColumns } from 'naive-ui'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 import { renderHeaderWithTooltip } from '../../../utils/renderHelpers'
+import { math } from '../../../utils/math'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -52,7 +53,8 @@ const requestReason = ref('')
 // Computed: USDT conversion for top-up
 const topUpUsdtHint = computed(() => {
     if (!topUpAmount.value || topUpAmount.value <= 0) return ''
-    const usdt = (topUpAmount.value / wallet.value.exchange_rate).toFixed(2)
+    // QA Fix: Use math.div for precision instead of /
+    const usdt = math.div(topUpAmount.value, wallet.value.exchange_rate).toFixed(2)
     return t('invoices.payAmountHint', { amount: usdt })
 })
 
@@ -65,13 +67,15 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
         key: 'id',
         width: 150,
         align: 'right',
+        sorter: (rowA, rowB) => rowA.id.localeCompare(rowB.id),
         render: (row) => h('span', { class: 'font-mono text-sm' }, row.id)
     },
     {
         title: t('invoices.period'),
         key: 'period',
         width: 120,
-        align: 'right'
+        align: 'right',
+        sorter: (rowA, rowB) => rowA.period.localeCompare(rowB.period)
     },
     {
         title: () => renderHeaderWithTooltip(
@@ -82,6 +86,7 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
         key: 'amount_due',
         width: 150,
         align: 'right',
+        sorter: (rowA, rowB) => (rowA.amount_due || 0) - (rowB.amount_due || 0),
         render: (row) => {
             if (row.amount_due === null || row.amount_due === undefined) {
                 return h('span', { class: 'text-gray-500' }, '-')
@@ -97,6 +102,7 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
         key: 'status',
         width: 120,
         align: 'right',
+        sorter: (rowA, rowB) => rowA.status.localeCompare(rowB.status),
         render: (row) => {
             // 判斷驗證狀態
             if (row.verification_status === 'verifying') {
@@ -341,7 +347,7 @@ onMounted(() => {
         <n-modal v-model:show="showTopUpModal" preset="card" :title="t('invoices.topUp')" class="w-[400px]">
             <n-form>
                 <n-form-item :label="t('invoices.topUpAmount') + ' (' + wallet.currency + ')'">
-                    <n-input-number v-model:value="topUpAmount" :min="1" :placeholder="wallet.currency" style="width: 100%;" />
+                    <n-input-number v-model:value="topUpAmount" :min="1" :placeholder="wallet.currency" class="w-full" />
                 </n-form-item>
                 <div v-if="topUpUsdtHint" class="text-sm text-gray-500 mb-4">{{ topUpUsdtHint }}</div>
                 <n-form-item :label="t('invoices.paymentAddress')">
@@ -387,7 +393,7 @@ onMounted(() => {
         <n-modal v-model:show="showCreditRequestModal" preset="card" :title="t('invoices.requestLimit')" class="w-[450px]">
             <n-form>
                 <n-form-item :label="t('invoices.desiredLimit') + ' (' + wallet.currency + ')'">
-                    <n-input-number v-model:value="desiredLimit" :min="1" style="width: 100%;" />
+                    <n-input-number v-model:value="desiredLimit" :min="1" class="w-full" />
                 </n-form-item>
                 <n-form-item :label="t('invoices.reason')">
                     <n-input v-model:value="requestReason" type="textarea" :placeholder="t('invoices.creditReasonPlaceholder')" />

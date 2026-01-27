@@ -4,7 +4,7 @@ import {
     NCard, NButton, NDataTable, NModal, NDatePicker, 
     NSpace, NStatistic, NDrawer, NDrawerContent, NList, NListItem,
     useMessage, type DataTableColumns, NTooltip, NIcon,
-    NInput, NSelect, NTag, NPopconfirm
+    NInput, NSelect, NTag, NPopconfirm, NImage
 } from 'naive-ui'
 import { DescriptionOutlined, CheckCircleOutlined, SearchOutlined } from '@vicons/material'
 import { useI18n } from 'vue-i18n'
@@ -109,6 +109,17 @@ const columns = computed<DataTableColumns<Invoice>>(() => [
         render: (row) => h('span', { class: 'font-bold' }, [
             h(MoneyText, { value: row.amount_due, currency: 'USD' })
         ])
+    },
+    {
+        title: t('finance.attachment'),
+        key: 'payment_proof',
+        width: 100,
+        align: 'center',
+        render: (row) => row.payment_proof ? h(NImage, {
+            width: 48,
+            src: row.payment_proof,
+            class: 'rounded shadow-sm'
+        }) : h('span', { class: 'text-gray-500' }, '-')
     },
     { 
         title: t('finance.status'), 
@@ -383,6 +394,18 @@ onMounted(() => {
                             </div>
                         </div>
                     </n-card>
+
+                    <!-- Payment Proof -->
+                    <div v-if="selectedInvoice.payment_proof">
+                        <h3 class="font-bold mb-3">{{ t('finance.attachment') }}</h3>
+                        <div class="bg-slate-800/30 p-2 rounded border border-slate-700 flex justify-center">
+                            <n-image 
+                                :src="selectedInvoice.payment_proof" 
+                                class="max-w-full rounded"
+                                width="300"
+                            />
+                        </div>
+                    </div>
 
                     <!-- Breakdown -->
                     <div>

@@ -7,6 +7,7 @@ export interface Invoice {
     commission_rate: number
     amount_due: number
     status: 'pending' | 'paid' | 'verifying'
+    payment_proof?: string
     created_at: string
     paid_at?: string
     paid_by?: string

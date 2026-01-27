@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, h, reactive, onMounted, computed, watch } from 'vue'
+import { ref, h, onMounted, computed, watch } from 'vue'
 import {
   NCard, NDatePicker, NButton, NRadioGroup, NRadioButton,
   NDataTable, useMessage, NTag
@@ -12,6 +12,8 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart, BarChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent, DataZoomComponent } from 'echarts/components'
 import type { FinancialReportItem } from '../../../types/report'
+import { useSessionStorage } from '@vueuse/core'
+import { format } from 'date-fns'
 
 // Register ECharts modules
 use([CanvasRenderer, LineChart, BarChart, GridComponent, TooltipComponent, LegendComponent, DataZoomComponent])
@@ -21,7 +23,8 @@ const { t } = useI18n()
 const loading = ref(false)
 const reportData = ref<FinancialReportItem[]>([])
 
-const filter = reactive({
+// QA Fix: State Persistence
+const filter = useSessionStorage('master-financial-report-filter', {
     timeRange: [Date.now() - 30 * 24 * 3600 * 1000, Date.now()] as [number, number],
     groupBy: 'date' as 'date' | 'agent'
 })
@@ -30,11 +33,21 @@ const filter = reactive({
 const fetchData = async () => {
     loading.value = true
     try {
+        // QA Fix: Format dates
+        let startTime = undefined
+        let endTime = undefined
+        if (filter.value.timeRange) {
+            startTime = format(filter.value.timeRange[0], 'yyyy-MM-dd')
+            endTime = format(filter.value.timeRange[1], 'yyyy-MM-dd')
+        }
+
         const res = await fetch('/api/v2/report/financial', {
             method: 'POST',
             body: JSON.stringify({
-                timeRange: filter.timeRange,
-                groupBy: filter.groupBy
+                timeRange: filter.value.timeRange, // Keep for backward compat if needed, or remove
+                startTime,
+                endTime,
+                groupBy: filter.value.groupBy
             })
         })
         const data = await res.json()
@@ -48,8 +61,7 @@ const fetchData = async () => {
     }
 }
 
-// Watch filters
-watch(() => filter.groupBy, () => {
+        watch(() => filter.value.groupBy, () => {
     fetchData()
 })
 
@@ -79,7 +91,7 @@ const chartOption = computed(() => {
             type: 'category',
             data: reportData.value.map(i => i.key),
             axisLabel: {
-                rotate: filter.groupBy === 'agent' ? 45 : 0
+                rotate: filter.value.groupBy === 'agent' ? 45 : 0
             }
         },
         yAxis: [
@@ -121,7 +133,7 @@ const chartOption = computed(() => {
 // Columns
 const columns = computed<DataTableColumns<FinancialReportItem>>(() => [
     { 
-        title: (_: any) => filter.groupBy === 'date' ? t('report.date') : t('report.agentName'), 
+        title: (_: any) => filter.value.groupBy === 'date' ? t('report.date') : t('report.agentName'), 
         key: 'key',
         sorter: (a, b) => a.key.localeCompare(b.key)
     },

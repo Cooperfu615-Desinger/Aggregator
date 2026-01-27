@@ -7,12 +7,14 @@ import DateRangePicker from '../../../components/Common/DateRangePicker.vue'
 import MoneyText from '../../../components/Common/MoneyText.vue'
 import JsonViewer from '../../../components/Common/JsonViewer.vue'
 import { useI18n } from 'vue-i18n'
+import { useSessionStorage } from '@vueuse/core'
+import { format } from 'date-fns'
 
 const { t } = useI18n()
 
 interface BetLog {
     id: string
-    time: string
+    created_at: string
     player_id: string
     game_name: string
     bet: number
@@ -24,25 +26,30 @@ interface BetLog {
 
 const loading = ref(false)
 const list = ref<BetLog[]>([])
-const dateRange = ref<[number, number] | null>(null)
-const playerId = ref('')
-const roundId = ref('')
+
+// QA Fix: State Persistence using SessionStorage
+const dateRange = useSessionStorage<[number, number] | null>('betQuery-dateRange', null)
+const playerId = useSessionStorage('betQuery-playerId', '')
+const roundId = useSessionStorage('betQuery-roundId', '')
+
 const showDetail = ref(false)
 const selectedLog = ref<BetLog | null>(null)
 
 const columns = computed<DataTableColumns<BetLog>>(() => [
     { 
         title: t('betQuery.time'), 
-        key: 'time',
+        key: 'created_at',
         width: 160,
         align: 'right',
-        render: (row) => h('span', { class: 'text-sm' }, new Date(row.time).toLocaleString())
+        sorter: (rowA, rowB) => new Date(rowA.created_at).getTime() - new Date(rowB.created_at).getTime(),
+        render: (row) => h('span', { class: 'text-sm' }, new Date(row.created_at).toLocaleString())
     },
     { 
         title: t('betQuery.roundId'), 
         key: 'id',
         width: 140,
         align: 'right',
+        sorter: (rowA, rowB) => rowA.id.localeCompare(rowB.id),
         render: (row) => h('span', { class: 'font-mono text-xs' }, row.id)
     },
     { 
@@ -50,6 +57,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         key: 'player_id',
         width: 120,
         align: 'right',
+        sorter: (rowA, rowB) => rowA.player_id.localeCompare(rowB.player_id),
         render: (row) => h('span', { class: 'font-mono' }, row.player_id)
     },
     { 
@@ -57,6 +65,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         key: 'game_name',
         width: 150,
         align: 'right',
+        sorter: (rowA, rowB) => rowA.game_name.localeCompare(rowB.game_name),
         ellipsis: { tooltip: true }
     },
     { 
@@ -64,6 +73,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         key: 'bet',
         width: 120,
         align: 'right',
+        sorter: (rowA, rowB) => rowA.bet - rowB.bet,
         render: (row) => h(MoneyText, { value: row.bet, currency: row.currency })
     },
     { 
@@ -71,6 +81,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         key: 'win',
         width: 120,
         align: 'right',
+        sorter: (rowA, rowB) => rowA.win - rowB.win,
         render: (row) => h(MoneyText, { value: row.win, currency: row.currency })
     },
     {
@@ -78,6 +89,7 @@ const columns = computed<DataTableColumns<BetLog>>(() => [
         key: 'status',
         width: 90,
         align: 'right',
+        sorter: (rowA, rowB) => rowA.status.localeCompare(rowB.status),
         render: (row) => {
             const typeMap: Record<string, any> = {
                 win: 'success', loss: 'error', refund: 'warning'
@@ -114,12 +126,21 @@ const handleReset = () => {
 const fetchData = async () => {
     loading.value = true
     try {
-        const res = await fetch('/api/v2/agent/report/bet-query', {
+        let startStr = undefined
+        let endStr = undefined
+        
+        // QA Fix: Use date-fns for timezone consistency
+        if (dateRange.value) {
+            startStr = format(dateRange.value[0], 'yyyy-MM-dd')
+            endStr = format(dateRange.value[1], 'yyyy-MM-dd')
+        }
+
+        const res = await fetch('/api/v2/merchant/reports/bet-logs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                date_start: dateRange.value?.[0],
-                date_end: dateRange.value?.[1],
+                date_start: startStr,
+                date_end: endStr,
                 player_id: playerId.value || undefined,
                 round_id: roundId.value || undefined
             })

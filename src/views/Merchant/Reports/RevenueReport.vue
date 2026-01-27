@@ -8,6 +8,8 @@ import { useI18n } from 'vue-i18n'
 import TransactionDetailDrawer from './components/TransactionDetailDrawer.vue'
 import type { RevenueReportRow } from '../../../types/table'
 import { exportToCSV } from '../../../utils/csvExport'
+import { format } from 'date-fns'
+import { math } from '../../../utils/math'
 
 const { t } = useI18n()
 const message = useMessage()
@@ -41,8 +43,9 @@ const fetchData = async () => {
     loading.value = true
     try {
         const [start, end] = dateRange.value
-        const startDate = new Date(start).toISOString().split('T')[0]
-        const endDate = new Date(end).toISOString().split('T')[0]
+        // QA Fix: Use local date formatting to prevent timezone shift (e.g. UTC+8 -> UTC-1 day)
+        const startDate = format(start, 'yyyy-MM-dd')
+        const endDate = format(end, 'yyyy-MM-dd')
 
         const res = await fetch(`/api/v2/merchant/reports/daily?startDate=${startDate}&endDate=${endDate}`)
         const data = await res.json()
@@ -66,7 +69,7 @@ const handleViewDetails = (date: string) => {
 const exportLoading = ref(false)
 
 const handleExportSummary = () => {
-    const filename = `Revenue_Summary_${new Date().toISOString().split('T')[0]}`
+    const filename = `Revenue_Summary_${format(new Date(), 'yyyy-MM-dd')}`
     const headers = {
         date: t('merchantReports.dailySummary'),
         active_players: t('merchantReports.activePlayers'),
@@ -76,8 +79,6 @@ const handleExportSummary = () => {
         net_win: t('merchantReports.netWin')
     }
     
-    // Flatten or filter to only primary date rows if needed, or just export current items
-    // Current items includes children, for CSV we might want to flatten or only take top level
     const exportData = items.value.map(row => ({
         date: row.children ? row.date : `  - ${t(`merchantReports.${row.date}`)}`,
         active_players: row.active_players,
@@ -95,8 +96,9 @@ const handleExportDetails = async () => {
     exportLoading.value = true
     try {
         const [start, end] = dateRange.value
-        const startDate = new Date(start).toISOString().split('T')[0]
-        const endDate = new Date(end).toISOString().split('T')[0]
+        // QA Fix: Use local date formatting
+        const startDate = format(start, 'yyyy-MM-dd')
+        const endDate = format(end, 'yyyy-MM-dd')
         
         // Fetch all transactions for the date range (simulated via API)
         const res = await fetch(`/api/v2/merchant/reports/transactions?startDate=${startDate}&endDate=${endDate}&all=true`)
@@ -134,6 +136,10 @@ const columns: DataTableColumns<DailyReportItem> = [
         key: 'date',
         width: 180,
         align: 'right',
+        sorter: (rowA, rowB) => {
+            if (rowA.children && rowB.children) return new Date(rowA.date).getTime() - new Date(rowB.date).getTime()
+            return 0
+        },
         render: (row) => {
             if (row.children) {
                 return row.date 
@@ -146,30 +152,35 @@ const columns: DataTableColumns<DailyReportItem> = [
         title: t('merchantReports.activePlayers'),
         key: 'active_players',
         align: 'right',
+        sorter: (rowA, rowB) => rowA.active_players - rowB.active_players,
         render: (row) => row.active_players.toLocaleString()
     },
     {
         title: t('merchantReports.txCount'),
         key: 'tx_count',
         align: 'right',
+        sorter: (rowA, rowB) => rowA.tx_count - rowB.tx_count,
         render: (row) => row.children ? row.tx_count.toLocaleString() : '-'
     },
     {
         title: t('merchantReports.totalBet'),
         key: 'total_bet',
         align: 'right',
+        sorter: (rowA, rowB) => rowA.total_bet - rowB.total_bet,
         render: (row) => row.total_bet.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     },
     {
         title: t('merchantReports.totalPayout'),
         key: 'total_payout',
         align: 'right',
+        sorter: (rowA, rowB) => rowA.total_payout - rowB.total_payout,
         render: (row) => row.total_payout.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     },
     {
         title: t('merchantReports.netWin'),
         key: 'net_win',
         align: 'right',
+        sorter: (rowA, rowB) => rowA.net_win - rowB.net_win,
         render: (row) => {
             const val = row.net_win
             const formatted = val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -233,7 +244,7 @@ onMounted(fetchData)
 
         <!-- Summary Cards -->
         <n-card :title="t('merchantReports.summaryTitle')" size="small">
-            <n-grid :cols="5" gap="12">
+            <n-grid :cols="6" gap="12">
                 <n-grid-item>
                     <n-statistic :label="t('merchantReports.activePlayers')">
                         {{ summary.active_players.toLocaleString() }}
@@ -261,6 +272,11 @@ onMounted(fetchData)
                                 {{ summary.net_win > 0 ? '+' : '' }}{{ summary.net_win.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                             </span>
                         </template>
+                    </n-statistic>
+                </n-grid-item>
+                <n-grid-item>
+                    <n-statistic label="RTP">
+                        {{ math.toPercent(math.div(summary.total_payout, summary.total_bet)) }}%
                     </n-statistic>
                 </n-grid-item>
             </n-grid>

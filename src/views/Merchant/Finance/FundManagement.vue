@@ -134,6 +134,11 @@ const statusMap: Record<string, TagType> = {
     'rejected': 'error'
 }
 
+const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    return date.toLocaleString()
+}
+
 // Columns
 const columns: DataTableColumns<FundManagementRow> = [
     {
@@ -141,13 +146,16 @@ const columns: DataTableColumns<FundManagementRow> = [
         key: 'created_at',
         width: 200,
         align: 'center',
-        render: (row: FundManagementRow) => h('span', { class: 'text-xs' }, new Date(row.created_at).toLocaleString())
+        sorter: (rowA, rowB) => new Date(rowA.created_at).getTime() - new Date(rowB.created_at).getTime(),
+        render: (row: FundManagementRow) => h('span', { class: 'text-xs' }, formatDate(row.created_at))
     },
     {
         title: t('merchant.fundRecord.type'),
         key: 'type',
         width: 120,
         align: 'center',
+        // Type is categorical, sorting by string value or specific order is possible, string sort is basic
+        sorter: (rowA, rowB) => rowA.type.localeCompare(rowB.type),
         render: (row: FundManagementRow) => h(NTag, { type: typeMap[row.type] || 'default', bordered: false, size: 'small' }, 
             { default: () => {
                 const map: Record<string, string> = { 'top-up': 'topUp', 'credit-limit': 'credit', 'manual-adjust': 'manual' }
@@ -160,13 +168,15 @@ const columns: DataTableColumns<FundManagementRow> = [
         key: 'amount',
         width: 150,
         align: 'right',
-        render: (row: FundManagementRow) => h('span', { class: 'font-mono' }, row.amount.toLocaleString())
+        sorter: (rowA, rowB) => rowA.amount - rowB.amount,
+        render: (row: FundManagementRow) => h('span', { class: 'font-mono' }, row.amount.toLocaleString(undefined, { minimumFractionDigits: 2 }))
     },
     {
         title: t('merchant.fundRecord.status'),
         key: 'status',
         width: 100,
         align: 'center',
+        sorter: (rowA, rowB) => rowA.status.localeCompare(rowB.status),
         render: (row: FundManagementRow) => h(NTag, { type: statusMap[row.status] || 'default', size: 'small' },
             { default: () => t(`merchant.fundRecord.statusLabel.${row.status}`) }
         )
