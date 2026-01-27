@@ -92,11 +92,11 @@
         "myGames": "我的遊戲",
         "reportCenter": "報表中心",
         "dailyRevenue": "營收報表",
-        "financeCenter": "財務中心",
+        "financeCenter": "我的帳單",
         "myInvoices": "我的帳單",
         "orgManagement": "組織管理",
         "subAgent": "下級代理",
-        "developer": "開發者",
+        "developer": "介接資訊",
         "integrationInfo": "介接資訊"
     },
     "layout": {
@@ -139,7 +139,7 @@
         "todaysGGR": "今日盈虧",
         "activePlayers": "活躍玩家",
         "winLossReport": "輸贏報表",
-        "developerCenter": "開發者中心",
+        "developerCenter": "介接資訊",
         "apiCredentials": "API 憑證",
         "ipWhitelist": "IP 白名單",
         "merchantCode": "商戶代碼",
@@ -288,7 +288,7 @@
         "selectedCount": "已選擇 {count} 項"
     },
     "developerCenter": {
-        "title": "開發者中心",
+        "title": "介接資訊",
         "apiCredentials": "🔑 API 憑證",
         "merchantCode": "商戶代碼",
         "secretKey": "通訊密鑰",
@@ -432,7 +432,7 @@
     },
     "invoices": {
         "myInvoices": "我的帳單",
-        "financeCenter": "財務中心",
+        "financeCenter": "我的帳單",
         "invoiceNo": "帳單編號",
         "period": "週期",
         "billingPeriod": "帳單週期",
@@ -689,7 +689,7 @@
         "perm": {
             "dashboard": "儀表板",
             "merchant": "商戶管理",
-            "finance": "財務中心",
+            "finance": "我的帳單",
             "reports": "報表中心",
             "reports_daily": "營收日報",
             "reports_bet": "投注明細",
@@ -748,7 +748,7 @@
         "loadFailed": "載入遊戲失敗"
     },
     "betQuery": {
-        "title": "注單查詢",
+        "title": "投注明細",
         "time": "時間",
         "roundId": "局號",
         "player": "玩家",

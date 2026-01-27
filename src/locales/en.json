@@ -92,11 +92,11 @@
         "myGames": "My Games",
         "reportCenter": "Report Center",
         "dailyRevenue": "Daily Revenue",
-        "financeCenter": "Finance Center",
+        "financeCenter": "My Invoices",
         "myInvoices": "My Invoices",
         "orgManagement": "Organization",
         "subAgent": "Sub-Agent",
-        "developer": "Developer",
+        "developer": "Integration Info",
         "integrationInfo": "Integration Info"
     },
     "layout": {
@@ -282,7 +282,7 @@
         "disabledByPlatform": "This game is disabled by platform admin"
     },
     "developerCenter": {
-        "title": "Developer Center",
+        "title": "Integration Info",
         "apiCredentials": "🔑 API Credentials",
         "merchantCode": "Merchant Code",
         "secretKey": "Secret Key",
@@ -502,7 +502,7 @@
     },
     "invoices": {
         "myInvoices": "My Invoices",
-        "financeCenter": "Finance Center",
+        "financeCenter": "My Invoices",
         "invoiceNo": "Invoice No.",
         "period": "Period",
         "billingPeriod": "Billing Period",
@@ -581,7 +581,7 @@
         "perm": {
             "dashboard": "Dashboard",
             "merchant": "Merchant",
-            "finance": "Finance",
+            "finance": "My Invoices",
             "reports": "Reports",
             "reports_daily": "Daily Report",
             "reports_bet": "Bet Details",
@@ -636,7 +636,7 @@
         "createPending": "Add sub-agent feature pending"
     },
     "betQuery": {
-        "title": "Bet Query",
+        "title": "Bet Details",
         "time": "Time",
         "roundId": "Round ID",
         "player": "Player",

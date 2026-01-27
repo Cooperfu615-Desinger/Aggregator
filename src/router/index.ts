@@ -71,7 +71,7 @@ const routes: RouteRecordRaw[] = [
                 path: 'data-center/bet-log',
                 name: 'BetLog',
                 component: () => import('../views/Master/DataCenter/BetLog.vue'),
-                meta: { title: '注單查詢', roles: ['admin'] }
+                meta: { title: '投注明細', roles: ['admin'] }
             },
             {
                 path: 'data-center/report',
@@ -157,7 +157,7 @@ const routes: RouteRecordRaw[] = [
                 path: 'reports/bet-query',
                 name: 'merchant-bet-query',
                 component: () => import('../views/Merchant/Reports/BetQuery.vue'),
-                meta: { title: '注單查詢', roles: ['agent', 'merchant'] }
+                meta: { title: '投注明細', roles: ['agent', 'merchant'] }
             },
             {
                 path: 'finance/invoices',
